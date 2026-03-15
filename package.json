@@ -32,10 +32,26 @@
     "swiper",
     "touch",
     "responsive",
-    "a11y"
+    "a11y",
+    "physics",
+    "coverflow",
+    "fade",
+    "cards",
+    "jquery-plugin",
+    "typescript",
+    "lightweight",
+    "modular"
   ],
-  "author": "",
+  "author": "hanfour",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hanfour/drift-slider.git"
+  },
+  "bugs": {
+    "url": "https://github.com/hanfour/drift-slider/issues"
+  },
+  "homepage": "https://hanfour.github.io/drift-slider/",
   "devDependencies": {
     "@rollup/plugin-terser": "^0.4.4",
     "rollup": "^4.9.0",
