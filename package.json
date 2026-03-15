@@ -30,7 +30,8 @@
     "test:coverage": "vitest run --coverage",
     "release": "release-it",
     "release:dry": "release-it --dry-run",
-    "prepublishOnly": "npm run build && npm run build:css"
+    "prepublishOnly": "npm run build && npm run build:css",
+    "optimize": "node scripts/agent-optimize.mjs"
   },
   "keywords": [
     "slider",
