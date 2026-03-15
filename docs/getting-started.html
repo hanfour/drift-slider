@@ -28,19 +28,23 @@
 <body>
   <div data-include="_includes/header.html"></div>
 
-  <div class="page-with-sidebar">
-    <!-- ═══ Sidebar ═══ -->
-    <aside class="sidebar">
-      <nav class="sidebar-nav">
-        <a href="#installation" data-nav>Installation</a>
-        <a href="#html-structure" data-nav>HTML Structure</a>
-        <a href="#css-import" data-nav>CSS Import</a>
-        <a href="#javascript-init" data-nav>JavaScript Init</a>
-        <a href="#jquery" data-nav>jQuery</a>
-        <a href="#typescript" data-nav>TypeScript</a>
-        <a href="#next-steps" data-nav>Next Steps</a>
-      </nav>
-    </aside>
+  <div class="page-body">
+    <div class="page-with-sidebar">
+
+      <!-- ═══ Sidebar ═══ -->
+      <aside class="sidebar">
+        <p class="sidebar-title" data-i18n-en>Getting Started</p>
+        <p class="sidebar-title" data-i18n-zh>快速入門</p>
+        <ul class="sidebar-nav">
+          <li><a href="#installation">Installation</a></li>
+          <li><a href="#html-structure">HTML Structure</a></li>
+          <li><a href="#css-import">CSS Import</a></li>
+          <li><a href="#javascript-init">JavaScript Init</a></li>
+          <li><a href="#jquery">jQuery</a></li>
+          <li><a href="#typescript">TypeScript</a></li>
+          <li><a href="#next-steps">Next Steps</a></li>
+        </ul>
+      </aside>
 
     <!-- ═══ Content ═══ -->
     <main class="content">
@@ -251,7 +255,8 @@ const slider = new DriftSlider('.drift-slider', options);</code></pre>
       </section>
 
     </main>
-  </div><!-- .page-with-sidebar -->
+    </div><!-- .page-with-sidebar -->
+  </div><!-- .page-body -->
 
   <div data-include="_includes/footer.html"></div>
 

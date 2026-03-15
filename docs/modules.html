@@ -26,22 +26,26 @@
 <body>
   <div data-include="_includes/header.html"></div>
 
-  <div class="page-with-sidebar">
-    <!-- ═══ Sidebar ═══ -->
-    <aside class="sidebar">
-      <nav class="sidebar-nav">
-        <a href="#overview" data-nav>Overview</a>
-        <a href="#navigation" data-nav>Navigation</a>
-        <a href="#pagination" data-nav>Pagination</a>
-        <a href="#autoplay" data-nav>Autoplay</a>
-        <a href="#effect-fade" data-nav>EffectFade</a>
-        <a href="#effect-coverflow" data-nav>EffectCoverflow</a>
-        <a href="#effect-cards" data-nav>EffectCards</a>
-        <a href="#keyboard" data-nav>Keyboard</a>
-        <a href="#a11y" data-nav>A11y</a>
-        <a href="#scroll-aos" data-nav>ScrollAos</a>
-      </nav>
-    </aside>
+  <div class="page-body">
+    <div class="page-with-sidebar">
+
+      <!-- ═══ Sidebar ═══ -->
+      <aside class="sidebar">
+        <p class="sidebar-title" data-i18n-en>Modules</p>
+        <p class="sidebar-title" data-i18n-zh>模組</p>
+        <ul class="sidebar-nav">
+          <li><a href="#overview">Overview</a></li>
+          <li><a href="#navigation">Navigation</a></li>
+          <li><a href="#pagination">Pagination</a></li>
+          <li><a href="#autoplay">Autoplay</a></li>
+          <li><a href="#effect-fade">EffectFade</a></li>
+          <li><a href="#effect-coverflow">EffectCoverflow</a></li>
+          <li><a href="#effect-cards">EffectCards</a></li>
+          <li><a href="#keyboard">Keyboard</a></li>
+          <li><a href="#a11y">A11y</a></li>
+          <li><a href="#scroll-aos">ScrollAos</a></li>
+        </ul>
+      </aside>
 
     <!-- ═══ Content ═══ -->
     <main class="content">
@@ -598,7 +602,8 @@ new DriftSlider('.slider', {
       </section>
 
     </main>
-  </div>
+    </div><!-- .page-with-sidebar -->
+  </div><!-- .page-body -->
 
   <div data-include="_includes/footer.html"></div>
 
