@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DriftSlider — Vertical Slider</title>
+  <meta name="description" content="Vertical scrolling DriftSlider using direction vertical option.">
+  <meta name="keywords" content="DriftSlider, demo, vertical, scrolling, direction, slider">
+  <link rel="canonical" href="https://hanfour.github.io/drift-slider/demos/vertical.html">
+  <meta property="og:title" content="DriftSlider — Vertical Slider">
+  <meta property="og:description" content="Vertical scrolling DriftSlider using direction vertical option.">
+  <meta property="og:image" content="https://hanfour.github.io/drift-slider/assets/img/og-image.svg">
+  <meta property="og:url" content="https://hanfour.github.io/drift-slider/demos/vertical.html">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="DriftSlider — Vertical Slider">
+  <meta name="twitter:description" content="Vertical scrolling DriftSlider using direction vertical option.">
+  <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/docs.css">
+  <link rel="stylesheet" href="../assets/css/prism-onedark.css">
+  <link rel="stylesheet" href="../assets/lib/drift-slider-bundle.css">
+  <style>
+    .drift-slider { height: 400px; }
+    .drift-list { flex-direction: column; }
+    .drift-slide { height: 100%; }
+  </style>
+</head>
+<body>
+  <div data-include="../_includes/header.html"></div>
+  <div class="page-body">
+    <div class="demo-page">
+      <a href="../demos.html" class="demo-back">&larr; Back to Demos</a>
+      <h1>Vertical Slider</h1>
+      <p class="demo-desc">Vertical scrolling slider using <code>direction: 'vertical'</code> with navigation and pagination.</p>
+
+      <!-- Live slider demo -->
+      <div class="drift-slider">
+        <div class="drift-track"><ul class="drift-list">
+          <li class="drift-slide"><div class="slide-content slide-1">Slide 1</div></li>
+          <li class="drift-slide"><div class="slide-content slide-2">Slide 2</div></li>
+          <li class="drift-slide"><div class="slide-content slide-3">Slide 3</div></li>
+          <li class="drift-slide"><div class="slide-content slide-4">Slide 4</div></li>
+          <li class="drift-slide"><div class="slide-content slide-5">Slide 5</div></li>
+        </ul></div>
+        <button class="drift-arrow drift-arrow--prev" aria-label="Previous" type="button"></button>
+        <button class="drift-arrow drift-arrow--next" aria-label="Next" type="button"></button>
+        <div class="drift-pagination"></div>
+      </div>
+
+      <!-- Source Code section -->
+      <h2 class="demo-section-title">Source Code</h2>
+      <div class="code-block">
+        <span class="code-lang">js</span>
+        <pre><code class="language-javascript">var DS = DriftSlider;
+var slider = new DS.DriftSlider('.drift-slider', {
+  modules: [DS.Navigation, DS.Pagination, DS.A11y],
+  direction: 'vertical',
+  slidesPerView: 1,
+  speed: 400,
+  grabCursor: true,
+});</code></pre>
+      </div>
+    </div>
+  </div>
+  <div data-include="../_includes/footer.html"></div>
+  <script src="../assets/lib/drift-slider.umd.js"></script>
+  <script src="../assets/js/prism.js"></script>
+  <script src="../assets/js/docs.js"></script>
+  <script>
+    var DS = DriftSlider;
+    var slider = new DS.DriftSlider('.drift-slider', {
+      modules: [DS.Navigation, DS.Pagination, DS.A11y],
+      direction: 'vertical',
+      slidesPerView: 1,
+      speed: 400,
+      grabCursor: true,
+    });
+  </script>
+</body>
+</html>

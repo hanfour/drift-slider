@@ -1,0 +1,16 @@
+// Fade effect styles
+.drift-slider--fade {
+  .drift-list {
+    // Disable transform-based sliding
+    transform: none !important;
+  }
+
+  .drift-slide {
+    transition-property: opacity;
+    pointer-events: none;
+
+    &--active {
+      pointer-events: auto;
+    }
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "name": "drift-slider",
+  "version": "0.1.0",
+  "description": "A lightweight, modular slider/carousel library with physics-based touch interaction",
+  "main": "dist/drift-slider.cjs.js",
+  "module": "dist/drift-slider.esm.js",
+  "types": "types/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/drift-slider.esm.js",
+      "require": "./dist/drift-slider.cjs.js"
+    },
+    "./modules": "./src/modules/index.js",
+    "./css": "./dist/drift-slider.css",
+    "./css/bundle": "./dist/drift-slider-bundle.css",
+    "./jquery": "./dist/drift-slider.jquery.js"
+  },
+  "files": [
+    "dist/",
+    "src/",
+    "types/"
+  ],
+  "scripts": {
+    "build": "rollup -c rollup.config.mjs",
+    "build:css": "sass src/styles/drift-slider.scss dist/drift-slider.css --style=compressed && sass src/styles/bundle.scss dist/drift-slider-bundle.css --style=compressed",
+    "dev": "rollup -c rollup.config.mjs -w",
+    "prepublishOnly": "npm run build && npm run build:css"
+  },
+  "keywords": [
+    "slider",
+    "carousel",
+    "swiper",
+    "touch",
+    "responsive",
+    "a11y"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@rollup/plugin-terser": "^0.4.4",
+    "rollup": "^4.9.0",
+    "sass": "^1.69.0"
+  }
+}

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DriftSlider — Fullscreen Hero</title>
+  <meta name="description" content="Fullscreen hero slider with parallax-inspired effects and autoplay.">
+  <meta name="keywords" content="DriftSlider, demo, fullscreen, hero, parallax, autoplay, slider">
+  <link rel="canonical" href="https://hanfour.github.io/drift-slider/demos/full-hero.html">
+  <meta property="og:title" content="DriftSlider — Fullscreen Hero">
+  <meta property="og:description" content="Fullscreen hero slider with parallax-inspired effects and autoplay.">
+  <meta property="og:image" content="https://hanfour.github.io/drift-slider/assets/img/og-image.svg">
+  <meta property="og:url" content="https://hanfour.github.io/drift-slider/demos/full-hero.html">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="DriftSlider — Fullscreen Hero">
+  <meta name="twitter:description" content="Fullscreen hero slider with parallax-inspired effects and autoplay.">
+  <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/docs.css">
+  <link rel="stylesheet" href="../assets/css/prism-onedark.css">
+  <link rel="stylesheet" href="../assets/lib/drift-slider-bundle.css">
+  <style>
+    .demo-page {
+      max-width: 100%;
+      padding: 0;
+    }
+    .hero-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 10;
+      padding: 24px 32px;
+    }
+    .hero-overlay .demo-back {
+      color: rgba(255, 255, 255, 0.8);
+    }
+    .hero-overlay .demo-back:hover {
+      color: #fff;
+    }
+    .hero-overlay h1 {
+      color: #fff;
+      margin: 8px 0 0;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+    .hero-overlay .demo-desc {
+      color: rgba(255, 255, 255, 0.8);
+      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+    }
+    .drift-slider.hero-slider {
+      height: 100vh;
+      width: 100%;
+      border-radius: 0;
+    }
+    .hero-slider .slide-content {
+      height: 100vh;
+      font-size: 3em;
+      border-radius: 0;
+    }
+    .hero-slider .slide-content.slide-1 {
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+    }
+    .hero-slider .slide-content.slide-2 {
+      background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+    }
+    .hero-slider .slide-content.slide-3 {
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    }
+    .hero-slider .slide-content.slide-4 {
+      background: linear-gradient(135deg, #232526, #414345);
+    }
+    .hero-slider .slide-content.slide-5 {
+      background: linear-gradient(135deg, #1d4350, #a43931);
+    }
+    .hero-source {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 48px 24px;
+    }
+  </style>
+</head>
+<body>
+  <div data-include="../_includes/header.html"></div>
+  <div class="page-body">
+    <div class="demo-page">
+      <!-- Live slider demo -->
+      <div style="position: relative;">
+        <div class="hero-overlay">
+          <a href="../demos.html" class="demo-back">&larr; Back to Demos</a>
+          <h1>Fullscreen Hero</h1>
+          <p class="demo-desc">Full-screen hero slider with parallax-inspired CSS effects and autoplay.</p>
+        </div>
+        <div class="drift-slider hero-slider">
+          <div class="drift-track"><ul class="drift-list">
+            <li class="drift-slide"><div class="slide-content slide-1">Welcome</div></li>
+            <li class="drift-slide"><div class="slide-content slide-2">Explore</div></li>
+            <li class="drift-slide"><div class="slide-content slide-3">Create</div></li>
+            <li class="drift-slide"><div class="slide-content slide-4">Build</div></li>
+            <li class="drift-slide"><div class="slide-content slide-5">Launch</div></li>
+          </ul></div>
+          <button class="drift-arrow drift-arrow--prev" aria-label="Previous" type="button"></button>
+          <button class="drift-arrow drift-arrow--next" aria-label="Next" type="button"></button>
+          <div class="drift-pagination"></div>
+        </div>
+      </div>
+
+      <!-- Source Code section -->
+      <div class="hero-source">
+        <h2 class="demo-section-title">Source Code</h2>
+        <div class="code-block">
+          <span class="code-lang">js</span>
+          <pre><code class="language-javascript">var DS = DriftSlider;
+var slider = new DS.DriftSlider('.hero-slider', {
+  modules: [DS.Navigation, DS.Pagination, DS.Autoplay, DS.A11y],
+  loop: true,
+  speed: 800,
+  grabCursor: true,
+  autoplay: {
+    enabled: true,
+    delay: 4000,
+    disableOnInteraction: false,
+  },
+});</code></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div data-include="../_includes/footer.html"></div>
+  <script src="../assets/lib/drift-slider.umd.js"></script>
+  <script src="../assets/js/prism.js"></script>
+  <script src="../assets/js/docs.js"></script>
+  <script>
+    var DS = DriftSlider;
+    var slider = new DS.DriftSlider('.hero-slider', {
+      modules: [DS.Navigation, DS.Pagination, DS.Autoplay, DS.A11y],
+      loop: true,
+      speed: 800,
+      grabCursor: true,
+      autoplay: {
+        enabled: true,
+        delay: 4000,
+        disableOnInteraction: false,
+      },
+    });
+  </script>
+</body>
+</html>

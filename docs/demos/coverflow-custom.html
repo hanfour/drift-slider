@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DriftSlider — Coverflow Custom Sizing</title>
+  <meta name="description" content="Custom coverflow sizing comparison: cropSides vs scale modes.">
+  <meta name="keywords" content="DriftSlider, demo, coverflow, custom sizing, cropSides, scale, comparison">
+  <link rel="canonical" href="https://hanfour.github.io/drift-slider/demos/coverflow-custom.html">
+  <meta property="og:title" content="DriftSlider — Coverflow Custom Sizing">
+  <meta property="og:description" content="Custom coverflow sizing comparison: cropSides vs scale modes.">
+  <meta property="og:image" content="https://hanfour.github.io/drift-slider/assets/img/og-image.svg">
+  <meta property="og:url" content="https://hanfour.github.io/drift-slider/demos/coverflow-custom.html">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="DriftSlider — Coverflow Custom Sizing">
+  <meta name="twitter:description" content="Custom coverflow sizing comparison: cropSides vs scale modes.">
+  <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/docs.css">
+  <link rel="stylesheet" href="../assets/css/prism-onedark.css">
+  <link rel="stylesheet" href="../assets/lib/drift-slider-bundle.css">
+  <style>
+    .demo-page { max-width: 1200px; }
+    .drift-slider { border-radius: 0; width: 1100px; margin: 0 auto; }
+
+    .slide-content {
+      border-radius: 12px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.15);
+    }
+
+    .size-info {
+      margin-top: 20px;
+      padding: 16px 20px;
+      background: #fff;
+      border-radius: 12px;
+      font-size: 14px;
+      line-height: 1.8;
+    }
+    .size-info code { background: #e8e8ed; padding: 2px 6px; border-radius: 4px; }
+    .size-info .highlight { color: #007aff; font-weight: 600; }
+
+    .controls {
+      margin-top: 24px;
+      padding: 20px;
+      background: #fff;
+      border-radius: 12px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px 24px;
+    }
+    .controls h3 {
+      grid-column: 1 / -1;
+      margin: 8px 0 0;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #86868b;
+      border-top: 1px solid #e8e8ed;
+      padding-top: 12px;
+    }
+    .controls h3:first-child { border-top: none; margin-top: 0; padding-top: 0; }
+    .controls label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+    }
+    .controls label span:first-child { min-width: 130px; }
+    .controls input[type="range"] { flex: 1; }
+    .controls .val { min-width: 56px; text-align: right; font-variant-numeric: tabular-nums; }
+    .controls select { padding: 4px 8px; border-radius: 4px; border: 1px solid #ccc; }
+
+    .presets {
+      margin-top: 16px;
+      padding: 16px 20px;
+      background: #fff;
+      border-radius: 12px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+    .presets span { font-size: 14px; font-weight: 600; color: #1d1d1f; }
+    .presets button {
+      padding: 8px 16px;
+      border: 1px solid #007aff;
+      border-radius: 8px;
+      background: #fff;
+      color: #007aff;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .presets button:hover { background: #007aff; color: #fff; }
+    .presets button.active { background: #007aff; color: #fff; }
+
+    .ruler {
+      position: relative;
+      width: 1100px;
+      margin: 12px auto 0;
+      height: 32px;
+      border-left: 1px dashed #ccc;
+      border-right: 1px dashed #ccc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      color: #86868b;
+    }
+
+    pre#code-output {
+      margin-top: 24px;
+      padding: 16px 20px;
+      background: #1e1e1e;
+      color: #d4d4d4;
+      border-radius: 12px;
+      font-size: 13px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+  </style>
+</head>
+<body>
+  <div data-include="../_includes/header.html"></div>
+  <div class="page-body">
+    <div class="demo-page">
+      <a href="../demos.html" class="demo-back">&larr; Back to Demos</a>
+      <h1>Coverflow Custom Sizing</h1>
+      <p class="demo-desc">Custom sizing calculator &mdash; <code>cropSides</code> vs <code>scale</code> mode for precise control.</p>
+
+      <!-- Live slider demo -->
+      <div class="drift-slider" style="width:1100px;">
+        <div class="drift-track"><ul class="drift-list">
+          <li class="drift-slide"><div class="slide-content slide-1">Slide 1</div></li>
+          <li class="drift-slide"><div class="slide-content slide-2">Slide 2</div></li>
+          <li class="drift-slide"><div class="slide-content slide-3">Slide 3</div></li>
+          <li class="drift-slide"><div class="slide-content slide-4">Slide 4</div></li>
+          <li class="drift-slide"><div class="slide-content slide-5">Slide 5</div></li>
+          <li class="drift-slide"><div class="slide-content slide-6">Slide 6</div></li>
+        </ul></div>
+        <button class="drift-arrow drift-arrow--prev" aria-label="Previous" type="button"></button>
+        <button class="drift-arrow drift-arrow--next" aria-label="Next" type="button"></button>
+        <div class="drift-pagination"></div>
+      </div>
+      <div class="ruler" id="ruler"></div>
+
+      <!-- Size Info -->
+      <div class="size-info" id="size-info"></div>
+
+      <!-- Interactive Controls -->
+      <div class="controls">
+        <h3>Mode</h3>
+        <label>
+          <span>cropSides</span>
+          <select id="ctrl-crop">
+            <option value="true" selected>true &mdash; crop sides</option>
+            <option value="false">false &mdash; scale mode</option>
+          </select>
+        </label>
+
+        <h3>Size Settings</h3>
+        <label>
+          <span>Container width (px)</span>
+          <input type="range" id="ctrl-container" min="600" max="1400" step="10" value="1100">
+          <span class="val" id="val-container">1100</span>
+        </label>
+        <label>
+          <span>Main slide (px)</span>
+          <input type="range" id="ctrl-center" min="200" max="1000" step="2" value="530">
+          <span class="val" id="val-center">530</span>
+        </label>
+        <label>
+          <span>Gap (px)</span>
+          <input type="range" id="ctrl-gap" min="0" max="60" step="2" value="16">
+          <span class="val" id="val-gap">16</span>
+        </label>
+        <label>
+          <span>Overlap (px)</span>
+          <input type="range" id="ctrl-overlap" min="0" max="400" step="5" value="0">
+          <span class="val" id="val-overlap">0</span>
+        </label>
+
+        <h3>Coverflow Appearance</h3>
+        <label>
+          <span>depth</span>
+          <input type="range" id="ctrl-depth" min="0" max="500" value="0">
+          <span class="val" id="val-depth">0</span>
+        </label>
+        <label>
+          <span>rotate</span>
+          <input type="range" id="ctrl-rotate" min="0" max="90" value="0">
+          <span class="val" id="val-rotate">0</span>
+        </label>
+        <label>
+          <span>opacity</span>
+          <input type="range" id="ctrl-opacity" min="0" max="100" value="80">
+          <span class="val" id="val-opacity">0.80</span>
+        </label>
+        <label>
+          <span>overlay</span>
+          <select id="ctrl-overlay">
+            <option value="true" selected>true</option>
+            <option value="false">false</option>
+          </select>
+        </label>
+        <label>
+          <span>align</span>
+          <select id="ctrl-align">
+            <option value="center" selected>center</option>
+            <option value="top">top</option>
+            <option value="bottom">bottom</option>
+          </select>
+        </label>
+        <label>
+          <span>staggerY (px)</span>
+          <input type="range" id="ctrl-staggerY" min="-200" max="200" step="5" value="0">
+          <span class="val" id="val-staggerY">0</span>
+        </label>
+        <label>
+          <span>visibleSides</span>
+          <select id="ctrl-visibleSides">
+            <option value="both" selected>both</option>
+            <option value="prev">prev</option>
+            <option value="next">next</option>
+          </select>
+        </label>
+        <label>
+          <span>loop</span>
+          <select id="ctrl-loop">
+            <option value="false" selected>false</option>
+            <option value="true">true</option>
+          </select>
+        </label>
+      </div>
+
+      <!-- Presets -->
+      <div class="presets">
+        <span>Presets:</span>
+        <button type="button" onclick="applyPreset('A', this)">Layout A</button>
+        <button type="button" onclick="applyPreset('B', this)">Layout B</button>
+        <button type="button" onclick="applyPreset('C', this)">Layout C</button>
+        <button type="button" onclick="applyPreset('reset', this)">Reset</button>
+      </div>
+
+      <!-- Live Code Output -->
+      <pre id="code-output"></pre>
+
+      <!-- Source Code section -->
+      <h2 class="demo-section-title">Source Code</h2>
+      <div class="code-block">
+        <span class="code-lang">js</span>
+        <pre><code class="language-javascript">var DS = DriftSlider;
+var slider = new DS.DriftSlider('.drift-slider', {
+  modules: [DS.Navigation, DS.Pagination, DS.EffectCoverflow, DS.A11y],
+  effect: 'coverflow',
+  slidesPerView: 2.075,   // containerWidth / centerWidth
+  centeredSlides: true,
+  speed: 500,
+  coverflowEffect: {
+    cropSides: true,
+    scale: 1,
+    stretch: -16,
+    depth: 0,
+    rotate: 0,
+    opacity: 0.8,
+    overlay: true,
+    align: 'center',
+    staggerY: 0,
+    visibleSides: 'both',
+  },
+});</code></pre>
+      </div>
+    </div>
+  </div>
+  <div data-include="../_includes/footer.html"></div>
+  <script src="../assets/lib/drift-slider.umd.js"></script>
+  <script src="../assets/js/prism.js"></script>
+  <script src="../assets/js/docs.js"></script>
+  <script>
+    var DS = DriftSlider;
+    var currentSlider = null;
+
+    function val(id) { return document.getElementById(id).value; }
+    function num(id) { return Number(val(id)); }
+    function bool(id) { return val(id) === 'true'; }
+
+    function createSlider() {
+      if (currentSlider) {
+        currentSlider.destroy(true);
+        currentSlider = null;
+      }
+
+      var containerWidth = num('ctrl-container');
+      var centerWidth = num('ctrl-center');
+      var gap = num('ctrl-gap');
+      var overlap = num('ctrl-overlap');
+      var depth = num('ctrl-depth');
+      var rotate = num('ctrl-rotate');
+      var opacity = num('ctrl-opacity') / 100;
+      var overlay = bool('ctrl-overlay');
+      var align = val('ctrl-align');
+      var staggerY = num('ctrl-staggerY');
+      var visibleSides = val('ctrl-visibleSides');
+      var isLoop = bool('ctrl-loop');
+      var cropSides = bool('ctrl-crop');
+
+      // Auto-calculate side slide size
+      var n = (visibleSides === 'both') ? 2 : 1;
+      var sideVisible = Math.max(50, Math.round((containerWidth - centerWidth - n * gap) / n));
+
+      // Update display values
+      document.getElementById('val-container').textContent = containerWidth;
+      document.getElementById('val-center').textContent = centerWidth;
+      document.getElementById('val-gap').textContent = gap;
+      document.getElementById('val-overlap').textContent = overlap;
+      document.getElementById('val-depth').textContent = depth;
+      document.getElementById('val-rotate').textContent = rotate;
+      document.getElementById('val-opacity').textContent = opacity.toFixed(2);
+      document.getElementById('val-staggerY').textContent = staggerY;
+
+      var slidesPerView, scale, stretch;
+
+      if (cropSides) {
+        slidesPerView = containerWidth / centerWidth;
+        scale = 1;
+        var naturalPeek = (containerWidth - centerWidth) / 2;
+        var desiredPeek = sideVisible + gap;
+        stretch = Math.round(naturalPeek - desiredPeek) - overlap;
+
+        document.getElementById('size-info').innerHTML =
+          '<strong>cropSides mode</strong> &mdash; Side slides keep original size (' + centerWidth + 'px), overflow is cropped<br>' +
+          'Side slide = (' + containerWidth + ' - ' + centerWidth + ' - ' + gap + '&times;' + n + ') / ' + n + ' = <span class="highlight">' + sideVisible + 'px</span><br>' +
+          '<code>slidesPerView</code> = <span class="highlight">' + slidesPerView.toFixed(3) + '</span><br>' +
+          '<code>stretch</code> = <span class="highlight">' + stretch + '</span><br>' +
+          'Layout: ' + (n === 1 ? '[' + sideVisible + 'px] ' + gap + 'px [' + centerWidth + 'px main]' : '[' + sideVisible + 'px] ' + gap + 'px [' + centerWidth + 'px main] ' + gap + 'px [' + sideVisible + 'px]');
+      } else {
+        slidesPerView = containerWidth / centerWidth;
+        scale = sideVisible / centerWidth;
+        var autoStretch = -Math.round((1 - scale) * centerWidth / 2);
+        stretch = autoStretch - overlap;
+
+        document.getElementById('size-info').innerHTML =
+          '<strong>scale mode</strong> &mdash; Side slides are scaled down via CSS scale<br>' +
+          'Side slide = (' + containerWidth + ' - ' + centerWidth + ' - ' + gap + '&times;' + n + ') / ' + n + ' = <span class="highlight">' + sideVisible + 'px</span><br>' +
+          '<code>slidesPerView</code> = <span class="highlight">' + slidesPerView.toFixed(3) + '</span>&nbsp;&nbsp;' +
+          '<code>scale</code> = ' + sideVisible + ' / ' + centerWidth + ' = <span class="highlight">' + scale.toFixed(3) + '</span><br>' +
+          '<code>stretch</code> = ' + autoStretch + ' (auto) - ' + overlap + ' (overlap) = <span class="highlight">' + stretch + '</span>';
+      }
+
+      // Update container & ruler width
+      document.querySelector('.drift-slider').style.width = containerWidth + 'px';
+      var ruler = document.getElementById('ruler');
+      ruler.style.width = containerWidth + 'px';
+      ruler.innerHTML = '<span>&larr; ' + containerWidth + 'px &rarr;</span>';
+
+      // Code output
+      var lines = [
+        "// Container: " + containerWidth + "px, Main: " + centerWidth + "px, Side: " + sideVisible + "px (x" + n + ")" + (cropSides ? " cropped" : " scaled"),
+        "",
+        "new DriftSlider('.my-slider', {",
+        "  modules: [Navigation, Pagination, EffectCoverflow, A11y],",
+        "  effect: 'coverflow',",
+        "  slidesPerView: " + slidesPerView.toFixed(3) + ",",
+        "  centeredSlides: true,",
+      ];
+      if (isLoop) lines.push("  loop: true,");
+      lines.push(
+        "  navigation: true,",
+        "  pagination: { clickable: true },",
+        "  coverflowEffect: {",
+        "    cropSides: " + cropSides + ",",
+        "    scale: " + scale.toFixed(3) + ",",
+        "    stretch: " + stretch + ",",
+        "    depth: " + depth + ",",
+        "    rotate: " + rotate + ",",
+        "    opacity: " + opacity + ",",
+        "    overlay: " + overlay + ",",
+        "    align: '" + align + "',",
+        "    staggerY: " + staggerY + ",",
+        "    visibleSides: '" + visibleSides + "',",
+        "  },",
+        "});"
+      );
+      document.getElementById('code-output').textContent = lines.join('\n');
+
+      // Create slider
+      var opts = {
+        modules: [DS.Navigation, DS.Pagination, DS.EffectCoverflow, DS.A11y],
+        effect: 'coverflow',
+        slidesPerView: slidesPerView,
+        centeredSlides: true,
+        speed: 500,
+        coverflowEffect: {
+          cropSides: cropSides,
+          scale: scale,
+          stretch: stretch,
+          depth: depth,
+          rotate: rotate,
+          opacity: opacity,
+          activeOpacity: 1,
+          overlay: overlay,
+          overlayColor: 'rgba(0,0,0,0.3)',
+          modifier: 1,
+          align: align,
+          staggerY: staggerY,
+          visibleSides: visibleSides,
+        },
+      };
+
+      if (isLoop) opts.loop = true;
+
+      currentSlider = new DS.DriftSlider('.drift-slider', opts);
+    }
+
+    // Bind controls
+    var controls = document.querySelectorAll('.controls input, .controls select');
+    for (var i = 0; i < controls.length; i++) {
+      controls[i].addEventListener('input', createSlider);
+      controls[i].addEventListener('change', createSlider);
+    }
+
+    function applyPreset(preset, btn) {
+      var presets = {
+        A: { container: 1100, center: 700, gap: 0, overlap: 200, depth: 0, rotate: 0, opacity: 80, overlay: 'true', crop: 'false', align: 'top', staggerY: 80, visibleSides: 'prev', loop: 'false' },
+        B: { container: 1100, center: 700, gap: 0, overlap: 200, depth: 0, rotate: 0, opacity: 80, overlay: 'true', crop: 'false', align: 'top', staggerY: 80, visibleSides: 'next', loop: 'false' },
+        C: { container: 1100, center: 500, gap: 16, overlap: 50, depth: 0, rotate: 0, opacity: 80, overlay: 'true', crop: 'false', align: 'top', staggerY: 80, visibleSides: 'both', loop: 'false' },
+        reset: { container: 1100, center: 530, gap: 16, overlap: 0, depth: 0, rotate: 0, opacity: 80, overlay: 'true', crop: 'true', align: 'center', staggerY: 0, visibleSides: 'both', loop: 'false' },
+      };
+      var p = presets[preset];
+      if (!p) return;
+
+      document.getElementById('ctrl-container').value = p.container;
+      document.getElementById('ctrl-center').value = p.center;
+      document.getElementById('ctrl-gap').value = p.gap;
+      document.getElementById('ctrl-overlap').value = p.overlap;
+      document.getElementById('ctrl-depth').value = p.depth;
+      document.getElementById('ctrl-rotate').value = p.rotate;
+      document.getElementById('ctrl-opacity').value = p.opacity;
+      document.getElementById('ctrl-overlay').value = p.overlay;
+      document.getElementById('ctrl-crop').value = p.crop;
+      document.getElementById('ctrl-align').value = p.align;
+      document.getElementById('ctrl-staggerY').value = p.staggerY;
+      document.getElementById('ctrl-visibleSides').value = p.visibleSides;
+      document.getElementById('ctrl-loop').value = p.loop;
+
+      // Highlight active preset button
+      var btns = document.querySelectorAll('.presets button');
+      for (var i = 0; i < btns.length; i++) btns[i].classList.remove('active');
+      if (preset !== 'reset' && btn) btn.classList.add('active');
+
+      createSlider();
+    }
+
+    createSlider();
+  </script>
+</body>
+</html>

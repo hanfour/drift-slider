@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DriftSlider — Lazy Loading Images</title>
+  <meta name="description" content="Image slider with native lazy loading using loading=lazy attribute.">
+  <meta name="keywords" content="DriftSlider, demo, lazy loading, images, native, loading attribute, performance">
+  <link rel="canonical" href="https://hanfour.github.io/drift-slider/demos/lazy-images.html">
+  <meta property="og:title" content="DriftSlider — Lazy Loading Images">
+  <meta property="og:description" content="Image slider with native lazy loading using loading=lazy attribute.">
+  <meta property="og:image" content="https://hanfour.github.io/drift-slider/assets/img/og-image.svg">
+  <meta property="og:url" content="https://hanfour.github.io/drift-slider/demos/lazy-images.html">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="DriftSlider — Lazy Loading Images">
+  <meta name="twitter:description" content="Image slider with native lazy loading using loading=lazy attribute.">
+  <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/docs.css">
+  <link rel="stylesheet" href="../assets/css/prism-onedark.css">
+  <link rel="stylesheet" href="../assets/lib/drift-slider-bundle.css">
+  <style>
+    .drift-slide img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      border-radius: 12px;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+    .drift-slide img.loaded {
+      opacity: 1;
+    }
+    .slide-img-wrapper {
+      width: 100%;
+      height: 300px;
+      background: #1d1d1f;
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .slide-img-wrapper::before {
+      content: 'Loading...';
+      position: absolute;
+      color: #86868b;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div data-include="../_includes/header.html"></div>
+  <div class="page-body">
+    <div class="demo-page">
+      <a href="../demos.html" class="demo-back">&larr; Back to Demos</a>
+      <h1>Lazy Loading Images</h1>
+      <p class="demo-desc">Image slider with native lazy loading using <code>loading="lazy"</code> and IntersectionObserver.</p>
+
+      <!-- Live slider demo -->
+      <div class="drift-slider">
+        <div class="drift-track"><ul class="drift-list">
+          <li class="drift-slide"><div class="slide-img-wrapper"><img src="https://picsum.photos/seed/lazy-1/800/400" loading="lazy" alt="Lazy image 1"></div></li>
+          <li class="drift-slide"><div class="slide-img-wrapper"><img src="https://picsum.photos/seed/lazy-2/800/400" loading="lazy" alt="Lazy image 2"></div></li>
+          <li class="drift-slide"><div class="slide-img-wrapper"><img src="https://picsum.photos/seed/lazy-3/800/400" loading="lazy" alt="Lazy image 3"></div></li>
+          <li class="drift-slide"><div class="slide-img-wrapper"><img src="https://picsum.photos/seed/lazy-4/800/400" loading="lazy" alt="Lazy image 4"></div></li>
+          <li class="drift-slide"><div class="slide-img-wrapper"><img src="https://picsum.photos/seed/lazy-5/800/400" loading="lazy" alt="Lazy image 5"></div></li>
+          <li class="drift-slide"><div class="slide-img-wrapper"><img src="https://picsum.photos/seed/lazy-6/800/400" loading="lazy" alt="Lazy image 6"></div></li>
+        </ul></div>
+        <button class="drift-arrow drift-arrow--prev" aria-label="Previous" type="button"></button>
+        <button class="drift-arrow drift-arrow--next" aria-label="Next" type="button"></button>
+        <div class="drift-pagination"></div>
+      </div>
+
+      <!-- Source Code section -->
+      <h2 class="demo-section-title">Source Code</h2>
+      <div class="code-block">
+        <span class="code-lang">js</span>
+        <pre><code class="language-javascript">var DS = DriftSlider;
+var slider = new DS.DriftSlider('.drift-slider', {
+  modules: [DS.Navigation, DS.Pagination, DS.A11y],
+  slidesPerView: 1,
+  spaceBetween: 20,
+  speed: 400,
+  grabCursor: true,
+});
+
+// IntersectionObserver for lazy-loaded images
+var images = document.querySelectorAll('.drift-slide img[loading="lazy"]');
+var observer = new IntersectionObserver(function(entries) {
+  entries.forEach(function(entry) {
+    if (entry.isIntersecting) {
+      var img = entry.target;
+      img.addEventListener('load', function() {
+        img.classList.add('loaded');
+      });
+      // If already loaded (cached), add class immediately
+      if (img.complete) {
+        img.classList.add('loaded');
+      }
+      observer.unobserve(img);
+    }
+  });
+}, { rootMargin: '100px' });
+
+images.forEach(function(img) {
+  observer.observe(img);
+});</code></pre>
+      </div>
+    </div>
+  </div>
+  <div data-include="../_includes/footer.html"></div>
+  <script src="../assets/lib/drift-slider.umd.js"></script>
+  <script src="../assets/js/prism.js"></script>
+  <script src="../assets/js/docs.js"></script>
+  <script>
+    var DS = DriftSlider;
+    var slider = new DS.DriftSlider('.drift-slider', {
+      modules: [DS.Navigation, DS.Pagination, DS.A11y],
+      slidesPerView: 1,
+      spaceBetween: 20,
+      speed: 400,
+      grabCursor: true,
+    });
+
+    // IntersectionObserver for lazy-loaded images
+    var images = document.querySelectorAll('.drift-slide img[loading="lazy"]');
+    var observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          var img = entry.target;
+          img.addEventListener('load', function() {
+            img.classList.add('loaded');
+          });
+          // If already loaded (cached), add class immediately
+          if (img.complete) {
+            img.classList.add('loaded');
+          }
+          observer.unobserve(img);
+        }
+      });
+    }, { rootMargin: '100px' });
+
+    images.forEach(function(img) {
+      observer.observe(img);
+    });
+  </script>
+</body>
+</html>

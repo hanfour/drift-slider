@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DriftSlider — Demos</title>
+  <meta name="description" content="Interactive demo gallery showcasing all DriftSlider effects: slide, fade, coverflow, cards, and advanced configurations.">
+  <meta name="keywords" content="DriftSlider, demos, slider examples, carousel demo, coverflow, fade, cards">
+  <link rel="canonical" href="https://hanfour.github.io/drift-slider/demos.html">
+  <meta property="og:title" content="DriftSlider — Demo Gallery">
+  <meta property="og:description" content="Interactive demo gallery showcasing all DriftSlider effects and configurations.">
+  <meta property="og:image" content="https://hanfour.github.io/drift-slider/assets/img/og-image.svg">
+  <meta property="og:url" content="https://hanfour.github.io/drift-slider/demos.html">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="DriftSlider — Demo Gallery">
+  <meta name="twitter:description" content="Interactive demo gallery showcasing all DriftSlider effects and configurations.">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/docs.css">
+</head>
+<body>
+  <div data-include="_includes/header.html"></div>
+
+  <div class="page-body">
+    <section class="section">
+      <h1 class="section-title" data-i18n-en>Demo Gallery</h1>
+      <h1 class="section-title" data-i18n-zh>範例展示</h1>
+      <p class="section-desc" data-i18n-en>Explore all DriftSlider features with interactive examples.</p>
+      <p class="section-desc" data-i18n-zh>透過互動範例探索 DriftSlider 的所有功能。</p>
+
+      <div style="max-width:var(--content-max); margin:0 auto;">
+        <!-- Core -->
+        <h3 style="margin-bottom:16px; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--c-text-secondary);">Core</h3>
+        <div class="demo-grid" style="margin-bottom:48px;">
+          <a href="demos/basic.html" class="demo-card">
+            <div class="demo-preview" style="background:linear-gradient(135deg,#48D9C1,#2FB8A1);"><span class="icon icon-play"></span></div>
+            <div class="demo-info">
+              <h3>Basic</h3>
+              <p data-i18n-en>Navigation, pagination, touch drag — the essentials.</p>
+              <p data-i18n-zh>導航、分頁、觸控拖曳 — 基本用法。</p>
+            </div>
+          </a>
+          <a href="demos/loop.html" class="demo-card">
+            <div class="demo-preview" style="background:linear-gradient(135deg,#B3F0E4,#48D9C1);"><span class="icon icon-infinity"></span></div>
+            <div class="demo-info">
+              <h3>Infinite Loop</h3>
+              <p data-i18n-en>Seamless infinite loop with autoplay.</p>
+              <p data-i18n-zh>無縫無限循環搭配自動播放。</p>
+            </div>
+          </a>
+          <a href="demos/responsive.html" class="demo-card">
+            <div class="demo-preview" style="background:linear-gradient(135deg,#2FB8A1,#1F9B87);"><span class="icon icon-smartphone"></span></div>
+            <div class="demo-info">
+              <h3>Responsive</h3>
+              <p data-i18n-en>Adaptive slidesPerView with breakpoints.</p>
+              <p data-i18n-zh>依據斷點自適應 slidesPerView。</p>
+            </div>
+          </a>
+          <a href="demos/vertical.html" class="demo-card">
+            <div class="demo-preview" style="background:linear-gradient(135deg,#48D9C1,#1F9B87);"><span class="icon icon-arrow-up"></span></div>
+            <div class="demo-info">
+              <h3>Vertical Slider</h3>
+              <p data-i18n-en>Vertical scrolling with direction: 'vertical'.</p>
+              <p data-i18n-zh>使用 direction: 'vertical' 垂直滑動。</p>
+            </div>
+          </a>
+          <a href="demos/centered.html" class="demo-card">
+            <div class="demo-preview" style="background:linear-gradient(135deg,#B3F0E4,#2FB8A1);"><span class="icon icon-maximize"></span></div>
+            <div class="demo-info">
+              <h3>Centered Slides</h3>
+              <p data-i18n-en>Centered active slide with partial adjacent views.</p>
+              <p data-i18n-zh>居中顯示的活動投影片，部分可見相鄰投影片。</p>
+            </div>
+          </a>
+          <a href="demos/multi-row.html" class="demo-card">
+            <div class="demo-preview" style="background:linear-gradient(135deg,#2FB8A1,#48D9C1);"><span class="icon icon-grid"></span></div>
+            <div class="demo-info">
+              <h3>Multi-Row Grid</h3>
+              <p data-i18n-en>Multi-row layout with multiple slides per view.</p>
+              <p data-i18n-zh>多行佈局，每視窗多個投影片。</p>
+            </div>
+          </a>
+        </div>
+
+        <!-- Effects -->
+        <h3 style="margin-bottom:16px; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--c-text-secondary);">Effects</h3>
+        <div class="demo-grid" style="margin-bottom:48px;">
+          <a href="demos/fade.html" class="demo-card">
+            <div class="demo-preview" style="background:linear-gradient(135deg,#48D9C1,#1F9B87);"><span class="icon icon-globe"></span></div>
+            <div class="demo-info">
+              <h3>Fade</h3>
+              <p data-i18n-en>Smooth cross-fade transition effect.</p>
+              <p data-i18n-zh>平滑交叉淡入淡出效果。</p>
+            </div>
+          </a>
+          <a href="demos/coverflow.html" class="demo-card">
+            <div class="demo-preview" style="background:linear-gradient(135deg,#B3F0E4,#2FB8A1);"><span class="icon icon-disc"></span></div>
+            <div class="demo-info">
+              <h3>Coverflow</h3>
+              <p data-i18n-en>3D cover flow with interactive controls.</p>
+              <p data-i18n-zh>3D 封面流效果，附互動控制面板。</p>
+            </div>
+          </a>
+          <a href="demos/coverflow-custom.html" class="demo-card">
+            <div class="demo-preview" style="background:linear-gradient(135deg,#2FB8A1,#48D9C1);"><span class="icon icon-sliders"></span></div>
+            <div class="demo-info">
+              <h3>Coverflow Custom</h3>
+              <p data-i18n-en>Custom sizing with cropSides vs scale.</p>
+              <p data-i18n-zh>自訂尺寸：cropSides 與 scale 模式。</p>
+            </div>
+          </a>
+          <a href="demos/cards.html" class="demo-card">
+            <div class="demo-preview" style="background:linear-gradient(135deg,#1F9B87,#48D9C1);"><span class="icon icon-layers"></span></div>
+            <div class="demo-info">
+              <h3>Cards</h3>
+              <p data-i18n-en>Stack, diagonal, and flip card effects.</p>
+              <p data-i18n-zh>堆疊、對角、翻轉卡片效果。</p>
+            </div>
+          </a>
+        </div>
+
+        <!-- Gallery & Media -->
+        <h3 style="margin-bottom:16px; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--c-text-secondary);">Gallery &amp; Media</h3>
+        <div class="demo-grid" style="margin-bottom:48px;">
+          <a href="demos/thumbs-gallery.html" class="demo-card">
+            <div class="demo-preview" style="background:linear-gradient(135deg,#1F9B87,#48D9C1);"><span class="icon icon-image"></span></div>
+            <div class="demo-info">
+              <h3>Thumbs Gallery</h3>
+              <p data-i18n-en>Synchronized main slider + thumbnail navigation.</p>
+              <p data-i18n-zh>主圖 + 縮圖導航同步聯動。</p>
+            </div>
+          </a>
+          <a href="demos/image-gallery.html" class="demo-card">
+            <div class="demo-preview" style="background:linear-gradient(135deg,#48D9C1,#B3F0E4);"><span class="icon icon-eye"></span></div>
+            <div class="demo-info">
+              <h3>Image Gallery</h3>
+              <p data-i18n-en>Image slider with keyboard navigation.</p>
+              <p data-i18n-zh>圖片滑塊，支援鍵盤導航。</p>
+            </div>
+          </a>
+          <a href="demos/lazy-images.html" class="demo-card">
+            <div class="demo-preview" style="background:linear-gradient(135deg,#B3F0E4,#2FB8A1);"><span class="icon icon-loader"></span></div>
+            <div class="demo-info">
+              <h3>Lazy Loading</h3>
+              <p data-i18n-en>Native lazy loading with IntersectionObserver.</p>
+              <p data-i18n-zh>原生延遲載入搭配 IntersectionObserver。</p>
+            </div>
+          </a>
+          <a href="demos/full-hero.html" class="demo-card">
+            <div class="demo-preview" style="background:linear-gradient(135deg,#2FB8A1,#1F9B87);"><span class="icon icon-maximize"></span></div>
+            <div class="demo-info">
+              <h3>Fullscreen Hero</h3>
+              <p data-i18n-en>Full-screen hero slider with parallax effects.</p>
+              <p data-i18n-zh>全螢幕 Hero 滑塊，視差效果。</p>
+            </div>
+          </a>
+        </div>
+
+        <!-- Pagination -->
+        <h3 style="margin-bottom:16px; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--c-text-secondary);">Pagination</h3>
+        <div class="demo-grid" style="margin-bottom:48px;">
+          <a href="demos/autoplay-progress.html" class="demo-card">
+            <div class="demo-preview" style="background:linear-gradient(135deg,#48D9C1,#2FB8A1);"><span class="icon icon-activity"></span></div>
+            <div class="demo-info">
+              <h3>Autoplay Progress</h3>
+              <p data-i18n-en>Autoplay with progressbar pagination.</p>
+              <p data-i18n-zh>自動播放搭配進度條分頁。</p>
+            </div>
+          </a>
+          <a href="demos/fraction-pagination.html" class="demo-card">
+            <div class="demo-preview" style="background:linear-gradient(135deg,#B3F0E4,#48D9C1);"><span class="icon icon-hash"></span></div>
+            <div class="demo-info">
+              <h3>Fraction Pagination</h3>
+              <p data-i18n-en>Fraction-style current / total pagination.</p>
+              <p data-i18n-zh>分數式目前/總計分頁。</p>
+            </div>
+          </a>
+        </div>
+
+        <!-- Integration -->
+        <h3 style="margin-bottom:16px; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--c-text-secondary);">Integration</h3>
+        <div class="demo-grid" style="margin-bottom:48px;">
+          <a href="demos/jquery.html" class="demo-card">
+            <div class="demo-preview" style="background:linear-gradient(135deg,#48D9C1,#B3F0E4);"><span class="icon icon-dollar"></span></div>
+            <div class="demo-info">
+              <h3>jQuery</h3>
+              <p data-i18n-en>jQuery plugin with all modules bundled.</p>
+              <p data-i18n-zh>jQuery 插件，所有模組自動載入。</p>
+            </div>
+          </a>
+          <a href="demos/custom-style.html" class="demo-card">
+            <div class="demo-preview" style="background:linear-gradient(135deg,#2FB8A1,#B3F0E4);"><span class="icon icon-palette"></span></div>
+            <div class="demo-info">
+              <h3>Custom Styling</h3>
+              <p data-i18n-en>Custom arrow positions and progressbar pagination.</p>
+              <p data-i18n-zh>自訂箭頭位置與進度條分頁。</p>
+            </div>
+          </a>
+        </div>
+
+        <!-- Advanced -->
+        <h3 style="margin-bottom:16px; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--c-text-secondary);">Advanced</h3>
+        <div class="demo-grid" style="margin-bottom:48px;">
+          <a href="demos/scroll-aos.html" class="demo-card">
+            <div class="demo-preview" style="background:linear-gradient(135deg,#1F9B87,#B3F0E4);"><span class="icon icon-rocket"></span></div>
+            <div class="demo-info">
+              <h3>Scroll AOS</h3>
+              <p data-i18n-en>Animate on scroll with AOS integration.</p>
+              <p data-i18n-zh>搭配 AOS 的滾動進場動畫。</p>
+            </div>
+          </a>
+          <a href="demos/multiple.html" class="demo-card">
+            <div class="demo-preview" style="background:linear-gradient(135deg,#48D9C1,#2FB8A1);"><span class="icon icon-copy"></span></div>
+            <div class="demo-info">
+              <h3>Multiple Sliders</h3>
+              <p data-i18n-en>Multiple independent sliders on one page.</p>
+              <p data-i18n-zh>同一頁面上多個獨立 Slider。</p>
+            </div>
+          </a>
+          <a href="demos/physics-playground.html" class="demo-card">
+            <div class="demo-preview" style="background:linear-gradient(135deg,#1F9B87,#B3F0E4);"><span class="icon icon-activity"></span></div>
+            <div class="demo-info">
+              <h3>Physics Playground</h3>
+              <p data-i18n-en>Interactive physics parameter controls.</p>
+              <p data-i18n-zh>互動式物理參數控制面板。</p>
+            </div>
+          </a>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div data-include="_includes/footer.html"></div>
+  <script src="assets/js/docs.js"></script>
+</body>
+</html>

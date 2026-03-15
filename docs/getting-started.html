@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Getting Started — DriftSlider</title>
+  <meta name="description" content="Learn how to install and set up DriftSlider in your project using npm, CDN, or direct download.">
+  <meta name="keywords" content="DriftSlider, install, setup, getting started, npm, CDN, jQuery, TypeScript">
+  <link rel="canonical" href="https://hanfour.github.io/drift-slider/getting-started.html">
+  <meta property="og:title" content="Getting Started — DriftSlider">
+  <meta property="og:description" content="Learn how to install and set up DriftSlider in your project using npm, CDN, or direct download.">
+  <meta property="og:image" content="https://hanfour.github.io/drift-slider/assets/img/og-image.svg">
+  <meta property="og:url" content="https://hanfour.github.io/drift-slider/getting-started.html">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Getting Started — DriftSlider">
+  <meta name="twitter:description" content="Learn how to install and set up DriftSlider in your project using npm, CDN, or direct download.">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/docs.css">
+  <link rel="stylesheet" href="assets/css/prism-onedark.css">
+  <link rel="stylesheet" href="assets/lib/drift-slider-bundle.css">
+</head>
+<body>
+  <div data-include="_includes/header.html"></div>
+
+  <div class="page-with-sidebar">
+    <!-- ═══ Sidebar ═══ -->
+    <aside class="sidebar">
+      <nav class="sidebar-nav">
+        <a href="#installation" data-nav>Installation</a>
+        <a href="#html-structure" data-nav>HTML Structure</a>
+        <a href="#css-import" data-nav>CSS Import</a>
+        <a href="#javascript-init" data-nav>JavaScript Init</a>
+        <a href="#jquery" data-nav>jQuery</a>
+        <a href="#typescript" data-nav>TypeScript</a>
+        <a href="#next-steps" data-nav>Next Steps</a>
+      </nav>
+    </aside>
+
+    <!-- ═══ Content ═══ -->
+    <main class="content">
+
+      <h1 data-i18n-en>Getting Started</h1>
+      <h1 data-i18n-zh>快速入門</h1>
+      <p data-i18n-en>Everything you need to install and initialize DriftSlider in your project.</p>
+      <p data-i18n-zh>安裝並初始化 DriftSlider 所需的一切。</p>
+
+      <!-- ─── Installation ─── -->
+      <section id="installation">
+        <h2 data-i18n-en>Installation</h2>
+        <h2 data-i18n-zh>安裝</h2>
+        <p data-i18n-en>Choose the method that best fits your workflow.</p>
+        <p data-i18n-zh>選擇最適合你工作流程的方式。</p>
+
+        <div class="code-tabs">
+          <div class="tab-bar">
+            <button class="tab-btn active" data-tab="install-npm">npm</button>
+            <button class="tab-btn" data-tab="install-cdn">CDN</button>
+            <button class="tab-btn" data-tab="install-download">Download</button>
+          </div>
+          <div class="tab-panel active" data-tab="install-npm">
+            <div class="code-block">
+              <span class="code-lang">bash</span>
+              <pre><code class="language-bash">npm install drift-slider</code></pre>
+            </div>
+          </div>
+          <div class="tab-panel" data-tab="install-cdn">
+            <div class="code-block">
+              <span class="code-lang">html</span>
+              <pre><code class="language-markup">&lt;link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/drift-slider/dist/drift-slider-bundle.css"&gt;
+&lt;script src="https://cdn.jsdelivr.net/npm/drift-slider/dist/drift-slider.umd.js"&gt;&lt;/script&gt;</code></pre>
+            </div>
+          </div>
+          <div class="tab-panel" data-tab="install-download">
+            <p data-i18n-en>Download the latest release from GitHub and include the files manually:</p>
+            <p data-i18n-zh>從 GitHub 下載最新版本並手動引入檔案：</p>
+            <p><a href="https://github.com/hanfour/drift-slider/releases" target="_blank" rel="noopener" class="btn btn-outline">GitHub Releases</a></p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── HTML Structure ─── -->
+      <section id="html-structure">
+        <h2 data-i18n-en>HTML Structure</h2>
+        <h2 data-i18n-zh>HTML 結構</h2>
+        <p data-i18n-en>DriftSlider uses semantic HTML with a clear, predictable structure. Navigation arrows and pagination are optional.</p>
+        <p data-i18n-zh>DriftSlider 使用語意化 HTML，結構清晰、可預測。導航箭頭與分頁為可選項。</p>
+
+        <div class="code-block">
+          <span class="code-lang">html</span>
+          <pre><code class="language-markup">&lt;section class="drift-slider" aria-label="My Slider"&gt;
+  &lt;div class="drift-track"&gt;
+    &lt;ul class="drift-list"&gt;
+      &lt;li class="drift-slide"&gt;Slide 1&lt;/li&gt;
+      &lt;li class="drift-slide"&gt;Slide 2&lt;/li&gt;
+      &lt;li class="drift-slide"&gt;Slide 3&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/div&gt;
+  &lt;!-- Optional: Navigation arrows --&gt;
+  &lt;button class="drift-arrow drift-arrow--prev" type="button"&gt;&lt;/button&gt;
+  &lt;button class="drift-arrow drift-arrow--next" type="button"&gt;&lt;/button&gt;
+  &lt;!-- Optional: Pagination --&gt;
+  &lt;div class="drift-pagination"&gt;&lt;/div&gt;
+&lt;/section&gt;</code></pre>
+        </div>
+      </section>
+
+      <!-- ─── CSS Import ─── -->
+      <section id="css-import">
+        <h2 data-i18n-en>CSS Import</h2>
+        <h2 data-i18n-zh>CSS 匯入</h2>
+        <p data-i18n-en>Import the bundled stylesheet which includes all module styles, or import only the core styles if you prefer a minimal footprint.</p>
+        <p data-i18n-zh>匯入包含所有模組樣式的整合樣式表，或僅匯入核心樣式以減少檔案大小。</p>
+
+        <div class="code-block">
+          <span class="code-lang">javascript</span>
+          <pre><code class="language-javascript">// Bundled (includes all module styles)
+import 'drift-slider/css/bundle';
+
+// Or core only
+import 'drift-slider/css';</code></pre>
+        </div>
+      </section>
+
+      <!-- ─── JavaScript Init ─── -->
+      <section id="javascript-init">
+        <h2 data-i18n-en>JavaScript Initialization</h2>
+        <h2 data-i18n-zh>JavaScript 初始化</h2>
+        <p data-i18n-en>DriftSlider supports both ESM and UMD formats. Pick the one that matches your build setup.</p>
+        <p data-i18n-zh>DriftSlider 同時支援 ESM 和 UMD 格式，選擇與你建構工具相符的方式。</p>
+
+        <div class="code-tabs">
+          <div class="tab-bar">
+            <button class="tab-btn active" data-tab="init-esm">ESM</button>
+            <button class="tab-btn" data-tab="init-umd">UMD</button>
+          </div>
+          <div class="tab-panel active" data-tab="init-esm">
+            <div class="code-block">
+              <span class="code-lang">javascript</span>
+              <pre><code class="language-javascript">import DriftSlider from 'drift-slider';
+import { Navigation, Pagination, Autoplay, A11y } from 'drift-slider/modules';
+
+const slider = new DriftSlider('.drift-slider', {
+  modules: [Navigation, Pagination, Autoplay, A11y],
+  slidesPerView: 1,
+  spaceBetween: 20,
+  speed: 400,
+  grabCursor: true,
+  loop: true,
+  autoplay: { enabled: true, delay: 3000 },
+});</code></pre>
+            </div>
+          </div>
+          <div class="tab-panel" data-tab="init-umd">
+            <div class="code-block">
+              <span class="code-lang">html</span>
+              <pre><code class="language-markup">&lt;script src="drift-slider.umd.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+  var DS = DriftSlider;
+  var slider = new DS.DriftSlider('.drift-slider', {
+    modules: [DS.Navigation, DS.Pagination, DS.A11y],
+    slidesPerView: 1,
+    speed: 400,
+  });
+&lt;/script&gt;</code></pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── jQuery ─── -->
+      <section id="jquery">
+        <h2>jQuery</h2>
+        <p data-i18n-en>If your project uses jQuery, DriftSlider provides a dedicated plugin build. All modules are included automatically — no need to register them manually.</p>
+        <p data-i18n-zh>如果你的專案使用 jQuery，DriftSlider 提供專用的插件版本。所有模組已自動包含，無需手動註冊。</p>
+
+        <div class="code-block">
+          <span class="code-lang">html</span>
+          <pre><code class="language-markup">&lt;script src="jquery.min.js"&gt;&lt;/script&gt;
+&lt;script src="drift-slider.jquery.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+  $('.drift-slider').driftSlider({
+    slidesPerView: 1,
+    loop: true,
+    navigation: true,
+    pagination: { type: 'bullets' },
+    autoplay: { enabled: true, delay: 4000 },
+  });
+&lt;/script&gt;</code></pre>
+        </div>
+
+        <p data-i18n-en><strong>Note:</strong> The jQuery build includes all modules automatically. You do not need to import or register them separately.</p>
+        <p data-i18n-zh><strong>注意：</strong>jQuery 版本已自動包含所有模組，無需另外匯入或註冊。</p>
+      </section>
+
+      <!-- ─── TypeScript ─── -->
+      <section id="typescript">
+        <h2>TypeScript</h2>
+        <p data-i18n-en>DriftSlider ships with full TypeScript declarations. Use the exported types for strong type-checking on your slider options and event callbacks.</p>
+        <p data-i18n-zh>DriftSlider 內建完整的 TypeScript 型別宣告。使用匯出的型別可對滑塊選項和事件回呼進行嚴格的型別檢查。</p>
+
+        <div class="code-block">
+          <span class="code-lang">typescript</span>
+          <pre><code class="language-typescript">import DriftSlider, { DriftSliderOptions } from 'drift-slider';
+import { Navigation, Pagination } from 'drift-slider/modules';
+
+const options: DriftSliderOptions = {
+  modules: [Navigation, Pagination],
+  slidesPerView: 1,
+  speed: 400,
+  on: {
+    slideChange: (slider) =&gt; {
+      console.log('Current slide:', slider.activeIndex);
+    },
+  },
+};
+
+const slider = new DriftSlider('.drift-slider', options);</code></pre>
+        </div>
+      </section>
+
+      <!-- ─── Next Steps ─── -->
+      <section id="next-steps">
+        <h2 data-i18n-en>Next Steps</h2>
+        <h2 data-i18n-zh>下一步</h2>
+        <p data-i18n-en>Now that your slider is running, explore the full capabilities of DriftSlider:</p>
+        <p data-i18n-zh>滑塊已成功運行，接下來探索 DriftSlider 的完整功能：</p>
+
+        <ul>
+          <li>
+            <a href="api.html"><strong data-i18n-en>API Documentation</strong><strong data-i18n-zh>API 文件</strong></a>
+            <span data-i18n-en> — Full options reference, methods, and events.</span>
+            <span data-i18n-zh> — 完整的選項參考、方法和事件。</span>
+          </li>
+          <li>
+            <a href="modules.html"><strong data-i18n-en>Modules Reference</strong><strong data-i18n-zh>模組參考</strong></a>
+            <span data-i18n-en> — Deep dive into Navigation, Pagination, Autoplay, and more.</span>
+            <span data-i18n-zh> — 深入了解 Navigation、Pagination、Autoplay 等模組。</span>
+          </li>
+          <li>
+            <a href="demos.html"><strong data-i18n-en>Demo Gallery</strong><strong data-i18n-zh>範例展示</strong></a>
+            <span data-i18n-en> — Interactive examples for every effect and configuration.</span>
+            <span data-i18n-zh> — 每種效果和配置的互動範例。</span>
+          </li>
+        </ul>
+      </section>
+
+    </main>
+  </div><!-- .page-with-sidebar -->
+
+  <div data-include="_includes/footer.html"></div>
+
+  <!-- Scripts -->
+  <script src="assets/js/prism.js"></script>
+  <script src="assets/js/docs.js"></script>
+</body>
+</html>

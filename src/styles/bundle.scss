@@ -1,0 +1,8 @@
+// DriftSlider Bundle - Core + All Module Styles
+@use 'drift-slider';
+
+// Module styles
+@use '../modules/navigation/navigation';
+@use '../modules/pagination/pagination';
+@use '../modules/autoplay/autoplay';
+@use '../modules/effects/effect-fade';

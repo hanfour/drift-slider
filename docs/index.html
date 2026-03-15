@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DriftSlider — Lightweight, Modular Slider with Physics-Based Touch</title>
+  <meta name="description" content="A lightweight, modular slider/carousel library with physics-based touch interaction. < 10KB gzipped.">
+  <meta name="keywords" content="DriftSlider, slider, carousel, JavaScript, touch, physics, modular, lightweight">
+  <link rel="canonical" href="https://hanfour.github.io/drift-slider/index.html">
+  <meta property="og:title" content="DriftSlider — Lightweight, Modular Slider with Physics-Based Touch">
+  <meta property="og:description" content="A lightweight, modular slider/carousel library with physics-based touch interaction. < 10KB gzipped.">
+  <meta property="og:image" content="https://hanfour.github.io/drift-slider/assets/img/og-image.svg">
+  <meta property="og:url" content="https://hanfour.github.io/drift-slider/index.html">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="DriftSlider — Lightweight, Modular Slider with Physics-Based Touch">
+  <meta name="twitter:description" content="A lightweight, modular slider/carousel library with physics-based touch interaction. < 10KB gzipped.">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"SoftwareSourceCode","name":"DriftSlider","description":"Lightweight, modular slider/carousel with physics-based touch interaction for the web.","programmingLanguage":"JavaScript","license":"https://opensource.org/licenses/MIT","codeRepository":"https://github.com/hanfour/drift-slider"}
+  </script>
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/docs.css">
+  <link rel="stylesheet" href="assets/css/prism-onedark.css">
+  <link rel="stylesheet" href="assets/lib/drift-slider-bundle.css">
+</head>
+<body>
+  <div data-include="_includes/header.html"></div>
+
+  <div class="page-body">
+    <!-- ═══ Hero ═══ -->
+    <section class="hero">
+      <h1>
+        <span data-i18n-en>Drift</span><span data-i18n-zh>Drift</span>Slider
+      </h1>
+      <p class="hero-desc" data-i18n-en>Lightweight, modular slider with physics-based touch interaction</p>
+      <p class="hero-desc" data-i18n-zh>輕量、模組化、物理慣性觸控的 Slider/Carousel 函式庫</p>
+      <div class="hero-badges">
+        <span class="hero-badge"><strong>v0.1.0</strong></span>
+        <span class="hero-badge">MIT License</span>
+        <span class="hero-badge">&lt; 10KB gzip</span>
+        <span class="hero-badge">Zero Dependencies</span>
+      </div>
+      <div class="hero-cta">
+        <a href="getting-started.html" class="btn btn-primary">Get Started</a>
+        <a href="https://github.com/hanfour/drift-slider" class="btn btn-outline" target="_blank" rel="noopener">
+          <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+          GitHub
+        </a>
+      </div>
+
+      <!-- Live Demo: Coverflow -->
+      <div style="max-width:800px; margin:0 auto;">
+        <section class="drift-slider" id="hero-slider" aria-label="Hero demo slider" style="overflow:visible; border-radius:12px;">
+          <div class="drift-track" style="overflow:visible !important;">
+            <ul class="drift-list">
+              <li class="drift-slide"><div class="slide-content slide-1" style="border-radius:12px;">Slide 1</div></li>
+              <li class="drift-slide"><div class="slide-content slide-2" style="border-radius:12px;">Slide 2</div></li>
+              <li class="drift-slide"><div class="slide-content slide-3" style="border-radius:12px;">Slide 3</div></li>
+              <li class="drift-slide"><div class="slide-content slide-4" style="border-radius:12px;">Slide 4</div></li>
+              <li class="drift-slide"><div class="slide-content slide-5" style="border-radius:12px;">Slide 5</div></li>
+            </ul>
+          </div>
+          <button class="drift-arrow drift-arrow--prev" aria-label="Previous" type="button"></button>
+          <button class="drift-arrow drift-arrow--next" aria-label="Next" type="button"></button>
+          <div class="drift-pagination"></div>
+        </section>
+      </div>
+    </section>
+
+    <!-- ═══ Features Grid ═══ -->
+    <section class="section section-alt">
+      <h2 class="section-title" data-i18n-en>Why DriftSlider?</h2>
+      <h2 class="section-title" data-i18n-zh>為什麼選擇 DriftSlider？</h2>
+      <p class="section-desc" data-i18n-en>Built for modern web — fast, accessible, and endlessly customizable.</p>
+      <p class="section-desc" data-i18n-zh>為現代網頁打造 — 快速、無障礙、可無限自訂。</p>
+      <div class="features-grid">
+        <div class="feature-card">
+          <span class="icon icon-zap"></span>
+          <h3 data-i18n-en>Lightweight</h3>
+          <h3 data-i18n-zh>輕量</h3>
+          <p data-i18n-en>Core under 10KB gzipped. Zero production dependencies.</p>
+          <p data-i18n-zh>核心不到 10KB gzip，零生產依賴。</p>
+        </div>
+        <div class="feature-card">
+          <span class="icon icon-crosshair"></span>
+          <h3 data-i18n-en>Physics-Based Touch</h3>
+          <h3 data-i18n-zh>物理慣性觸控</h3>
+          <p data-i18n-en>Velocity tracking + friction + bounce for natural feel.</p>
+          <p data-i18n-zh>速度追蹤 + 摩擦力 + 回彈，帶來自然手感。</p>
+        </div>
+        <div class="feature-card">
+          <span class="icon icon-package"></span>
+          <h3 data-i18n-en>Modular Architecture</h3>
+          <h3 data-i18n-zh>模組化架構</h3>
+          <p data-i18n-en>9 optional modules — only bundle what you use.</p>
+          <p data-i18n-zh>9 個可選模組 — 只打包你需要的。</p>
+        </div>
+        <div class="feature-card">
+          <span class="icon icon-shield"></span>
+          <h3 data-i18n-en>Accessible</h3>
+          <h3 data-i18n-zh>無障礙</h3>
+          <p data-i18n-en>ARIA labels, keyboard navigation, prefers-reduced-motion.</p>
+          <p data-i18n-zh>ARIA 標籤、鍵盤導航、prefers-reduced-motion。</p>
+        </div>
+        <div class="feature-card">
+          <span class="icon icon-repeat"></span>
+          <h3 data-i18n-en>Dual Interface</h3>
+          <h3 data-i18n-zh>雙介面</h3>
+          <p data-i18n-en>Vanilla JS (ESM/UMD/CJS) + jQuery plugin.</p>
+          <p data-i18n-zh>原生 JS (ESM/UMD/CJS) + jQuery 插件。</p>
+        </div>
+        <div class="feature-card">
+          <span class="icon icon-layers"></span>
+          <h3 data-i18n-en>4 Effects</h3>
+          <h3 data-i18n-zh>4 種效果</h3>
+          <p data-i18n-en>Slide, Fade, 3D Coverflow, and Cards (stack/diagonal/flip).</p>
+          <p data-i18n-zh>Slide、Fade、3D Coverflow、Cards（堆疊/對角/翻轉）。</p>
+        </div>
+        <div class="feature-card">
+          <span class="icon icon-smartphone"></span>
+          <h3 data-i18n-en>Responsive</h3>
+          <h3 data-i18n-zh>響應式</h3>
+          <p data-i18n-en>Breakpoint system for mobile-first adaptive designs.</p>
+          <p data-i18n-zh>斷點系統，支援行動優先自適應設計。</p>
+        </div>
+        <div class="feature-card">
+          <span class="icon icon-code"></span>
+          <h3 data-i18n-en>TypeScript Ready</h3>
+          <h3 data-i18n-zh>TypeScript 支援</h3>
+          <p data-i18n-en>Full type definitions included out of the box.</p>
+          <p data-i18n-zh>內建完整型別定義。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ Effects Showcase ═══ -->
+    <section class="section">
+      <h2 class="section-title" data-i18n-en>Effects</h2>
+      <h2 class="section-title" data-i18n-zh>效果展示</h2>
+      <p class="section-desc" data-i18n-en>Four built-in transition effects to match any design.</p>
+      <p class="section-desc" data-i18n-zh>四種內建轉場效果，適配任何設計。</p>
+      <div class="effects-grid">
+        <!-- Slide -->
+        <div class="effect-item">
+          <section class="drift-slider effect-slide" aria-label="Slide effect demo">
+            <div class="drift-track"><ul class="drift-list">
+              <li class="drift-slide"><div class="slide-content slide-1" style="height:200px;font-size:1.2em;">Slide</div></li>
+              <li class="drift-slide"><div class="slide-content slide-2" style="height:200px;font-size:1.2em;">Effect</div></li>
+              <li class="drift-slide"><div class="slide-content slide-3" style="height:200px;font-size:1.2em;">Demo</div></li>
+            </ul></div>
+            <div class="drift-pagination"></div>
+          </section>
+          <h4>Slide</h4>
+          <p data-i18n-en>Classic horizontal sliding</p>
+          <p data-i18n-zh>經典水平滑動</p>
+        </div>
+        <!-- Fade -->
+        <div class="effect-item">
+          <section class="drift-slider effect-fade" aria-label="Fade effect demo">
+            <div class="drift-track"><ul class="drift-list">
+              <li class="drift-slide"><div class="slide-content" style="height:200px;font-size:1.2em;background:#2C3E50;">Fade</div></li>
+              <li class="drift-slide"><div class="slide-content" style="height:200px;font-size:1.2em;background:#8E44AD;">Effect</div></li>
+              <li class="drift-slide"><div class="slide-content" style="height:200px;font-size:1.2em;background:#16A085;">Demo</div></li>
+            </ul></div>
+            <div class="drift-pagination"></div>
+          </section>
+          <h4>Fade</h4>
+          <p data-i18n-en>Smooth cross-fade transition</p>
+          <p data-i18n-zh>平滑交叉淡入淡出</p>
+        </div>
+        <!-- Coverflow -->
+        <div class="effect-item">
+          <section class="drift-slider effect-coverflow" aria-label="Coverflow effect demo" style="overflow:visible;">
+            <div class="drift-track" style="overflow:visible !important;"><ul class="drift-list">
+              <li class="drift-slide"><div class="slide-content slide-4" style="height:200px;font-size:1.2em;border-radius:8px;">A</div></li>
+              <li class="drift-slide"><div class="slide-content slide-5" style="height:200px;font-size:1.2em;border-radius:8px;">B</div></li>
+              <li class="drift-slide"><div class="slide-content slide-6" style="height:200px;font-size:1.2em;border-radius:8px;">C</div></li>
+              <li class="drift-slide"><div class="slide-content slide-1" style="height:200px;font-size:1.2em;border-radius:8px;">D</div></li>
+              <li class="drift-slide"><div class="slide-content slide-2" style="height:200px;font-size:1.2em;border-radius:8px;">E</div></li>
+            </ul></div>
+            <div class="drift-pagination"></div>
+          </section>
+          <h4>Coverflow</h4>
+          <p data-i18n-en>3D cover flow perspective</p>
+          <p data-i18n-zh>3D 封面流透視效果</p>
+        </div>
+        <!-- Cards -->
+        <div class="effect-item">
+          <section class="drift-slider effect-cards" aria-label="Cards effect demo">
+            <div class="drift-track"><ul class="drift-list">
+              <li class="drift-slide"><div class="slide-content slide-3" style="height:200px;font-size:1.2em;border-radius:8px;">1</div></li>
+              <li class="drift-slide"><div class="slide-content slide-4" style="height:200px;font-size:1.2em;border-radius:8px;">2</div></li>
+              <li class="drift-slide"><div class="slide-content slide-5" style="height:200px;font-size:1.2em;border-radius:8px;">3</div></li>
+            </ul></div>
+            <div class="drift-pagination"></div>
+          </section>
+          <h4>Cards</h4>
+          <p data-i18n-en>Stacked card transitions</p>
+          <p data-i18n-zh>堆疊卡片轉場</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ Quick Install ═══ -->
+    <section class="section section-alt">
+      <h2 class="section-title" data-i18n-en>Quick Install</h2>
+      <h2 class="section-title" data-i18n-zh>快速安裝</h2>
+      <p class="section-desc" data-i18n-en>Get started in seconds with your preferred method.</p>
+      <p class="section-desc" data-i18n-zh>用你喜歡的方式，幾秒鐘即可開始。</p>
+      <div class="install-section">
+        <div class="code-tabs">
+          <div class="tab-bar">
+            <button class="tab-btn active" data-tab="npm">npm</button>
+            <button class="tab-btn" data-tab="cdn">CDN</button>
+            <button class="tab-btn" data-tab="esm">ESM</button>
+          </div>
+          <div class="tab-panel active" data-tab="npm">
+            <div class="code-block"><pre><code class="language-bash">npm install drift-slider</code></pre></div>
+          </div>
+          <div class="tab-panel" data-tab="cdn">
+            <div class="code-block"><pre><code class="language-markup">&lt;link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/drift-slider/dist/drift-slider-bundle.css"&gt;
+&lt;script src="https://cdn.jsdelivr.net/npm/drift-slider/dist/drift-slider.umd.js"&gt;&lt;/script&gt;</code></pre></div>
+          </div>
+          <div class="tab-panel" data-tab="esm">
+            <div class="code-block"><pre><code class="language-javascript">import DriftSlider from 'drift-slider';
+import { Navigation, Pagination } from 'drift-slider/modules';
+import 'drift-slider/css/bundle';</code></pre></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div><!-- .page-body -->
+
+  <div data-include="_includes/footer.html"></div>
+
+  <!-- Scripts -->
+  <script src="assets/lib/drift-slider.umd.js"></script>
+  <script src="assets/js/prism.js"></script>
+  <script src="assets/js/docs.js"></script>
+  <script>
+    (function () {
+      var DS = DriftSlider;
+
+      // Hero Coverflow Slider
+      new DS.DriftSlider('#hero-slider', {
+        modules: [DS.Navigation, DS.Pagination, DS.EffectCoverflow, DS.Autoplay, DS.A11y],
+        effect: 'coverflow',
+        slidesPerView: 3,
+        centeredSlides: true,
+        loop: true,
+        speed: 500,
+        grabCursor: true,
+        autoplay: { enabled: true, delay: 3000, disableOnInteraction: false },
+        coverflowEffect: {
+          depth: 200,
+          rotate: 30,
+          scale: 0.85,
+          opacity: 0.6,
+          overlay: true,
+          overlayColor: 'rgba(0,0,0,0.4)',
+          activeOpacity: 1,
+        },
+      });
+
+      // Effect: Slide
+      new DS.DriftSlider('.effect-slide', {
+        modules: [DS.Pagination, DS.Autoplay, DS.A11y],
+        slidesPerView: 1,
+        speed: 400,
+        loop: true,
+        autoplay: { enabled: true, delay: 2500, disableOnInteraction: false },
+      });
+
+      // Effect: Fade
+      new DS.DriftSlider('.effect-fade', {
+        modules: [DS.Pagination, DS.EffectFade, DS.Autoplay, DS.A11y],
+        effect: 'fade',
+        speed: 600,
+        loop: true,
+        autoplay: { enabled: true, delay: 2500, disableOnInteraction: false },
+      });
+
+      // Effect: Coverflow
+      new DS.DriftSlider('.effect-coverflow', {
+        modules: [DS.Pagination, DS.EffectCoverflow, DS.Autoplay, DS.A11y],
+        effect: 'coverflow',
+        slidesPerView: 3,
+        centeredSlides: true,
+        loop: true,
+        speed: 500,
+        autoplay: { enabled: true, delay: 2500, disableOnInteraction: false },
+        coverflowEffect: {
+          depth: 150,
+          rotate: 25,
+          scale: 0.8,
+          opacity: 0.5,
+          overlay: true,
+        },
+      });
+
+      // Effect: Cards
+      new DS.DriftSlider('.effect-cards', {
+        modules: [DS.Pagination, DS.EffectCards, DS.Autoplay, DS.A11y],
+        effect: 'cards',
+        speed: 500,
+        loop: true,
+        autoplay: { enabled: true, delay: 2500, disableOnInteraction: false },
+        cardsEffect: { mode: 'stack', overlay: true },
+      });
+    })();
+  </script>
+</body>
+</html>

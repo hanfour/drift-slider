@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DriftSlider — Responsive Breakpoints</title>
+  <meta name="description" content="Responsive DriftSlider with adaptive slidesPerView using breakpoint system.">
+  <meta name="keywords" content="DriftSlider, demo, responsive, breakpoints, slidesPerView, adaptive, mobile">
+  <link rel="canonical" href="https://hanfour.github.io/drift-slider/demos/responsive.html">
+  <meta property="og:title" content="DriftSlider — Responsive Breakpoints">
+  <meta property="og:description" content="Responsive DriftSlider with adaptive slidesPerView using breakpoint system.">
+  <meta property="og:image" content="https://hanfour.github.io/drift-slider/assets/img/og-image.svg">
+  <meta property="og:url" content="https://hanfour.github.io/drift-slider/demos/responsive.html">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="DriftSlider — Responsive Breakpoints">
+  <meta name="twitter:description" content="Responsive DriftSlider with adaptive slidesPerView using breakpoint system.">
+  <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/docs.css">
+  <link rel="stylesheet" href="../assets/css/prism-onedark.css">
+  <link rel="stylesheet" href="../assets/lib/drift-slider-bundle.css">
+</head>
+<body>
+  <div data-include="../_includes/header.html"></div>
+  <div class="page-body">
+    <div class="demo-page" style="max-width:960px">
+      <a href="../demos.html" class="demo-back">&larr; Back to Demos</a>
+      <h1>Responsive Breakpoints</h1>
+      <p class="demo-desc">Automatically adjust <code>slidesPerView</code> based on viewport width.</p>
+
+      <!-- Live slider demo -->
+      <div class="drift-slider">
+        <div class="drift-track"><ul class="drift-list">
+          <li class="drift-slide"><div class="card"><h3>Card 1</h3><p>Responsive content that adapts to your screen size.</p></div></li>
+          <li class="drift-slide"><div class="card"><h3>Card 2</h3><p>Resize the browser window to see breakpoints in action.</p></div></li>
+          <li class="drift-slide"><div class="card"><h3>Card 3</h3><p>Mobile shows 1 slide, tablet shows 2, desktop shows 3.</p></div></li>
+          <li class="drift-slide"><div class="card"><h3>Card 4</h3><p>Breakpoints are configured via the breakpoints option.</p></div></li>
+          <li class="drift-slide"><div class="card"><h3>Card 5</h3><p>Each breakpoint can override any slider parameter.</p></div></li>
+          <li class="drift-slide"><div class="card"><h3>Card 6</h3><p>spaceBetween also adjusts per breakpoint.</p></div></li>
+        </ul></div>
+        <button class="drift-arrow drift-arrow--prev" aria-label="Previous" type="button"></button>
+        <button class="drift-arrow drift-arrow--next" aria-label="Next" type="button"></button>
+        <div class="drift-pagination"></div>
+      </div>
+
+      <div class="demo-info-bar">
+        <span>Breakpoints: <strong>768px &rarr; 2 slides</strong> | <strong>1024px &rarr; 3 slides</strong></span>
+        <span>Current slidesPerView: <strong id="current-spv">1</strong></span>
+      </div>
+
+      <!-- Source Code section -->
+      <h2 class="demo-section-title">Source Code</h2>
+      <div class="code-block">
+        <span class="code-lang">js</span>
+        <pre><code class="language-javascript">var DS = DriftSlider;
+var slider = new DS.DriftSlider('.drift-slider', {
+  modules: [DS.Navigation, DS.Pagination, DS.A11y],
+  slidesPerView: 1,
+  spaceBetween: 16,
+  grabCursor: true,
+  breakpoints: {
+    768: { slidesPerView: 2, spaceBetween: 20 },
+    1024: { slidesPerView: 3, spaceBetween: 24 },
+  },
+  on: {
+    init: function(s) { updateSpv(s); },
+    breakpoint: function(s) { updateSpv(s); },
+  },
+});
+function updateSpv(s) {
+  document.getElementById('current-spv').textContent = s.params.slidesPerView;
+}</code></pre>
+      </div>
+    </div>
+  </div>
+  <div data-include="../_includes/footer.html"></div>
+  <script src="../assets/lib/drift-slider.umd.js"></script>
+  <script src="../assets/js/prism.js"></script>
+  <script src="../assets/js/docs.js"></script>
+  <script>
+    var DS = DriftSlider;
+    var slider = new DS.DriftSlider('.drift-slider', {
+      modules: [DS.Navigation, DS.Pagination, DS.A11y],
+      slidesPerView: 1,
+      spaceBetween: 16,
+      grabCursor: true,
+      breakpoints: {
+        768: { slidesPerView: 2, spaceBetween: 20 },
+        1024: { slidesPerView: 3, spaceBetween: 24 },
+      },
+      on: {
+        init: function(s) { updateSpv(s); },
+        breakpoint: function(s) { updateSpv(s); },
+      },
+    });
+    function updateSpv(s) {
+      document.getElementById('current-spv').textContent = s.params.slidesPerView;
+    }
+  </script>
+</body>
+</html>

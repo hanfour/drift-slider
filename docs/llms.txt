@@ -1,0 +1,20 @@
+# DriftSlider
+> Lightweight, modular slider/carousel with physics-based touch for the web.
+
+## Quick Start
+npm install drift-slider
+
+## Features
+- 4 effects: slide, fade, coverflow, cards
+- 9 optional modules: Navigation, Pagination, Autoplay, EffectFade, EffectCoverflow, EffectCards, Keyboard, A11y, ScrollAos
+- Physics-based momentum scrolling
+- jQuery plugin included
+- TypeScript definitions
+- <10KB gzipped core
+
+## Links
+- Docs: /getting-started.html
+- API: /api.html
+- Modules: /modules.html
+- Demos: /demos.html
+- Changelog: /changelog.html

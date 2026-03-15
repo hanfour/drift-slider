@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DriftSlider — 響應式</title>
+  <link rel="stylesheet" href="demo-common.css">
+  <style>body { max-width: 960px; }</style>
+</head>
+<body>
+  <a class="back" href="index.html">&larr; 返回展示頁</a>
+  <h1>響應式斷點</h1>
+  <p class="desc">依視窗寬度自動調整 <code>slidesPerView</code>：手機 1 張、平板 2 張、桌面 3 張</p>
+
+  <section class="drift-slider" aria-label="響應式範例輪播">
+    <div class="drift-track">
+      <ul class="drift-list">
+        <li class="drift-slide"><div class="card"><h3>卡片 1</h3><p>產品描述文字</p></div></li>
+        <li class="drift-slide"><div class="card"><h3>卡片 2</h3><p>產品描述文字</p></div></li>
+        <li class="drift-slide"><div class="card"><h3>卡片 3</h3><p>產品描述文字</p></div></li>
+        <li class="drift-slide"><div class="card"><h3>卡片 4</h3><p>產品描述文字</p></div></li>
+        <li class="drift-slide"><div class="card"><h3>卡片 5</h3><p>產品描述文字</p></div></li>
+        <li class="drift-slide"><div class="card"><h3>卡片 6</h3><p>產品描述文字</p></div></li>
+      </ul>
+    </div>
+    <button class="drift-arrow drift-arrow--prev" aria-label="上一張" type="button"></button>
+    <button class="drift-arrow drift-arrow--next" aria-label="下一張" type="button"></button>
+    <div class="drift-pagination"></div>
+  </section>
+
+  <div class="info">
+    <strong>斷點設定：</strong>
+    <code>&lt;768px → 1 張</code> |
+    <code>≥768px → 2 張</code> |
+    <code>≥1024px → 3 張</code>
+    <br>
+    <strong>目前 slidesPerView：</strong><code id="current-spv">1</code>
+  </div>
+
+  <script src="../dist/drift-slider.umd.js"></script>
+  <script>
+    var DS = DriftSlider;
+    var slider = new DS.DriftSlider('.drift-slider', {
+      modules: [DS.Navigation, DS.Pagination, DS.A11y],
+      slidesPerView: 1,
+      spaceBetween: 16,
+      grabCursor: true,
+      breakpoints: {
+        768: { slidesPerView: 2, spaceBetween: 20 },
+        1024: { slidesPerView: 3, spaceBetween: 24 },
+      },
+      on: {
+        init: function(s) { updateSpv(s); },
+        breakpoint: function(s) { updateSpv(s); },
+      },
+    });
+
+    function updateSpv(s) {
+      document.getElementById('current-spv').textContent = s.params.slidesPerView;
+    }
+
+    window.slider = slider;
+  </script>
+</body>
+</html>

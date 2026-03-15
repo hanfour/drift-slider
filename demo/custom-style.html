@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DriftSlider — 自訂導航樣式</title>
+  <link rel="stylesheet" href="demo-common.css">
+</head>
+<body>
+  <a class="back" href="index.html">&larr; 返回展示頁</a>
+  <h1>自訂導航樣式</h1>
+  <p class="desc">透過 JS 參數自訂箭頭位置與分頁圓點樣式，無需覆寫 CSS</p>
+
+  <section class="drift-slider" aria-label="自訂樣式範例輪播">
+    <div class="drift-track">
+      <ul class="drift-list">
+        <li class="drift-slide"><div class="slide-content slide-1">Slide 1</div></li>
+        <li class="drift-slide"><div class="slide-content slide-2">Slide 2</div></li>
+        <li class="drift-slide"><div class="slide-content slide-3">Slide 3</div></li>
+        <li class="drift-slide"><div class="slide-content slide-4">Slide 4</div></li>
+        <li class="drift-slide"><div class="slide-content slide-5">Slide 5</div></li>
+      </ul>
+    </div>
+    <button class="drift-arrow drift-arrow--prev" aria-label="上一張" type="button"></button>
+    <button class="drift-arrow drift-arrow--next" aria-label="下一張" type="button"></button>
+    <div class="drift-pagination"></div>
+  </section>
+
+  <div class="info">
+    <strong>目前 Slide：</strong><code id="current-index">1</code> / 5
+  </div>
+
+  <h2 style="margin-top:48px;">進度條模式 (Progressbar)</h2>
+  <p class="desc">使用 <code>type: 'progressbar'</code> 搭配自訂樣式，將進度條移到 slider 底部</p>
+
+  <section class="drift-slider" id="slider-progress" aria-label="進度條範例輪播">
+    <div class="drift-track">
+      <ul class="drift-list">
+        <li class="drift-slide"><div class="slide-content slide-1">Slide 1</div></li>
+        <li class="drift-slide"><div class="slide-content slide-2">Slide 2</div></li>
+        <li class="drift-slide"><div class="slide-content slide-3">Slide 3</div></li>
+        <li class="drift-slide"><div class="slide-content slide-4">Slide 4</div></li>
+        <li class="drift-slide"><div class="slide-content slide-5">Slide 5</div></li>
+      </ul>
+    </div>
+    <button class="drift-arrow drift-arrow--prev" aria-label="上一張" type="button"></button>
+    <button class="drift-arrow drift-arrow--next" aria-label="下一張" type="button"></button>
+    <div class="drift-pagination"></div>
+  </section>
+
+  <div class="info">
+    <strong>目前 Slide：</strong><code id="progress-index">1</code> / 5
+  </div>
+
+  <h2 style="margin-top:32px;">使用的自訂參數</h2>
+  <pre><code>// 自訂圓點 + 箭頭位置
+navigation: {
+  prevStyle: { bottom: '16px', top: 'auto', left: '16px' },
+  nextStyle: { bottom: '16px', top: 'auto', right: '16px' },
+},
+pagination: {
+  style: { position: 'relative', bottom: 'auto', marginTop: '12px' },
+  bulletStyle: { width: '14px', height: '14px', background: '#999', borderRadius: '3px' },
+  bulletActiveStyle: { background: '#007aff', transform: 'scale(1.2)' },
+}
+
+// 進度條移到底部 + 自訂容器與填充條樣式
+pagination: {
+  type: 'progressbar',
+  style: { top: 'auto', bottom: '0', height: '6px', background: 'rgba(255,255,255,0.3)' },
+  progressStyle: { background: '#ff6b35', borderRadius: '0 3px 3px 0' },
+}</code></pre>
+
+  <script src="../dist/drift-slider.umd.js"></script>
+  <script>
+    var DS = DriftSlider;
+    var slider = new DS.DriftSlider('.drift-slider', {
+      modules: [DS.Navigation, DS.Pagination, DS.Keyboard, DS.A11y],
+      slidesPerView: 1,
+      spaceBetween: 20,
+      speed: 400,
+      grabCursor: true,
+      keyboard: { enabled: true },
+      navigation: {
+        prevStyle: { bottom: '16px', top: 'auto', left: '16px' },
+        nextStyle: { bottom: '16px', top: 'auto', right: '16px' },
+      },
+      pagination: {
+        style: { position: 'relative', bottom: 'auto', marginTop: '12px' },
+        bulletStyle: { width: '14px', height: '14px', background: '#999', borderRadius: '3px' },
+        bulletActiveStyle: { background: '#007aff', transform: 'scale(1.2)' },
+      },
+      on: {
+        slideChange: function(s) {
+          document.getElementById('current-index').textContent = s.realIndex + 1;
+        },
+      },
+    });
+
+    window.slider = slider;
+
+    // 進度條範例
+    var slider2 = new DS.DriftSlider('#slider-progress', {
+      modules: [DS.Navigation, DS.Pagination, DS.Keyboard, DS.A11y],
+      slidesPerView: 1,
+      spaceBetween: 20,
+      speed: 400,
+      grabCursor: true,
+      pagination: {
+        type: 'progressbar',
+        style: { top: 'auto', bottom: '0', height: '6px', background: 'rgba(255,255,255,0.3)' },
+        progressStyle: { background: '#ff6b35', borderRadius: '0 3px 3px 0' },
+      },
+      on: {
+        slideChange: function(s) {
+          document.getElementById('progress-index').textContent = s.realIndex + 1;
+        },
+      },
+    });
+
+    window.slider2 = slider2;
+  </script>
+</body>
+</html>

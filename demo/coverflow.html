@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DriftSlider — Coverflow 效果</title>
+  <link rel="stylesheet" href="demo-common.css">
+  <style>
+    body { max-width: 960px; }
+    .drift-slider { overflow: visible; border-radius: 0; }
+    .drift-track { overflow: visible !important; }
+
+    .controls {
+      margin-top: 24px;
+      padding: 20px;
+      background: #fff;
+      border-radius: 12px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px 24px;
+    }
+    .controls h3 {
+      grid-column: 1 / -1;
+      margin: 8px 0 0;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #86868b;
+      border-top: 1px solid #e8e8ed;
+      padding-top: 12px;
+    }
+    .controls h3:first-child { border-top: none; margin-top: 0; padding-top: 0; }
+    .controls label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+    }
+    .controls label span:first-child { min-width: 110px; }
+    .controls input[type="range"] { flex: 1; }
+    .controls .val { min-width: 48px; text-align: right; font-variant-numeric: tabular-nums; }
+    .controls select { padding: 4px 8px; border-radius: 4px; border: 1px solid #ccc; }
+
+    pre { white-space: pre-wrap; word-break: break-all; }
+  </style>
+</head>
+<body>
+  <a class="back" href="index.html">&larr; 返回展示頁</a>
+  <h1>Coverflow 效果</h1>
+  <p class="desc">使用 <code>effect: 'coverflow'</code> 搭配 EffectCoverflow 模組，產生 3D 封面流效果</p>
+
+  <section class="drift-slider" aria-label="Coverflow 範例輪播">
+    <div class="drift-track">
+      <ul class="drift-list">
+        <li class="drift-slide"><div class="slide-content slide-1">Slide 1</div></li>
+        <li class="drift-slide"><div class="slide-content slide-2">Slide 2</div></li>
+        <li class="drift-slide"><div class="slide-content slide-3">Slide 3</div></li>
+        <li class="drift-slide"><div class="slide-content slide-4">Slide 4</div></li>
+        <li class="drift-slide"><div class="slide-content slide-5">Slide 5</div></li>
+        <li class="drift-slide"><div class="slide-content slide-6">Slide 6</div></li>
+      </ul>
+    </div>
+    <button class="drift-arrow drift-arrow--prev" aria-label="上一張" type="button"></button>
+    <button class="drift-arrow drift-arrow--next" aria-label="下一張" type="button"></button>
+    <div class="drift-pagination"></div>
+  </section>
+
+  <div class="controls">
+    <!-- Slider options -->
+    <h3>Slider 設定</h3>
+    <label>
+      <span>slidesPerView</span>
+      <input type="range" id="ctrl-spv" min="3" max="7" step="2" value="3">
+      <span class="val" id="val-spv">3</span>
+    </label>
+    <label>
+      <span>loop</span>
+      <select id="ctrl-loop">
+        <option value="false" selected>false</option>
+        <option value="true">true</option>
+      </select>
+    </label>
+    <label>
+      <span>autoplay</span>
+      <select id="ctrl-autoplay">
+        <option value="false" selected>false</option>
+        <option value="true">true</option>
+      </select>
+    </label>
+
+    <!-- Coverflow effect options -->
+    <h3>Coverflow 參數</h3>
+    <label>
+      <span>depth</span>
+      <input type="range" id="ctrl-depth" min="0" max="500" value="200">
+      <span class="val" id="val-depth">200</span>
+    </label>
+    <label>
+      <span>rotate</span>
+      <input type="range" id="ctrl-rotate" min="0" max="90" value="30">
+      <span class="val" id="val-rotate">30</span>
+    </label>
+    <label>
+      <span>scale</span>
+      <input type="range" id="ctrl-scale" min="0" max="100" value="85">
+      <span class="val" id="val-scale">0.85</span>
+    </label>
+    <label>
+      <span>stretch</span>
+      <input type="range" id="ctrl-stretch" min="-100" max="100" value="0">
+      <span class="val" id="val-stretch">0</span>
+    </label>
+    <label>
+      <span>opacity</span>
+      <input type="range" id="ctrl-opacity" min="0" max="100" value="60">
+      <span class="val" id="val-opacity">0.6</span>
+    </label>
+    <label>
+      <span>align</span>
+      <select id="ctrl-align">
+        <option value="center" selected>center</option>
+        <option value="top">top</option>
+        <option value="bottom">bottom</option>
+      </select>
+    </label>
+    <label>
+      <span>overlay</span>
+      <select id="ctrl-overlay">
+        <option value="true" selected>true</option>
+        <option value="false">false</option>
+      </select>
+    </label>
+    <label>
+      <span>fillCenter</span>
+      <select id="ctrl-fillCenter">
+        <option value="false" selected>false</option>
+        <option value="true">true</option>
+      </select>
+    </label>
+  </div>
+
+  <pre id="code-output"></pre>
+
+  <script src="../dist/drift-slider.umd.js"></script>
+  <script>
+    var DS = DriftSlider;
+    var currentSlider = null;
+
+    function val(id) { return document.getElementById(id).value; }
+    function num(id) { return Number(val(id)); }
+    function bool(id) { return val(id) === 'true'; }
+
+    function getCoverflowParams() {
+      return {
+        depth: num('ctrl-depth'),
+        rotate: num('ctrl-rotate'),
+        scale: num('ctrl-scale') / 100,
+        stretch: num('ctrl-stretch'),
+        opacity: num('ctrl-opacity') / 100,
+        align: val('ctrl-align'),
+        overlay: bool('ctrl-overlay'),
+        fillCenter: bool('ctrl-fillCenter'),
+        overlayColor: 'rgba(0,0,0,0.4)',
+        activeOpacity: 1,
+        modifier: 1,
+      };
+    }
+
+    function updateDisplay() {
+      document.getElementById('val-spv').textContent = val('ctrl-spv');
+      document.getElementById('val-depth').textContent = val('ctrl-depth');
+      document.getElementById('val-rotate').textContent = val('ctrl-rotate');
+      document.getElementById('val-scale').textContent = (num('ctrl-scale') / 100).toFixed(2);
+      document.getElementById('val-stretch').textContent = val('ctrl-stretch');
+      document.getElementById('val-opacity').textContent = (num('ctrl-opacity') / 100).toFixed(2);
+    }
+
+    function updateCode(cfParams) {
+      var spv = num('ctrl-spv');
+      var isLoop = bool('ctrl-loop');
+      var isAutoplay = bool('ctrl-autoplay');
+
+      var modules = 'Navigation, Pagination, EffectCoverflow, A11y';
+      if (isAutoplay) modules = 'Navigation, Pagination, Autoplay, EffectCoverflow, A11y';
+
+      var lines = [
+        "new DriftSlider('.my-slider', {",
+        "  modules: [" + modules + "],",
+        "  effect: 'coverflow',",
+        "  slidesPerView: " + spv + ",",
+        "  centeredSlides: true,",
+      ];
+      if (isLoop) lines.push("  loop: true,");
+      if (isAutoplay) lines.push("  autoplay: { enabled: true, delay: 3000 },");
+      lines.push(
+        "  coverflowEffect: {",
+        "    depth: " + cfParams.depth + ",",
+        "    rotate: " + cfParams.rotate + ",",
+        "    scale: " + cfParams.scale + ",",
+        "    stretch: " + cfParams.stretch + ",",
+        "    opacity: " + cfParams.opacity + ",",
+        "    align: '" + cfParams.align + "',",
+        "    overlay: " + cfParams.overlay + ",",
+        "    fillCenter: " + cfParams.fillCenter + ",",
+        "  },",
+        "});"
+      );
+      document.getElementById('code-output').textContent = lines.join('\n');
+    }
+
+    function createSlider() {
+      if (currentSlider) {
+        currentSlider.destroy(true);
+        currentSlider = null;
+      }
+
+      var cfParams = getCoverflowParams();
+      var spv = num('ctrl-spv');
+      var isLoop = bool('ctrl-loop');
+      var isAutoplay = bool('ctrl-autoplay');
+
+      updateDisplay();
+      updateCode(cfParams);
+
+      var modules = [DS.Navigation, DS.Pagination, DS.EffectCoverflow, DS.A11y];
+      if (isAutoplay) modules.splice(2, 0, DS.Autoplay);
+
+      var opts = {
+        modules: modules,
+        effect: 'coverflow',
+        slidesPerView: spv,
+        centeredSlides: true,
+        speed: 500,
+        coverflowEffect: cfParams,
+      };
+
+      if (isLoop) opts.loop = true;
+      if (isAutoplay) opts.autoplay = { enabled: true, delay: 3000 };
+
+      currentSlider = new DS.DriftSlider('.drift-slider', opts);
+      window.slider = currentSlider;
+    }
+
+    // Bind all controls
+    var controls = document.querySelectorAll('.controls input, .controls select');
+    for (var i = 0; i < controls.length; i++) {
+      controls[i].addEventListener('input', createSlider);
+      controls[i].addEventListener('change', createSlider);
+    }
+
+    createSlider();
+  </script>
+</body>
+</html>

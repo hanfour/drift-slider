@@ -1,0 +1,213 @@
+/* DriftSlider Demo — 共用樣式 */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #f5f5f7;
+  color: #1d1d1f;
+  padding: 40px 20px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+h1 { margin-bottom: 8px; }
+p.desc { color: #86868b; margin-bottom: 24px; }
+p.desc code { background: #e8e8ed; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; }
+a.back { display: inline-block; margin-bottom: 20px; color: #007aff; text-decoration: none; }
+
+/* === DriftSlider Core Layout === */
+.drift-slider {
+  position: relative;
+  overflow: hidden;
+  margin: 0 auto;
+  border-radius: 12px;
+}
+.drift-track {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+.drift-list {
+  display: flex;
+  transition-property: transform;
+  transition-timing-function: ease-out;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.drift-slide {
+  flex-shrink: 0;
+  width: 100%;
+}
+.drift-slide img { -webkit-user-drag: none; user-select: none; }
+.drift-slider--dragging .drift-list { user-select: none; }
+
+/* === Arrow === */
+.drift-arrow {
+  appearance: none;
+  border: none;
+  background: rgba(255,255,255,0.9);
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  transition: opacity 0.3s, background 0.3s;
+}
+.drift-arrow:hover { background: #fff; }
+.drift-arrow::after {
+  content: '';
+  width: 10px;
+  height: 10px;
+  border-right: 2.5px solid #333;
+  border-bottom: 2.5px solid #333;
+}
+.drift-arrow--prev { left: 12px; }
+.drift-arrow--prev::after { transform: rotate(135deg); margin-left: 3px; }
+.drift-arrow--next { right: 12px; }
+.drift-arrow--next::after { transform: rotate(-45deg); margin-right: 3px; }
+.drift-arrow--disabled { opacity: 0.35; pointer-events: none; }
+
+/* === Pagination === */
+.drift-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  bottom: 16px;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  gap: 8px;
+}
+.drift-pagination__bullet {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.4);
+  border: 2px solid rgba(255,255,255,0.7);
+  cursor: pointer;
+  transition: background 0.3s, transform 0.3s, border-color 0.3s;
+}
+.drift-pagination__bullet:hover {
+  background: rgba(255,255,255,0.7);
+}
+.drift-pagination__bullet--active {
+  background: #fff;
+  border-color: #fff;
+  transform: scale(1.3);
+}
+
+/* Progressbar */
+.drift-pagination--progressbar {
+  top: 0;
+  bottom: auto;
+  height: 4px;
+  background: rgba(0,0,0,0.1);
+  display: block;
+}
+.drift-pagination__progress {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: #007aff;
+  transform-origin: left center;
+  transform: scaleX(0);
+  transition: transform 0.3s;
+}
+
+/* === Slide Content — 純色 === */
+.slide-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 320px;
+  font-size: 2em;
+  font-weight: 700;
+  color: #fff;
+}
+.slide-1 { background: #5B6ABF; }
+.slide-2 { background: #E05A6D; }
+.slide-3 { background: #2BA5B5; }
+.slide-4 { background: #3BB273; }
+.slide-5 { background: #E8734A; }
+.slide-6 { background: #9B59B6; }
+
+/* === Card (responsive demo) === */
+.card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  height: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+.card h3 { font-size: 1.2em; margin-bottom: 8px; }
+.card p { color: #86868b; font-size: 14px; text-align: center; }
+
+/* === Info bar === */
+.info {
+  margin-top: 16px;
+  padding: 12px;
+  background: #fff;
+  border-radius: 8px;
+  font-size: 14px;
+}
+.info code {
+  background: #f0f0f0;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+/* === Code block === */
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 16px;
+  border-radius: 8px;
+  margin-top: 20px;
+  font-size: 13px;
+  overflow-x: auto;
+  line-height: 1.6;
+}
+
+/* === SR only === */
+.drift-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* === Coverflow === */
+.drift-slider--coverflow { overflow: visible; }
+.drift-slider--coverflow .drift-track { overflow: visible; }
+.drift-slider--coverflow .drift-list { transform-style: preserve-3d; }
+.drift-slider--coverflow .drift-slide { transform-style: preserve-3d; backface-visibility: hidden; }
+.drift-coverflow-overlay { position: absolute; inset: 0; pointer-events: none; z-index: 1; transition: opacity 0.3s; }
+
+/* === Cards === */
+.drift-slider--cards .drift-slide { backface-visibility: hidden; }
+.drift-slider--cards-diagonal,
+.drift-slider--cards-diagonal .drift-track { overflow: visible; }
+.drift-slider--cards-flip .drift-track { perspective: 1200px; }
+.drift-cards-overlay { position: absolute; inset: 0; pointer-events: none; z-index: 1; transition: opacity 0.3s; }
+
+/* === Reduced motion === */
+@media (prefers-reduced-motion: reduce) {
+  .drift-list { transition-duration: 0ms !important; }
+}

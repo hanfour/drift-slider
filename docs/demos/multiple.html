@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DriftSlider — Multiple Sliders</title>
+  <meta name="description" content="Multiple independent DriftSlider instances on a single page.">
+  <meta name="keywords" content="DriftSlider, demo, multiple sliders, independent instances, single page">
+  <link rel="canonical" href="https://hanfour.github.io/drift-slider/demos/multiple.html">
+  <meta property="og:title" content="DriftSlider — Multiple Sliders">
+  <meta property="og:description" content="Multiple independent DriftSlider instances on a single page.">
+  <meta property="og:image" content="https://hanfour.github.io/drift-slider/assets/img/og-image.svg">
+  <meta property="og:url" content="https://hanfour.github.io/drift-slider/demos/multiple.html">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="DriftSlider — Multiple Sliders">
+  <meta name="twitter:description" content="Multiple independent DriftSlider instances on a single page.">
+  <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/docs.css">
+  <link rel="stylesheet" href="../assets/css/prism-onedark.css">
+  <link rel="stylesheet" href="../assets/lib/drift-slider-bundle.css">
+  <style>
+    .slider-section {
+      margin-bottom: 48px;
+    }
+    .slider-section h2 {
+      font-size: 1.3em;
+      margin-bottom: 8px;
+    }
+    .slider-section p {
+      color: #86868b;
+      font-size: 14px;
+      margin-bottom: 16px;
+    }
+
+    /* Dark slides for Fade Slider */
+    #fade-slider .slide-content.fade-1 { background: linear-gradient(135deg, #1a1a2e, #16213e); color: #fff; }
+    #fade-slider .slide-content.fade-2 { background: linear-gradient(135deg, #0f3460, #533483); color: #fff; }
+    #fade-slider .slide-content.fade-3 { background: linear-gradient(135deg, #e94560, #533483); color: #fff; }
+    #fade-slider .slide-content.fade-4 { background: linear-gradient(135deg, #16213e, #e94560); color: #fff; }
+  </style>
+</head>
+<body>
+  <div data-include="../_includes/header.html"></div>
+  <div class="page-body">
+    <div class="demo-page">
+      <a href="../demos.html" class="demo-back">&larr; Back to Demos</a>
+      <h1>Multiple Sliders</h1>
+      <p class="demo-desc">Multiple independent DriftSlider instances on a single page.</p>
+
+      <!-- Gallery Slider -->
+      <div class="slider-section">
+        <h2>Gallery Slider</h2>
+        <p>Basic slider with navigation and pagination.</p>
+        <div class="drift-slider" id="gallery-slider">
+          <div class="drift-track"><ul class="drift-list">
+            <li class="drift-slide"><div class="slide-content slide-1">Slide 1</div></li>
+            <li class="drift-slide"><div class="slide-content slide-2">Slide 2</div></li>
+            <li class="drift-slide"><div class="slide-content slide-3">Slide 3</div></li>
+            <li class="drift-slide"><div class="slide-content slide-4">Slide 4</div></li>
+            <li class="drift-slide"><div class="slide-content slide-5">Slide 5</div></li>
+          </ul></div>
+          <button class="drift-arrow drift-arrow--prev" aria-label="Previous" type="button"></button>
+          <button class="drift-arrow drift-arrow--next" aria-label="Next" type="button"></button>
+          <div class="drift-pagination"></div>
+        </div>
+      </div>
+
+      <!-- Fade Slider -->
+      <div class="slider-section">
+        <h2>Fade Slider</h2>
+        <p>Fade effect with autoplay and custom dark color scheme.</p>
+        <div class="drift-slider" id="fade-slider">
+          <div class="drift-track"><ul class="drift-list">
+            <li class="drift-slide"><div class="slide-content fade-1">Fade 1</div></li>
+            <li class="drift-slide"><div class="slide-content fade-2">Fade 2</div></li>
+            <li class="drift-slide"><div class="slide-content fade-3">Fade 3</div></li>
+            <li class="drift-slide"><div class="slide-content fade-4">Fade 4</div></li>
+          </ul></div>
+          <div class="drift-pagination"></div>
+        </div>
+      </div>
+
+      <!-- Card Slider -->
+      <div class="slider-section">
+        <h2>Card Slider</h2>
+        <p>Cards effect with stacking animation.</p>
+        <div class="drift-slider" id="card-slider">
+          <div class="drift-track"><ul class="drift-list">
+            <li class="drift-slide"><div class="slide-content slide-1">Card 1</div></li>
+            <li class="drift-slide"><div class="slide-content slide-2">Card 2</div></li>
+            <li class="drift-slide"><div class="slide-content slide-3">Card 3</div></li>
+            <li class="drift-slide"><div class="slide-content slide-4">Card 4</div></li>
+          </ul></div>
+          <button class="drift-arrow drift-arrow--prev" aria-label="Previous" type="button"></button>
+          <button class="drift-arrow drift-arrow--next" aria-label="Next" type="button"></button>
+          <div class="drift-pagination"></div>
+        </div>
+      </div>
+
+      <!-- Source Code section -->
+      <h2 class="demo-section-title">Source Code</h2>
+      <div class="code-block">
+        <span class="code-lang">js</span>
+        <pre><code class="language-javascript">var DS = DriftSlider;
+
+// Gallery Slider
+new DS.DriftSlider('#gallery-slider', {
+  modules: [DS.Navigation, DS.Pagination, DS.Keyboard, DS.A11y],
+  slidesPerView: 1,
+  spaceBetween: 20,
+  speed: 400,
+  grabCursor: true,
+});
+
+// Fade Slider
+new DS.DriftSlider('#fade-slider', {
+  modules: [DS.Pagination, DS.EffectFade, DS.Autoplay, DS.A11y],
+  effect: 'fade',
+  speed: 600,
+  loop: true,
+  autoplay: { enabled: true, delay: 3000, disableOnInteraction: false },
+});
+
+// Card Slider
+new DS.DriftSlider('#card-slider', {
+  modules: [DS.Navigation, DS.Pagination, DS.EffectCards, DS.A11y],
+  effect: 'cards',
+  speed: 500,
+  cardsEffect: { mode: 'stack', overlay: true },
+});</code></pre>
+      </div>
+    </div>
+  </div>
+  <div data-include="../_includes/footer.html"></div>
+  <script src="../assets/lib/drift-slider.umd.js"></script>
+  <script src="../assets/js/prism.js"></script>
+  <script src="../assets/js/docs.js"></script>
+  <script>
+    var DS = DriftSlider;
+
+    // Gallery Slider
+    new DS.DriftSlider('#gallery-slider', {
+      modules: [DS.Navigation, DS.Pagination, DS.Keyboard, DS.A11y],
+      slidesPerView: 1,
+      spaceBetween: 20,
+      speed: 400,
+      grabCursor: true,
+    });
+
+    // Fade Slider
+    new DS.DriftSlider('#fade-slider', {
+      modules: [DS.Pagination, DS.EffectFade, DS.Autoplay, DS.A11y],
+      effect: 'fade',
+      speed: 600,
+      loop: true,
+      autoplay: { enabled: true, delay: 3000, disableOnInteraction: false },
+    });
+
+    // Card Slider
+    new DS.DriftSlider('#card-slider', {
+      modules: [DS.Navigation, DS.Pagination, DS.EffectCards, DS.A11y],
+      effect: 'cards',
+      speed: 500,
+      cardsEffect: { mode: 'stack', overlay: true },
+    });
+  </script>
+</body>
+</html>

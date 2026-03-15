@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DriftSlider — Scroll AOS Effect</title>
+  <meta name="description" content="DriftSlider with scroll-based animate on scroll integration.">
+  <meta name="keywords" content="DriftSlider, demo, scroll, AOS, animate on scroll, intersection observer">
+  <link rel="canonical" href="https://hanfour.github.io/drift-slider/demos/scroll-aos.html">
+  <meta property="og:title" content="DriftSlider — Scroll AOS Effect">
+  <meta property="og:description" content="DriftSlider with scroll-based animate on scroll integration.">
+  <meta property="og:image" content="https://hanfour.github.io/drift-slider/assets/img/og-image.svg">
+  <meta property="og:url" content="https://hanfour.github.io/drift-slider/demos/scroll-aos.html">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="DriftSlider — Scroll AOS Effect">
+  <meta name="twitter:description" content="DriftSlider with scroll-based animate on scroll integration.">
+  <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/docs.css">
+  <link rel="stylesheet" href="../assets/css/prism-onedark.css">
+  <link rel="stylesheet" href="../assets/lib/drift-slider-bundle.css">
+  <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css">
+  <style>
+    .hero {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+    .hero h1 { font-size: 2.5em; margin-bottom: 16px; }
+    .hero p { color: #86868b; font-size: 1.2em; }
+    .hero .scroll-hint {
+      margin-top: 40px;
+      font-size: 14px;
+      color: #86868b;
+      animation: bounce 2s infinite;
+    }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(8px); }
+    }
+
+    .demo-section {
+      min-height: 80vh;
+      padding: 80px 0;
+    }
+    .demo-section h2 {
+      font-size: 1.5em;
+      margin-bottom: 8px;
+    }
+    .demo-section p.section-desc {
+      color: #86868b;
+      margin-bottom: 24px;
+    }
+
+    .drift-slider { margin-bottom: 40px; }
+
+    .controls {
+      margin-top: 24px;
+      padding: 20px;
+      background: #fff;
+      border-radius: 12px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px 24px;
+    }
+    .controls h3 {
+      grid-column: 1 / -1;
+      margin: 0;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #86868b;
+    }
+    .controls label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+    }
+    .controls label span:first-child { min-width: 110px; }
+    .controls input[type="range"] { flex: 1; }
+    .controls .val { min-width: 48px; text-align: right; font-variant-numeric: tabular-nums; }
+    .controls select { padding: 4px 8px; border-radius: 4px; border: 1px solid #ccc; }
+  </style>
+</head>
+<body>
+  <div data-include="../_includes/header.html"></div>
+  <div class="page-body">
+    <div class="demo-page">
+      <a href="../demos.html" class="demo-back">&larr; Back to Demos</a>
+
+      <!-- Hero -->
+      <section class="hero">
+        <h1>Scroll AOS Effect</h1>
+        <p>Animate on scroll integration with AOS library and <code>ScrollAos</code> module.</p>
+        <div class="scroll-hint">&darr; Scroll down</div>
+      </section>
+
+      <!-- Section 1: Basic slider + AOS fade-up -->
+      <section class="demo-section">
+        <h2 data-aos="fade-right">Basic Slider &mdash; fade-up</h2>
+        <p class="section-desc" data-aos="fade-right" data-aos-delay="100">Container entrance uses <code>fade-up</code> animation.</p>
+        <div class="drift-slider slider-1" data-aos="fade-up" data-aos-duration="800" data-aos-offset="120">
+          <div class="drift-track"><ul class="drift-list">
+            <li class="drift-slide"><div class="slide-content slide-1">Slide 1</div></li>
+            <li class="drift-slide"><div class="slide-content slide-2">Slide 2</div></li>
+            <li class="drift-slide"><div class="slide-content slide-3">Slide 3</div></li>
+            <li class="drift-slide"><div class="slide-content slide-4">Slide 4</div></li>
+          </ul></div>
+          <button class="drift-arrow drift-arrow--prev" aria-label="Previous" type="button"></button>
+          <button class="drift-arrow drift-arrow--next" aria-label="Next" type="button"></button>
+          <div class="drift-pagination"></div>
+        </div>
+      </section>
+
+      <!-- Section 2: Cards slider + AOS slide-right -->
+      <section class="demo-section">
+        <h2 data-aos="fade-right">Cards Effect &mdash; slide-right</h2>
+        <p class="section-desc" data-aos="fade-right" data-aos-delay="100">Container entrance uses <code>slide-right</code> animation.</p>
+        <div class="drift-slider slider-2" data-aos="slide-right" data-aos-duration="800" data-aos-offset="120">
+          <div class="drift-track"><ul class="drift-list">
+            <li class="drift-slide"><div class="slide-content slide-1">Card 1</div></li>
+            <li class="drift-slide"><div class="slide-content slide-2">Card 2</div></li>
+            <li class="drift-slide"><div class="slide-content slide-3">Card 3</div></li>
+            <li class="drift-slide"><div class="slide-content slide-4">Card 4</div></li>
+          </ul></div>
+          <button class="drift-arrow drift-arrow--prev" aria-label="Previous" type="button"></button>
+          <button class="drift-arrow drift-arrow--next" aria-label="Next" type="button"></button>
+        </div>
+      </section>
+
+      <!-- Section 3: Coverflow + per-slide AOS -->
+      <section class="demo-section">
+        <h2 data-aos="fade-right">Coverflow Effect &mdash; Per-Slide Animation</h2>
+        <p class="section-desc" data-aos="fade-right" data-aos-delay="100">Each slide uses <code>fade-up</code> with incremental delay.</p>
+        <div class="drift-slider slider-3" style="overflow: visible;" data-aos="fade-up" data-aos-duration="800" data-aos-offset="120">
+          <div class="drift-track" style="overflow: visible !important;">
+            <ul class="drift-list">
+              <li class="drift-slide"><div class="slide-content slide-1">Slide 1</div></li>
+              <li class="drift-slide"><div class="slide-content slide-2">Slide 2</div></li>
+              <li class="drift-slide"><div class="slide-content slide-3">Slide 3</div></li>
+              <li class="drift-slide"><div class="slide-content slide-4">Slide 4</div></li>
+              <li class="drift-slide"><div class="slide-content slide-5">Slide 5</div></li>
+              <li class="drift-slide"><div class="slide-content slide-6">Slide 6</div></li>
+            </ul>
+          </div>
+          <button class="drift-arrow drift-arrow--prev" aria-label="Previous" type="button"></button>
+          <button class="drift-arrow drift-arrow--next" aria-label="Next" type="button"></button>
+          <div class="drift-pagination"></div>
+        </div>
+      </section>
+
+      <!-- Controls -->
+      <div class="controls">
+        <h3>AOS Global Settings (updates live)</h3>
+        <label>
+          <span>animation</span>
+          <select id="ctrl-animation">
+            <option value="fade-up" selected>fade-up</option>
+            <option value="fade-down">fade-down</option>
+            <option value="fade-left">fade-left</option>
+            <option value="fade-right">fade-right</option>
+            <option value="slide-up">slide-up</option>
+            <option value="slide-right">slide-right</option>
+            <option value="zoom-in">zoom-in</option>
+            <option value="flip-up">flip-up</option>
+          </select>
+        </label>
+        <label>
+          <span>duration</span>
+          <input type="range" id="ctrl-duration" min="200" max="2000" step="100" value="800">
+          <span class="val" id="val-duration">800</span>
+        </label>
+        <label>
+          <span>offset</span>
+          <input type="range" id="ctrl-offset" min="0" max="400" step="20" value="120">
+          <span class="val" id="val-offset">120</span>
+        </label>
+        <label>
+          <span>once</span>
+          <select id="ctrl-once">
+            <option value="true" selected>true</option>
+            <option value="false">false</option>
+          </select>
+        </label>
+      </div>
+
+      <!-- Source Code section -->
+      <h2 class="demo-section-title">Source Code</h2>
+      <div class="code-block">
+        <span class="code-lang">js</span>
+        <pre><code class="language-javascript">var DS = DriftSlider;
+
+// Slider 1: Basic + ScrollAos
+var slider1 = new DS.DriftSlider('.slider-1', {
+  modules: [DS.Navigation, DS.Pagination, DS.ScrollAos, DS.A11y],
+  slidesPerView: 1,
+  speed: 400,
+  scrollAos: { enabled: true, refreshOnChange: true },
+});
+
+// Slider 2: Cards + ScrollAos
+var slider2 = new DS.DriftSlider('.slider-2', {
+  modules: [DS.Navigation, DS.EffectCards, DS.ScrollAos, DS.A11y],
+  effect: 'cards',
+  slidesPerView: 1,
+  speed: 400,
+  scrollAos: { enabled: true, refreshOnChange: true },
+});
+
+// Slider 3: Coverflow + ScrollAos with per-slide animation
+var slider3 = new DS.DriftSlider('.slider-3', {
+  modules: [DS.Navigation, DS.Pagination, DS.EffectCoverflow, DS.ScrollAos, DS.A11y],
+  effect: 'coverflow',
+  slidesPerView: 3,
+  centeredSlides: true,
+  speed: 500,
+  coverflowEffect: { depth: 200, rotate: 30, scale: 0.85 },
+  scrollAos: {
+    enabled: true,
+    slideAnimation: 'fade-up',
+    slideDelay: 100,
+    refreshOnChange: true,
+  },
+});
+
+AOS.init({ once: true, duration: 800, offset: 120 });</code></pre>
+      </div>
+    </div>
+  </div>
+  <div data-include="../_includes/footer.html"></div>
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+  <script>
+    // Fallback if AOS failed to load
+    if (typeof AOS === 'undefined') {
+      window.AOS = { init: function(){}, refresh: function(){} };
+      var fs = document.createElement('style');
+      fs.textContent = '[data-aos]{opacity:1!important;transform:none!important;}';
+      document.head.appendChild(fs);
+    }
+  </script>
+  <script src="../assets/lib/drift-slider.umd.js"></script>
+  <script src="../assets/js/prism.js"></script>
+  <script src="../assets/js/docs.js"></script>
+  <script>
+    var DS = DriftSlider;
+
+    // Slider 1: Basic + ScrollAos
+    var slider1 = new DS.DriftSlider('.slider-1', {
+      modules: [DS.Navigation, DS.Pagination, DS.ScrollAos, DS.A11y],
+      slidesPerView: 1,
+      speed: 400,
+      scrollAos: {
+        enabled: true,
+        refreshOnChange: true,
+      },
+    });
+
+    // Slider 2: Cards + ScrollAos
+    var slider2 = new DS.DriftSlider('.slider-2', {
+      modules: [DS.Navigation, DS.EffectCards, DS.ScrollAos, DS.A11y],
+      effect: 'cards',
+      slidesPerView: 1,
+      speed: 400,
+      scrollAos: {
+        enabled: true,
+        refreshOnChange: true,
+      },
+    });
+
+    // Slider 3: Coverflow + ScrollAos with per-slide animation
+    var slider3 = new DS.DriftSlider('.slider-3', {
+      modules: [DS.Navigation, DS.Pagination, DS.EffectCoverflow, DS.ScrollAos, DS.A11y],
+      effect: 'coverflow',
+      slidesPerView: 3,
+      centeredSlides: true,
+      speed: 500,
+      coverflowEffect: {
+        depth: 200,
+        rotate: 30,
+        scale: 0.85,
+      },
+      scrollAos: {
+        enabled: true,
+        slideAnimation: 'fade-up',
+        slideDelay: 100,
+        refreshOnChange: true,
+      },
+    });
+
+    // Controls: update AOS attributes dynamically
+    function val(id) { return document.getElementById(id).value; }
+    function num(id) { return Number(val(id)); }
+    function bool(id) { return val(id) === 'true'; }
+
+    function updateAosSettings() {
+      var animation = val('ctrl-animation');
+      var duration = String(num('ctrl-duration'));
+      var offset = String(num('ctrl-offset'));
+      var once = val('ctrl-once');
+
+      document.getElementById('val-duration').textContent = duration;
+      document.getElementById('val-offset').textContent = offset;
+
+      // Update all data-aos elements
+      var els = document.querySelectorAll('[data-aos]');
+      for (var i = 0; i < els.length; i++) {
+        var el = els[i];
+        // Only update slider containers (not headings/paragraphs)
+        if (el.classList.contains('drift-slider')) {
+          el.setAttribute('data-aos', animation);
+        }
+        el.setAttribute('data-aos-duration', duration);
+        el.setAttribute('data-aos-offset', offset);
+        el.setAttribute('data-aos-once', once);
+      }
+
+      // Re-init AOS with new settings
+      AOS.init({
+        once: bool('ctrl-once'),
+        duration: num('ctrl-duration'),
+        offset: num('ctrl-offset'),
+      });
+    }
+
+    var controls = document.querySelectorAll('.controls input, .controls select');
+    for (var i = 0; i < controls.length; i++) {
+      controls[i].addEventListener('input', updateAosSettings);
+      controls[i].addEventListener('change', updateAosSettings);
+    }
+
+    // Init AOS after sliders are created
+    AOS.init({
+      once: true,
+      duration: 800,
+      offset: 120,
+    });
+  </script>
+</body>
+</html>

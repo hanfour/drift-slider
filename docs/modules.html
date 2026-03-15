@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Modules — DriftSlider</title>
+  <meta name="description" content="Complete documentation for all DriftSlider modules: Navigation, Pagination, Autoplay, EffectFade, EffectCoverflow, EffectCards, Keyboard, A11y, and ScrollAos.">
+  <meta name="keywords" content="DriftSlider, modules, Navigation, Pagination, Autoplay, EffectFade, EffectCoverflow, EffectCards, Keyboard, A11y">
+  <link rel="canonical" href="https://hanfour.github.io/drift-slider/modules.html">
+  <meta property="og:title" content="Modules — DriftSlider">
+  <meta property="og:description" content="Complete documentation for all DriftSlider modules: Navigation, Pagination, Autoplay, and more.">
+  <meta property="og:image" content="https://hanfour.github.io/drift-slider/assets/img/og-image.svg">
+  <meta property="og:url" content="https://hanfour.github.io/drift-slider/modules.html">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Modules — DriftSlider">
+  <meta name="twitter:description" content="Complete documentation for all DriftSlider modules: Navigation, Pagination, Autoplay, and more.">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/docs.css">
+  <link rel="stylesheet" href="assets/css/prism-onedark.css">
+  <link rel="stylesheet" href="assets/lib/drift-slider-bundle.css">
+</head>
+<body>
+  <div data-include="_includes/header.html"></div>
+
+  <div class="page-with-sidebar">
+    <!-- ═══ Sidebar ═══ -->
+    <aside class="sidebar">
+      <nav class="sidebar-nav">
+        <a href="#overview" data-nav>Overview</a>
+        <a href="#navigation" data-nav>Navigation</a>
+        <a href="#pagination" data-nav>Pagination</a>
+        <a href="#autoplay" data-nav>Autoplay</a>
+        <a href="#effect-fade" data-nav>EffectFade</a>
+        <a href="#effect-coverflow" data-nav>EffectCoverflow</a>
+        <a href="#effect-cards" data-nav>EffectCards</a>
+        <a href="#keyboard" data-nav>Keyboard</a>
+        <a href="#a11y" data-nav>A11y</a>
+        <a href="#scroll-aos" data-nav>ScrollAos</a>
+      </nav>
+    </aside>
+
+    <!-- ═══ Content ═══ -->
+    <main class="content">
+
+      <h1 data-i18n-en>Modules</h1>
+      <h1 data-i18n-zh>模組</h1>
+      <p data-i18n-en>Complete reference for every DriftSlider module &mdash; options, APIs, and usage examples.</p>
+      <p data-i18n-zh>每個 DriftSlider 模組的完整參考 — 選項、API 和使用範例。</p>
+
+      <!-- ─── Overview ─── -->
+      <section id="overview">
+        <h2 data-i18n-en>Overview</h2>
+        <h2 data-i18n-zh>概覽</h2>
+        <p data-i18n-en>DriftSlider uses a modular architecture. Import only what you need to keep your bundle size small. Each module extends the slider with additional functionality &mdash; from navigation controls to advanced visual effects.</p>
+        <p data-i18n-zh>DriftSlider 使用模組化架構。只匯入你需要的模組以保持打包體積精簡。每個模組為滑塊擴展額外功能 — 從導航控制到進階視覺效果。</p>
+        <p data-i18n-en>Register modules via the <code>modules</code> array when creating a new instance:</p>
+        <p data-i18n-zh>建立新實例時，透過 <code>modules</code> 陣列註冊模組：</p>
+
+        <div class="code-block">
+          <span class="code-lang">js</span>
+          <pre><code class="language-javascript">import DriftSlider from 'drift-slider';
+import { Navigation, Pagination } from 'drift-slider/modules';
+
+new DriftSlider('.slider', {
+  modules: [Navigation, Pagination],
+  navigation: true,
+  pagination: { el: '.pagination', type: 'bullets' }
+});</code></pre>
+        </div>
+
+        <p data-i18n-en>When using the UMD / CDN build, all modules are available on the global <code>DriftSlider</code> object:</p>
+        <p data-i18n-zh>使用 UMD / CDN 版本時，所有模組都可從全域 <code>DriftSlider</code> 物件取得：</p>
+
+        <div class="code-block">
+          <span class="code-lang">js</span>
+          <pre><code class="language-javascript">const { Navigation, Pagination } = DriftSlider;
+
+new DriftSlider('.slider', {
+  modules: [Navigation, Pagination],
+  navigation: true,
+  pagination: { el: '.pagination' }
+});</code></pre>
+        </div>
+      </section>
+
+      <!-- ─── Navigation ─── -->
+      <section id="navigation">
+        <h2 data-i18n-en>Navigation</h2>
+        <h2 data-i18n-zh>導航</h2>
+        <p data-i18n-en>Adds previous / next arrow buttons for slide navigation. Pass <code>navigation: true</code> to use default settings, or provide an options object for custom configuration.</p>
+        <p data-i18n-zh>新增上一頁/下一頁箭頭按鈕。傳入 <code>navigation: true</code> 使用預設設定，或提供選項物件自訂配置。</p>
+
+        <h3>Import</h3>
+        <div class="code-block">
+          <span class="code-lang">js</span>
+          <pre><code class="language-javascript">// ESM
+import { Navigation } from 'drift-slider/modules';
+
+// UMD
+const { Navigation } = DriftSlider;</code></pre>
+        </div>
+
+        <h3>Options</h3>
+        <table class="api-table">
+          <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td>nextEl</td><td>string &vert; HTMLElement &vert; null</td><td>null</td><td>Next button selector or element</td></tr>
+            <tr><td>prevEl</td><td>string &vert; HTMLElement &vert; null</td><td>null</td><td>Previous button selector or element</td></tr>
+            <tr><td>disabledClass</td><td>string</td><td>'drift-arrow--disabled'</td><td>Class applied to disabled arrows</td></tr>
+            <tr><td>hiddenClass</td><td>string</td><td>'drift-arrow--hidden'</td><td>Class applied to hidden arrows</td></tr>
+            <tr><td>prevStyle</td><td>Partial&lt;CSSStyleDeclaration&gt; &vert; null</td><td>null</td><td>Custom inline styles for the prev button</td></tr>
+            <tr><td>nextStyle</td><td>Partial&lt;CSSStyleDeclaration&gt; &vert; null</td><td>null</td><td>Custom inline styles for the next button</td></tr>
+          </tbody>
+        </table>
+
+        <h3>Instance API</h3>
+        <table class="api-table">
+          <thead><tr><th>Method</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>slider.navigation.update()</code></td><td>Recalculate navigation state (enabled/disabled)</td></tr>
+            <tr><td><code>slider.navigation.enable()</code></td><td>Enable navigation arrows</td></tr>
+            <tr><td><code>slider.navigation.disable()</code></td><td>Disable navigation arrows</td></tr>
+          </tbody>
+        </table>
+
+        <h3>Example</h3>
+        <div class="code-block">
+          <span class="code-lang">js</span>
+          <pre><code class="language-javascript">new DriftSlider('.slider', {
+  modules: [Navigation],
+  navigation: {
+    nextEl: '.btn-next',
+    prevEl: '.btn-prev',
+    disabledClass: 'arrow-disabled'
+  }
+});</code></pre>
+        </div>
+      </section>
+
+      <!-- ─── Pagination ─── -->
+      <section id="pagination">
+        <h2 data-i18n-en>Pagination</h2>
+        <h2 data-i18n-zh>分頁</h2>
+        <p data-i18n-en>Renders pagination indicators &mdash; bullets, fraction counters, or a progress bar &mdash; to show the current position within the slider.</p>
+        <p data-i18n-zh>渲染分頁指示器 — 圓點、分數計數器或進度條 — 顯示滑塊中的目前位置。</p>
+
+        <h3>Import</h3>
+        <div class="code-block">
+          <span class="code-lang">js</span>
+          <pre><code class="language-javascript">// ESM
+import { Pagination } from 'drift-slider/modules';
+
+// UMD
+const { Pagination } = DriftSlider;</code></pre>
+        </div>
+
+        <h3>Options</h3>
+        <table class="api-table">
+          <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td>el</td><td>string &vert; HTMLElement &vert; null</td><td>null</td><td>Pagination container selector or element</td></tr>
+            <tr><td>type</td><td>'bullets' &vert; 'fraction' &vert; 'progressbar'</td><td>'bullets'</td><td>Pagination display type</td></tr>
+            <tr><td>clickable</td><td>boolean</td><td>true</td><td>Allow clicking bullets to navigate</td></tr>
+            <tr><td>bulletClass</td><td>string</td><td>'drift-pagination__bullet'</td><td>Class for each bullet element</td></tr>
+            <tr><td>bulletActiveClass</td><td>string</td><td>'drift-pagination__bullet--active'</td><td>Class for the active bullet</td></tr>
+            <tr><td>currentClass</td><td>string</td><td>'drift-pagination__current'</td><td>Class for the current number in fraction mode</td></tr>
+            <tr><td>totalClass</td><td>string</td><td>'drift-pagination__total'</td><td>Class for the total number in fraction mode</td></tr>
+            <tr><td>progressClass</td><td>string</td><td>'drift-pagination__progress'</td><td>Class for the progress bar fill</td></tr>
+            <tr><td>renderBullet</td><td>(index, className) =&gt; string</td><td>null</td><td>Custom render function for bullets</td></tr>
+            <tr><td>renderFraction</td><td>(currentClass, totalClass) =&gt; string</td><td>null</td><td>Custom render function for fraction</td></tr>
+            <tr><td>renderProgressbar</td><td>(progressClass) =&gt; string</td><td>null</td><td>Custom render function for progress bar</td></tr>
+            <tr><td>style</td><td>Partial&lt;CSSStyleDeclaration&gt; &vert; null</td><td>null</td><td>Inline styles for the pagination container</td></tr>
+            <tr><td>bulletStyle</td><td>Partial&lt;CSSStyleDeclaration&gt; &vert; null</td><td>null</td><td>Inline styles for each bullet</td></tr>
+            <tr><td>bulletActiveStyle</td><td>Partial&lt;CSSStyleDeclaration&gt; &vert; null</td><td>null</td><td>Inline styles for the active bullet</td></tr>
+            <tr><td>progressStyle</td><td>Partial&lt;CSSStyleDeclaration&gt; &vert; null</td><td>null</td><td>Inline styles for the progress bar fill</td></tr>
+          </tbody>
+        </table>
+
+        <h3>Instance API</h3>
+        <table class="api-table">
+          <thead><tr><th>Method / Property</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>slider.pagination.update()</code></td><td>Recalculate and refresh pagination state</td></tr>
+            <tr><td><code>slider.pagination.render()</code></td><td>Re-render the pagination DOM</td></tr>
+            <tr><td><code>slider.pagination.el</code></td><td>Reference to the pagination container element</td></tr>
+          </tbody>
+        </table>
+
+        <h3>Example</h3>
+        <div class="code-block">
+          <span class="code-lang">js</span>
+          <pre><code class="language-javascript">new DriftSlider('.slider', {
+  modules: [Pagination],
+  pagination: {
+    el: '.slider-pagination',
+    type: 'bullets',
+    clickable: true,
+    renderBullet(index, className) {
+      return `&lt;span class="${className}"&gt;${index + 1}&lt;/span&gt;`;
+    }
+  }
+});</code></pre>
+        </div>
+      </section>
+
+      <!-- ─── Autoplay ─── -->
+      <section id="autoplay">
+        <h2 data-i18n-en>Autoplay</h2>
+        <h2 data-i18n-zh>自動播放</h2>
+        <p data-i18n-en>Automatically advances slides at a configurable interval. Supports pausing on hover and stopping on user interaction.</p>
+        <p data-i18n-zh>以可配置的間隔自動推進投影片。支援懸停暫停和使用者互動時停止。</p>
+
+        <h3>Import</h3>
+        <div class="code-block">
+          <span class="code-lang">js</span>
+          <pre><code class="language-javascript">// ESM
+import { Autoplay } from 'drift-slider/modules';
+
+// UMD
+const { Autoplay } = DriftSlider;</code></pre>
+        </div>
+
+        <h3>Options</h3>
+        <table class="api-table">
+          <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td>enabled</td><td>boolean</td><td>false</td><td>Enable autoplay on init</td></tr>
+            <tr><td>delay</td><td>number</td><td>3000</td><td>Delay between slide transitions in milliseconds</td></tr>
+            <tr><td>disableOnInteraction</td><td>boolean</td><td>true</td><td>Stop autoplay when the user interacts with the slider</td></tr>
+            <tr><td>pauseOnMouseEnter</td><td>boolean</td><td>false</td><td>Pause autoplay when the cursor enters the slider</td></tr>
+            <tr><td>stopOnLastSlide</td><td>boolean</td><td>false</td><td>Stop at the last slide instead of looping (non-loop mode)</td></tr>
+            <tr><td>reverseDirection</td><td>boolean</td><td>false</td><td>Autoplay in reverse (previous instead of next)</td></tr>
+          </tbody>
+        </table>
+
+        <h3>Instance API</h3>
+        <table class="api-table">
+          <thead><tr><th>Method</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>slider.autoplay.start()</code></td><td>Start autoplay</td></tr>
+            <tr><td><code>slider.autoplay.stop()</code></td><td>Stop autoplay completely</td></tr>
+            <tr><td><code>slider.autoplay.pause()</code></td><td>Temporarily pause autoplay</td></tr>
+            <tr><td><code>slider.autoplay.resume()</code></td><td>Resume after a pause</td></tr>
+            <tr><td><code>slider.autoplay.running()</code></td><td>Returns <code>true</code> if autoplay is currently running</td></tr>
+          </tbody>
+        </table>
+
+        <h3>Events</h3>
+        <table class="api-table">
+          <thead><tr><th>Event</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>autoplayStart</code></td><td>Fired when autoplay starts</td></tr>
+            <tr><td><code>autoplayStop</code></td><td>Fired when autoplay stops</td></tr>
+            <tr><td><code>autoplayPause</code></td><td>Fired when autoplay is paused</td></tr>
+            <tr><td><code>autoplayResume</code></td><td>Fired when autoplay resumes</td></tr>
+          </tbody>
+        </table>
+
+        <h3>Example</h3>
+        <div class="code-block">
+          <span class="code-lang">js</span>
+          <pre><code class="language-javascript">const slider = new DriftSlider('.slider', {
+  modules: [Autoplay],
+  autoplay: {
+    enabled: true,
+    delay: 5000,
+    pauseOnMouseEnter: true,
+    disableOnInteraction: false
+  }
+});
+
+slider.on('autoplayPause', () =&gt; {
+  console.log('Autoplay paused');
+});
+
+// Programmatic control
+slider.autoplay.stop();
+slider.autoplay.start();</code></pre>
+        </div>
+      </section>
+
+      <!-- ─── EffectFade ─── -->
+      <section id="effect-fade">
+        <h2 data-i18n-en>EffectFade</h2>
+        <h2 data-i18n-zh>淡入淡出效果</h2>
+        <p data-i18n-en>Replaces the default slide transition with a fade effect. Slides cross-fade in place rather than sliding horizontally.</p>
+        <p data-i18n-zh>用淡入淡出效果取代預設的滑動轉場。投影片原地交叉淡入淡出，而非水平滑動。</p>
+
+        <h3>Import</h3>
+        <div class="code-block">
+          <span class="code-lang">js</span>
+          <pre><code class="language-javascript">// ESM
+import { EffectFade } from 'drift-slider/modules';
+
+// UMD
+const { EffectFade } = DriftSlider;</code></pre>
+        </div>
+
+        <h3>Options</h3>
+        <table class="api-table">
+          <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td>crossFade</td><td>boolean</td><td>false</td><td>Enable cross-fade so the incoming slide fades in while the outgoing slide fades out simultaneously</td></tr>
+          </tbody>
+        </table>
+
+        <p><strong>Note:</strong> Requires <code>effect: 'fade'</code> in the main slider options.</p>
+
+        <h3>Example</h3>
+        <div class="code-block">
+          <span class="code-lang">js</span>
+          <pre><code class="language-javascript">new DriftSlider('.slider', {
+  modules: [EffectFade],
+  effect: 'fade',
+  fadeEffect: {
+    crossFade: true
+  }
+});</code></pre>
+        </div>
+      </section>
+
+      <!-- ─── EffectCoverflow ─── -->
+      <section id="effect-coverflow">
+        <h2 data-i18n-en>EffectCoverflow</h2>
+        <h2 data-i18n-zh>封面流效果</h2>
+        <p data-i18n-en>Creates a 3D coverflow effect inspired by album art browsers. Side slides rotate, scale, and recede in depth around the active center slide.</p>
+        <p data-i18n-zh>建立受專輯封面瀏覽器啟發的 3D 封面流效果。側邊投影片圍繞活動中心投影片旋轉、縮放和後退。</p>
+
+        <h3>Import</h3>
+        <div class="code-block">
+          <span class="code-lang">js</span>
+          <pre><code class="language-javascript">// ESM
+import { EffectCoverflow } from 'drift-slider/modules';
+
+// UMD
+const { EffectCoverflow } = DriftSlider;</code></pre>
+        </div>
+
+        <h3>Options</h3>
+        <table class="api-table">
+          <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td>depth</td><td>number</td><td>200</td><td>3D depth offset in pixels (translateZ)</td></tr>
+            <tr><td>rotate</td><td>number</td><td>30</td><td>Rotation angle in degrees for side slides</td></tr>
+            <tr><td>scale</td><td>number</td><td>0.85</td><td>Scale factor for side slides</td></tr>
+            <tr><td>stretch</td><td>number</td><td>0</td><td>Stretch offset between slides in pixels</td></tr>
+            <tr><td>modifier</td><td>number</td><td>1</td><td>Multiplier applied to all effect values</td></tr>
+            <tr><td>overlay</td><td>boolean</td><td>true</td><td>Show a darkening overlay on side slides</td></tr>
+            <tr><td>overlayColor</td><td>string</td><td>'rgba(0,0,0,0.4)'</td><td>Color of the overlay</td></tr>
+            <tr><td>opacity</td><td>number</td><td>0.6</td><td>Opacity of side slides</td></tr>
+            <tr><td>activeOpacity</td><td>number</td><td>1</td><td>Opacity of the active slide</td></tr>
+            <tr><td>align</td><td>'center' &vert; 'bottom' &vert; 'top'</td><td>'center'</td><td>Vertical alignment of slides</td></tr>
+            <tr><td>fillCenter</td><td>boolean</td><td>false</td><td>Stretch the active slide to fill the center area</td></tr>
+            <tr><td>cropSides</td><td>boolean</td><td>false</td><td>Crop side slides at the container edge</td></tr>
+            <tr><td>staggerY</td><td>number</td><td>0</td><td>Vertical stagger offset in pixels</td></tr>
+            <tr><td>visibleSides</td><td>'both' &vert; 'prev' &vert; 'next'</td><td>'both'</td><td>Which side slides are visible</td></tr>
+          </tbody>
+        </table>
+
+        <p><strong>Note:</strong> Requires <code>effect: 'coverflow'</code> in the main slider options. Typically used with <code>centeredSlides: true</code> and <code>slidesPerView: 3</code>.</p>
+
+        <h3>Example</h3>
+        <div class="code-block">
+          <span class="code-lang">js</span>
+          <pre><code class="language-javascript">new DriftSlider('.slider', {
+  modules: [EffectCoverflow],
+  effect: 'coverflow',
+  centeredSlides: true,
+  slidesPerView: 3,
+  coverflowEffect: {
+    depth: 250,
+    rotate: 45,
+    scale: 0.8,
+    overlay: true,
+    overlayColor: 'rgba(0,0,0,0.5)'
+  }
+});</code></pre>
+        </div>
+      </section>
+
+      <!-- ─── EffectCards ─── -->
+      <section id="effect-cards">
+        <h2 data-i18n-en>EffectCards</h2>
+        <h2 data-i18n-zh>卡片效果</h2>
+        <p data-i18n-en>Displays slides as stacked cards with support for three distinct modes: <code>stack</code>, <code>diagonal</code>, and <code>flip</code>. Cards can be swiped away to reveal the next one.</p>
+        <p data-i18n-zh>將投影片顯示為堆疊卡片，支援三種不同模式：<code>stack</code>、<code>diagonal</code> 和 <code>flip</code>。可滑動卡片以顯示下一張。</p>
+
+        <h3>Import</h3>
+        <div class="code-block">
+          <span class="code-lang">js</span>
+          <pre><code class="language-javascript">// ESM
+import { EffectCards } from 'drift-slider/modules';
+
+// UMD
+const { EffectCards } = DriftSlider;</code></pre>
+        </div>
+
+        <h3>Options</h3>
+        <table class="api-table">
+          <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td>mode</td><td>'stack' &vert; 'diagonal' &vert; 'flip'</td><td>'stack'</td><td>Card effect mode</td></tr>
+            <tr><td>direction</td><td>'tl-br' &vert; 'bl-tr' &vert; 'tr-bl' &vert; 'br-tl' &vert; 'auto'</td><td>'tl-br'</td><td>Direction of the card stack offset</td></tr>
+            <tr><td>offsetX</td><td>number</td><td>30</td><td>Horizontal offset between stacked cards in pixels</td></tr>
+            <tr><td>offsetY</td><td>number</td><td>30</td><td>Vertical offset between stacked cards in pixels</td></tr>
+            <tr><td>scale</td><td>number</td><td>0.92</td><td>Scale factor for stacked cards behind the active card</td></tr>
+            <tr><td>opacity</td><td>number</td><td>0.85</td><td>Opacity of stacked cards behind the active card</td></tr>
+            <tr><td>diagonalMultiplier</td><td>number</td><td>2.5</td><td>Offset multiplier used in diagonal mode</td></tr>
+            <tr><td>flipAxis</td><td>'Y' &vert; 'X'</td><td>'Y'</td><td>Rotation axis used in flip mode</td></tr>
+            <tr><td>overlay</td><td>boolean</td><td>true</td><td>Show a darkening overlay on stacked cards</td></tr>
+            <tr><td>overlayColor</td><td>string</td><td>'rgba(0,0,0,0.15)'</td><td>Overlay color</td></tr>
+            <tr><td>shadow</td><td>boolean</td><td>true</td><td>Show drop shadows on cards</td></tr>
+            <tr><td>shadowColor</td><td>string</td><td>'rgba(0,0,0,0.25)'</td><td>Shadow color</td></tr>
+            <tr><td>shadowBlur</td><td>number</td><td>20</td><td>Shadow blur radius in pixels</td></tr>
+          </tbody>
+        </table>
+
+        <p><strong>Note:</strong> Requires <code>effect: 'cards'</code> in the main slider options.</p>
+
+        <h3>Example</h3>
+        <div class="code-block">
+          <span class="code-lang">js</span>
+          <pre><code class="language-javascript">new DriftSlider('.slider', {
+  modules: [EffectCards],
+  effect: 'cards',
+  cardsEffect: {
+    mode: 'stack',
+    direction: 'tl-br',
+    offsetX: 20,
+    offsetY: 20,
+    scale: 0.9,
+    shadow: true,
+    shadowBlur: 30
+  }
+});</code></pre>
+        </div>
+      </section>
+
+      <!-- ─── Keyboard ─── -->
+      <section id="keyboard">
+        <h2 data-i18n-en>Keyboard</h2>
+        <h2 data-i18n-zh>鍵盤</h2>
+        <p data-i18n-en>Enables keyboard arrow-key navigation for the slider. By default, the slider only responds to key events when it is visible in the viewport.</p>
+        <p data-i18n-zh>啟用滑塊的鍵盤方向鍵導航。預設情況下，滑塊僅在可見於視窗時回應鍵盤事件。</p>
+
+        <h3>Import</h3>
+        <div class="code-block">
+          <span class="code-lang">js</span>
+          <pre><code class="language-javascript">// ESM
+import { Keyboard } from 'drift-slider/modules';
+
+// UMD
+const { Keyboard } = DriftSlider;</code></pre>
+        </div>
+
+        <h3>Options</h3>
+        <table class="api-table">
+          <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td>enabled</td><td>boolean</td><td>false</td><td>Enable keyboard navigation</td></tr>
+            <tr><td>onlyInViewport</td><td>boolean</td><td>true</td><td>Only respond to key events when the slider is in the viewport</td></tr>
+          </tbody>
+        </table>
+
+        <h3>Instance API</h3>
+        <table class="api-table">
+          <thead><tr><th>Method</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>slider.keyboard.enable()</code></td><td>Enable keyboard control at runtime</td></tr>
+            <tr><td><code>slider.keyboard.disable()</code></td><td>Disable keyboard control at runtime</td></tr>
+          </tbody>
+        </table>
+
+        <h3>Example</h3>
+        <div class="code-block">
+          <span class="code-lang">js</span>
+          <pre><code class="language-javascript">new DriftSlider('.slider', {
+  modules: [Keyboard],
+  keyboard: {
+    enabled: true,
+    onlyInViewport: true
+  }
+});</code></pre>
+        </div>
+      </section>
+
+      <!-- ─── A11y ─── -->
+      <section id="a11y">
+        <h2 data-i18n-en>A11y</h2>
+        <h2 data-i18n-zh>無障礙</h2>
+        <p data-i18n-en>Enhances the slider with ARIA attributes, roles, and live-region announcements so assistive technologies can convey slide content and navigation to users.</p>
+        <p data-i18n-zh>透過 ARIA 屬性、角色和即時區域通知增強滑塊，讓輔助技術能向使用者傳達投影片內容和導航資訊。</p>
+
+        <h3>Import</h3>
+        <div class="code-block">
+          <span class="code-lang">js</span>
+          <pre><code class="language-javascript">// ESM
+import { A11y } from 'drift-slider/modules';
+
+// UMD
+const { A11y } = DriftSlider;</code></pre>
+        </div>
+
+        <h3>Options</h3>
+        <table class="api-table">
+          <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td>enabled</td><td>boolean</td><td>true</td><td>Enable accessibility features</td></tr>
+            <tr><td>prevSlideMessage</td><td>string</td><td>'Previous slide'</td><td>aria-label for the previous button</td></tr>
+            <tr><td>nextSlideMessage</td><td>string</td><td>'Next slide'</td><td>aria-label for the next button</td></tr>
+            <tr><td>firstSlideMessage</td><td>string</td><td>'This is the first slide'</td><td>Announced when the first slide is reached</td></tr>
+            <tr><td>lastSlideMessage</td><td>string</td><td>'This is the last slide'</td><td>Announced when the last slide is reached</td></tr>
+            <tr><td>paginationBulletMessage</td><td>string</td><td>'Go to slide {{index}}'</td><td>aria-label template for pagination bullets</td></tr>
+            <tr><td>containerMessage</td><td>string &vert; null</td><td>null</td><td>aria-label for the slider container</td></tr>
+            <tr><td>containerRoleDescription</td><td>string</td><td>'carousel'</td><td>aria-roledescription for the container</td></tr>
+            <tr><td>slideRole</td><td>string</td><td>'group'</td><td>ARIA role assigned to each slide</td></tr>
+            <tr><td>slideRoleDescription</td><td>string</td><td>'slide'</td><td>aria-roledescription for each slide</td></tr>
+            <tr><td>liveRegion</td><td>boolean</td><td>true</td><td>Create an aria-live region that announces slide changes</td></tr>
+          </tbody>
+        </table>
+
+        <h3>Example</h3>
+        <div class="code-block">
+          <span class="code-lang">js</span>
+          <pre><code class="language-javascript">new DriftSlider('.slider', {
+  modules: [Navigation, Pagination, A11y],
+  navigation: true,
+  pagination: { el: '.pagination' },
+  a11y: {
+    enabled: true,
+    containerMessage: 'Featured products carousel',
+    prevSlideMessage: 'Go to previous product',
+    nextSlideMessage: 'Go to next product',
+    paginationBulletMessage: 'Go to product {{index}}'
+  }
+});</code></pre>
+        </div>
+      </section>
+
+      <!-- ─── ScrollAos ─── -->
+      <section id="scroll-aos">
+        <h2 data-i18n-en>ScrollAos</h2>
+        <h2 data-i18n-zh>滾動動畫</h2>
+        <p data-i18n-en>Integrates with the <a href="https://michalsnik.github.io/aos/" target="_blank" rel="noopener">AOS (Animate On Scroll)</a> library to trigger entrance animations when the slider scrolls into view. Individual slides can animate with staggered delays.</p>
+        <p data-i18n-zh>整合 <a href="https://michalsnik.github.io/aos/" target="_blank" rel="noopener">AOS (Animate On Scroll)</a> 函式庫，在滑塊滾動進入視窗時觸發進場動畫。個別投影片可以交錯延遲動畫。</p>
+
+        <h3>Import</h3>
+        <div class="code-block">
+          <span class="code-lang">js</span>
+          <pre><code class="language-javascript">// ESM
+import { ScrollAos } from 'drift-slider/modules';
+
+// UMD
+const { ScrollAos } = DriftSlider;</code></pre>
+        </div>
+
+        <h3>Options</h3>
+        <table class="api-table">
+          <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td>enabled</td><td>boolean</td><td>false</td><td>Enable scroll-triggered animations</td></tr>
+            <tr><td>animation</td><td>string</td><td>'fade-up'</td><td>AOS animation class applied to the container</td></tr>
+            <tr><td>duration</td><td>number</td><td>800</td><td>Animation duration in milliseconds</td></tr>
+            <tr><td>offset</td><td>number</td><td>120</td><td>Scroll offset (in pixels) before the animation triggers</td></tr>
+            <tr><td>once</td><td>boolean</td><td>true</td><td>Only animate the first time the element scrolls into view</td></tr>
+            <tr><td>setContainerAos</td><td>boolean</td><td>true</td><td>Automatically set <code>data-aos</code> attribute on the slider container</td></tr>
+            <tr><td>slideAnimation</td><td>string &vert; null</td><td>null</td><td>AOS animation class applied individually to each slide</td></tr>
+            <tr><td>slideDelay</td><td>number</td><td>100</td><td>Stagger delay between each slide animation in milliseconds</td></tr>
+            <tr><td>refreshOnChange</td><td>boolean</td><td>false</td><td>Call <code>AOS.refresh()</code> on every slide change</td></tr>
+          </tbody>
+        </table>
+
+        <p><strong>Note:</strong> This module requires the external <a href="https://michalsnik.github.io/aos/" target="_blank" rel="noopener">AOS library</a> to be loaded on the page.</p>
+
+        <h3>Example</h3>
+        <div class="code-block">
+          <span class="code-lang">js</span>
+          <pre><code class="language-javascript">// Make sure AOS is loaded and initialized
+import AOS from 'aos';
+import 'aos/dist/aos.css';
+AOS.init();
+
+new DriftSlider('.slider', {
+  modules: [ScrollAos],
+  scrollAos: {
+    enabled: true,
+    animation: 'fade-up',
+    duration: 1000,
+    slideAnimation: 'fade-right',
+    slideDelay: 150
+  }
+});</code></pre>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <div data-include="_includes/footer.html"></div>
+
+  <script src="assets/js/prism.js"></script>
+  <script src="assets/js/docs.js"></script>
+</body>
+</html>

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DriftSlider — Custom Styling</title>
+  <meta name="description" content="Custom styled DriftSlider with custom arrow positions and progressbar pagination.">
+  <meta name="keywords" content="DriftSlider, demo, custom styling, arrows, progressbar, pagination, CSS">
+  <link rel="canonical" href="https://hanfour.github.io/drift-slider/demos/custom-style.html">
+  <meta property="og:title" content="DriftSlider — Custom Styling">
+  <meta property="og:description" content="Custom styled DriftSlider with custom arrow positions and progressbar pagination.">
+  <meta property="og:image" content="https://hanfour.github.io/drift-slider/assets/img/og-image.svg">
+  <meta property="og:url" content="https://hanfour.github.io/drift-slider/demos/custom-style.html">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="DriftSlider — Custom Styling">
+  <meta name="twitter:description" content="Custom styled DriftSlider with custom arrow positions and progressbar pagination.">
+  <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/docs.css">
+  <link rel="stylesheet" href="../assets/css/prism-onedark.css">
+  <link rel="stylesheet" href="../assets/lib/drift-slider-bundle.css">
+</head>
+<body>
+  <div data-include="../_includes/header.html"></div>
+  <div class="page-body">
+    <div class="demo-page">
+      <a href="../demos.html" class="demo-back">&larr; Back to Demos</a>
+      <h1>Custom Styling</h1>
+      <p class="demo-desc">Customize arrow positions and pagination styles via JS parameters — no CSS overrides needed.</p>
+
+      <!-- Slider 1: Custom bullet pagination -->
+      <h2 class="demo-section-title">Custom Bullets + Arrow Positioning</h2>
+      <div class="drift-slider">
+        <div class="drift-track"><ul class="drift-list">
+          <li class="drift-slide"><div class="slide-content slide-1">Slide 1</div></li>
+          <li class="drift-slide"><div class="slide-content slide-2">Slide 2</div></li>
+          <li class="drift-slide"><div class="slide-content slide-3">Slide 3</div></li>
+          <li class="drift-slide"><div class="slide-content slide-4">Slide 4</div></li>
+          <li class="drift-slide"><div class="slide-content slide-5">Slide 5</div></li>
+        </ul></div>
+        <button class="drift-arrow drift-arrow--prev" aria-label="Previous" type="button"></button>
+        <button class="drift-arrow drift-arrow--next" aria-label="Next" type="button"></button>
+        <div class="drift-pagination"></div>
+      </div>
+
+      <div class="demo-info-bar">
+        <span>Current Slide: <strong id="current-index">1</strong> / 5</span>
+        <span>Square bullets &middot; Arrows at bottom corners</span>
+      </div>
+
+      <!-- Slider 2: Progressbar pagination -->
+      <h2 class="demo-section-title">Progressbar Pagination</h2>
+      <div id="slider-progress" class="drift-slider">
+        <div class="drift-track"><ul class="drift-list">
+          <li class="drift-slide"><div class="slide-content slide-1">Slide 1</div></li>
+          <li class="drift-slide"><div class="slide-content slide-2">Slide 2</div></li>
+          <li class="drift-slide"><div class="slide-content slide-3">Slide 3</div></li>
+          <li class="drift-slide"><div class="slide-content slide-4">Slide 4</div></li>
+          <li class="drift-slide"><div class="slide-content slide-5">Slide 5</div></li>
+        </ul></div>
+        <button class="drift-arrow drift-arrow--prev" aria-label="Previous" type="button"></button>
+        <button class="drift-arrow drift-arrow--next" aria-label="Next" type="button"></button>
+        <div class="drift-pagination"></div>
+      </div>
+
+      <div class="demo-info-bar">
+        <span>Current Slide: <strong id="progress-index">1</strong> / 5</span>
+        <span>Orange progress bar at bottom</span>
+      </div>
+
+      <!-- Configuration Used -->
+      <h2 class="demo-section-title">Configuration Used</h2>
+      <div class="code-block">
+        <span class="code-lang">js</span>
+        <pre><code class="language-javascript">var DS = DriftSlider;
+
+// Slider 1: Custom bullets + arrow positioning
+var slider = new DS.DriftSlider('.drift-slider', {
+  modules: [DS.Navigation, DS.Pagination, DS.Keyboard, DS.A11y],
+  slidesPerView: 1,
+  spaceBetween: 20,
+  speed: 400,
+  grabCursor: true,
+  keyboard: { enabled: true },
+  navigation: {
+    prevStyle: { bottom: '16px', top: 'auto', left: '16px' },
+    nextStyle: { bottom: '16px', top: 'auto', right: '16px' },
+  },
+  pagination: {
+    style: { position: 'relative', bottom: 'auto', marginTop: '12px' },
+    bulletStyle: { width: '14px', height: '14px', background: '#999', borderRadius: '3px' },
+    bulletActiveStyle: { background: '#007aff', transform: 'scale(1.2)' },
+  },
+  on: {
+    slideChange: function(s) {
+      document.getElementById('current-index').textContent = s.realIndex + 1;
+    },
+  },
+});
+
+// Slider 2: Progressbar
+var slider2 = new DS.DriftSlider('#slider-progress', {
+  modules: [DS.Navigation, DS.Pagination, DS.Keyboard, DS.A11y],
+  slidesPerView: 1,
+  spaceBetween: 20,
+  speed: 400,
+  grabCursor: true,
+  pagination: {
+    type: 'progressbar',
+    style: { top: 'auto', bottom: '0', height: '6px', background: 'rgba(255,255,255,0.3)' },
+    progressStyle: { background: '#ff6b35', borderRadius: '0 3px 3px 0' },
+  },
+  on: {
+    slideChange: function(s) {
+      document.getElementById('progress-index').textContent = s.realIndex + 1;
+    },
+  },
+});</code></pre>
+      </div>
+    </div>
+  </div>
+  <div data-include="../_includes/footer.html"></div>
+  <script src="../assets/lib/drift-slider.umd.js"></script>
+  <script src="../assets/js/prism.js"></script>
+  <script src="../assets/js/docs.js"></script>
+  <script>
+    var DS = DriftSlider;
+
+    // Slider 1: Custom bullets + arrow positioning
+    var slider = new DS.DriftSlider('.drift-slider', {
+      modules: [DS.Navigation, DS.Pagination, DS.Keyboard, DS.A11y],
+      slidesPerView: 1,
+      spaceBetween: 20,
+      speed: 400,
+      grabCursor: true,
+      keyboard: { enabled: true },
+      navigation: {
+        prevStyle: { bottom: '16px', top: 'auto', left: '16px' },
+        nextStyle: { bottom: '16px', top: 'auto', right: '16px' },
+      },
+      pagination: {
+        style: { position: 'relative', bottom: 'auto', marginTop: '12px' },
+        bulletStyle: { width: '14px', height: '14px', background: '#999', borderRadius: '3px' },
+        bulletActiveStyle: { background: '#007aff', transform: 'scale(1.2)' },
+      },
+      on: {
+        slideChange: function(s) {
+          document.getElementById('current-index').textContent = s.realIndex + 1;
+        },
+      },
+    });
+
+    // Slider 2: Progressbar
+    var slider2 = new DS.DriftSlider('#slider-progress', {
+      modules: [DS.Navigation, DS.Pagination, DS.Keyboard, DS.A11y],
+      slidesPerView: 1,
+      spaceBetween: 20,
+      speed: 400,
+      grabCursor: true,
+      pagination: {
+        type: 'progressbar',
+        style: { top: 'auto', bottom: '0', height: '6px', background: 'rgba(255,255,255,0.3)' },
+        progressStyle: { background: '#ff6b35', borderRadius: '0 3px 3px 0' },
+      },
+      on: {
+        slideChange: function(s) {
+          document.getElementById('progress-index').textContent = s.realIndex + 1;
+        },
+      },
+    });
+  </script>
+</body>
+</html>

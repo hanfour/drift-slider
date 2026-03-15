@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DriftSlider — AOS 滾動效果</title>
+  <link rel="stylesheet" href="demo-common.css">
+  <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css">
+  <style>
+    body { max-width: 960px; }
+
+    .hero {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+    .hero h1 { font-size: 2.5em; margin-bottom: 16px; }
+    .hero p { color: #86868b; font-size: 1.2em; }
+    .hero .scroll-hint {
+      margin-top: 40px;
+      font-size: 14px;
+      color: #86868b;
+      animation: bounce 2s infinite;
+    }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(8px); }
+    }
+
+    .demo-section {
+      min-height: 80vh;
+      padding: 80px 0;
+    }
+    .demo-section h2 {
+      font-size: 1.5em;
+      margin-bottom: 8px;
+    }
+    .demo-section p.section-desc {
+      color: #86868b;
+      margin-bottom: 24px;
+    }
+
+    .drift-slider { margin-bottom: 40px; }
+
+    .controls {
+      margin-top: 24px;
+      padding: 20px;
+      background: #fff;
+      border-radius: 12px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px 24px;
+    }
+    .controls h3 {
+      grid-column: 1 / -1;
+      margin: 0;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #86868b;
+    }
+    .controls label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+    }
+    .controls label span:first-child { min-width: 110px; }
+    .controls input[type="range"] { flex: 1; }
+    .controls .val { min-width: 48px; text-align: right; font-variant-numeric: tabular-nums; }
+    .controls select { padding: 4px 8px; border-radius: 4px; border: 1px solid #ccc; }
+  </style>
+</head>
+<body>
+
+  <a class="back" href="index.html">&larr; 返回展示頁</a>
+
+  <!-- Hero -->
+  <section class="hero">
+    <h1>AOS 滾動效果</h1>
+    <p>搭配 <code>ScrollAos</code> 模組，讓 Slider 在滾動進入視窗時播放動畫</p>
+    <div class="scroll-hint">&darr; 往下滾動</div>
+  </section>
+
+  <!-- Section 1: Basic slider + AOS fade-up -->
+  <section class="demo-section">
+    <h2 data-aos="fade-right">基本 Slider — fade-up</h2>
+    <p class="section-desc" data-aos="fade-right" data-aos-delay="100">容器進場使用 <code>fade-up</code> 動畫</p>
+    <div class="drift-slider slider-1" aria-label="AOS 基本範例" data-aos="fade-up" data-aos-duration="800" data-aos-offset="120">
+      <div class="drift-track">
+        <ul class="drift-list">
+          <li class="drift-slide"><div class="slide-content slide-1">Slide 1</div></li>
+          <li class="drift-slide"><div class="slide-content slide-2">Slide 2</div></li>
+          <li class="drift-slide"><div class="slide-content slide-3">Slide 3</div></li>
+          <li class="drift-slide"><div class="slide-content slide-4">Slide 4</div></li>
+        </ul>
+      </div>
+      <button class="drift-arrow drift-arrow--prev" aria-label="上一張" type="button"></button>
+      <button class="drift-arrow drift-arrow--next" aria-label="下一張" type="button"></button>
+      <div class="drift-pagination"></div>
+    </div>
+  </section>
+
+  <!-- Section 2: Cards slider + AOS slide-right -->
+  <section class="demo-section">
+    <h2 data-aos="fade-right">Cards 效果 — slide-right</h2>
+    <p class="section-desc" data-aos="fade-right" data-aos-delay="100">容器進場使用 <code>slide-right</code> 動畫</p>
+    <div class="drift-slider slider-2" aria-label="AOS Cards 範例" data-aos="slide-right" data-aos-duration="800" data-aos-offset="120">
+      <div class="drift-track">
+        <ul class="drift-list">
+          <li class="drift-slide"><div class="slide-content slide-1">Card 1</div></li>
+          <li class="drift-slide"><div class="slide-content slide-2">Card 2</div></li>
+          <li class="drift-slide"><div class="slide-content slide-3">Card 3</div></li>
+          <li class="drift-slide"><div class="slide-content slide-4">Card 4</div></li>
+        </ul>
+      </div>
+      <button class="drift-arrow drift-arrow--prev" aria-label="上一張" type="button"></button>
+      <button class="drift-arrow drift-arrow--next" aria-label="下一張" type="button"></button>
+    </div>
+  </section>
+
+  <!-- Section 3: Coverflow + per-slide AOS -->
+  <section class="demo-section">
+    <h2 data-aos="fade-right">Coverflow 效果 — 個別 Slide 動畫</h2>
+    <p class="section-desc" data-aos="fade-right" data-aos-delay="100">每張 slide 使用 <code>fade-up</code> 加上遞增延遲</p>
+    <div class="drift-slider slider-3" aria-label="AOS Coverflow 範例" style="overflow: visible;" data-aos="fade-up" data-aos-duration="800" data-aos-offset="120">
+      <div class="drift-track" style="overflow: visible !important;">
+        <ul class="drift-list">
+          <li class="drift-slide"><div class="slide-content slide-1">Slide 1</div></li>
+          <li class="drift-slide"><div class="slide-content slide-2">Slide 2</div></li>
+          <li class="drift-slide"><div class="slide-content slide-3">Slide 3</div></li>
+          <li class="drift-slide"><div class="slide-content slide-4">Slide 4</div></li>
+          <li class="drift-slide"><div class="slide-content slide-5">Slide 5</div></li>
+          <li class="drift-slide"><div class="slide-content slide-6">Slide 6</div></li>
+        </ul>
+      </div>
+      <button class="drift-arrow drift-arrow--prev" aria-label="上一張" type="button"></button>
+      <button class="drift-arrow drift-arrow--next" aria-label="下一張" type="button"></button>
+      <div class="drift-pagination"></div>
+    </div>
+  </section>
+
+  <!-- Controls -->
+  <div class="controls">
+    <h3>AOS 全域設定（重新載入頁面後生效）</h3>
+    <label>
+      <span>animation</span>
+      <select id="ctrl-animation">
+        <option value="fade-up" selected>fade-up</option>
+        <option value="fade-down">fade-down</option>
+        <option value="fade-left">fade-left</option>
+        <option value="fade-right">fade-right</option>
+        <option value="slide-up">slide-up</option>
+        <option value="slide-right">slide-right</option>
+        <option value="zoom-in">zoom-in</option>
+        <option value="flip-up">flip-up</option>
+      </select>
+    </label>
+    <label>
+      <span>duration</span>
+      <input type="range" id="ctrl-duration" min="200" max="2000" step="100" value="800">
+      <span class="val" id="val-duration">800</span>
+    </label>
+    <label>
+      <span>offset</span>
+      <input type="range" id="ctrl-offset" min="0" max="400" step="20" value="120">
+      <span class="val" id="val-offset">120</span>
+    </label>
+    <label>
+      <span>once</span>
+      <select id="ctrl-once">
+        <option value="true" selected>true</option>
+        <option value="false">false</option>
+      </select>
+    </label>
+  </div>
+
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+  <script>
+    // Fallback if AOS failed to load
+    if (typeof AOS === 'undefined') {
+      window.AOS = { init: function(){}, refresh: function(){} };
+      var fs = document.createElement('style');
+      fs.textContent = '[data-aos]{opacity:1!important;transform:none!important;}';
+      document.head.appendChild(fs);
+    }
+  </script>
+  <script src="../dist/drift-slider.umd.js"></script>
+  <script>
+    var DS = DriftSlider;
+
+    // Slider 1: Basic + ScrollAos
+    var slider1 = new DS.DriftSlider('.slider-1', {
+      modules: [DS.Navigation, DS.Pagination, DS.ScrollAos, DS.A11y],
+      slidesPerView: 1,
+      speed: 400,
+      scrollAos: {
+        enabled: true,
+        refreshOnChange: true,
+      },
+    });
+
+    // Slider 2: Cards + ScrollAos
+    var slider2 = new DS.DriftSlider('.slider-2', {
+      modules: [DS.Navigation, DS.EffectCards, DS.ScrollAos, DS.A11y],
+      effect: 'cards',
+      slidesPerView: 1,
+      speed: 400,
+      scrollAos: {
+        enabled: true,
+        refreshOnChange: true,
+      },
+    });
+
+    // Slider 3: Coverflow + ScrollAos with per-slide animation
+    var slider3 = new DS.DriftSlider('.slider-3', {
+      modules: [DS.Navigation, DS.Pagination, DS.EffectCoverflow, DS.ScrollAos, DS.A11y],
+      effect: 'coverflow',
+      slidesPerView: 3,
+      centeredSlides: true,
+      speed: 500,
+      coverflowEffect: {
+        depth: 200,
+        rotate: 30,
+        scale: 0.85,
+      },
+      scrollAos: {
+        enabled: true,
+        slideAnimation: 'fade-up',
+        slideDelay: 100,
+        refreshOnChange: true,
+      },
+    });
+
+    // Controls: update AOS attributes dynamically
+    function val(id) { return document.getElementById(id).value; }
+    function num(id) { return Number(val(id)); }
+    function bool(id) { return val(id) === 'true'; }
+
+    function updateAosSettings() {
+      var animation = val('ctrl-animation');
+      var duration = String(num('ctrl-duration'));
+      var offset = String(num('ctrl-offset'));
+      var once = val('ctrl-once');
+
+      document.getElementById('val-duration').textContent = duration;
+      document.getElementById('val-offset').textContent = offset;
+
+      // Update all data-aos elements
+      var els = document.querySelectorAll('[data-aos]');
+      for (var i = 0; i < els.length; i++) {
+        var el = els[i];
+        // Only update slider containers (not headings/paragraphs)
+        if (el.classList.contains('drift-slider')) {
+          el.setAttribute('data-aos', animation);
+        }
+        el.setAttribute('data-aos-duration', duration);
+        el.setAttribute('data-aos-offset', offset);
+        el.setAttribute('data-aos-once', once);
+      }
+
+      // Re-init AOS with new settings
+      AOS.init({
+        once: bool('ctrl-once'),
+        duration: num('ctrl-duration'),
+        offset: num('ctrl-offset'),
+      });
+    }
+
+    var controls = document.querySelectorAll('.controls input, .controls select');
+    for (var i = 0; i < controls.length; i++) {
+      controls[i].addEventListener('input', updateAosSettings);
+      controls[i].addEventListener('change', updateAosSettings);
+    }
+
+    // Init AOS after sliders are created
+    AOS.init({
+      once: true,
+      duration: 800,
+      offset: 120,
+    });
+  </script>
+</body>
+</html>

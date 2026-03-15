@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DriftSlider — Changelog</title>
+  <meta name="description" content="DriftSlider release history — what's new, fixed, and improved in each version.">
+  <meta name="keywords" content="DriftSlider, changelog, releases, version history">
+  <link rel="canonical" href="https://hanfour.github.io/drift-slider/changelog.html">
+  <meta property="og:title" content="Changelog — DriftSlider">
+  <meta property="og:description" content="DriftSlider release history — what's new, fixed, and improved in each version.">
+  <meta property="og:image" content="https://hanfour.github.io/drift-slider/assets/img/og-image.svg">
+  <meta property="og:url" content="https://hanfour.github.io/drift-slider/changelog.html">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Changelog — DriftSlider">
+  <meta name="twitter:description" content="DriftSlider release history — what's new, fixed, and improved in each version.">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/docs.css">
+</head>
+<body>
+  <div data-include="_includes/header.html"></div>
+
+  <div class="page-body">
+    <div class="container" style="max-width:800px; padding:40px 24px 80px;">
+      <h1 data-i18n-en>Changelog</h1>
+      <h1 data-i18n-zh>版本記錄</h1>
+      <p class="lead" data-i18n-en>All notable changes to DriftSlider will be documented here.</p>
+      <p class="lead" data-i18n-zh>DriftSlider 所有重要變更都記錄在此。</p>
+
+      <!-- v0.1.0 -->
+      <div class="changelog-entry">
+        <h2 class="changelog-version">v0.1.0</h2>
+        <p class="changelog-date">2025-03-14 &mdash; Initial Release</p>
+
+        <h3 data-i18n-en>Core</h3>
+        <h3 data-i18n-zh>核心</h3>
+        <ul>
+          <li data-i18n-en>Physics-based touch interaction with velocity tracking, friction, and bounce</li>
+          <li data-i18n-zh>物理慣性觸控，包含速度追蹤、摩擦力、回彈</li>
+          <li data-i18n-en>Horizontal and vertical slider directions</li>
+          <li data-i18n-zh>水平與垂直滑動方向</li>
+          <li data-i18n-en>Configurable <code>slidesPerView</code>, <code>spaceBetween</code>, <code>centeredSlides</code></li>
+          <li data-i18n-zh>可設定 <code>slidesPerView</code>、<code>spaceBetween</code>、<code>centeredSlides</code></li>
+          <li data-i18n-en>Infinite loop mode with clone slides</li>
+          <li data-i18n-zh>支援無限循環模式（clone slides）</li>
+          <li data-i18n-en>Responsive breakpoint system</li>
+          <li data-i18n-zh>響應式斷點系統</li>
+          <li data-i18n-en>Event system with <code>on</code>, <code>once</code>, <code>off</code>, <code>emit</code></li>
+          <li data-i18n-zh>事件系統（<code>on</code>、<code>once</code>、<code>off</code>、<code>emit</code>）</li>
+          <li data-i18n-en>20 built-in events for full lifecycle control</li>
+          <li data-i18n-zh>20 個內建事件，完整掌握生命週期</li>
+        </ul>
+
+        <h3 data-i18n-en>Modules</h3>
+        <h3 data-i18n-zh>模組</h3>
+        <ul>
+          <li data-i18n-en><strong>Navigation</strong> &mdash; Prev/next arrow buttons with custom styling support</li>
+          <li data-i18n-zh><strong>Navigation</strong> &mdash; 上下頁箭頭按鈕，支援自訂樣式</li>
+          <li data-i18n-en><strong>Pagination</strong> &mdash; Bullets, fraction, and progressbar types with custom rendering</li>
+          <li data-i18n-zh><strong>Pagination</strong> &mdash; 圓點、分數、進度條三種類型，支援自訂渲染</li>
+          <li data-i18n-en><strong>Autoplay</strong> &mdash; Automatic slide advance with pause on hover/interaction</li>
+          <li data-i18n-zh><strong>Autoplay</strong> &mdash; 自動播放，支援滑鼠懸停/互動暫停</li>
+          <li data-i18n-en><strong>EffectFade</strong> &mdash; Cross-fade transition effect</li>
+          <li data-i18n-zh><strong>EffectFade</strong> &mdash; 交叉淡入淡出效果</li>
+          <li data-i18n-en><strong>EffectCoverflow</strong> &mdash; 3D cover flow with depth, rotation, scale, cropSides, staggerY, visibleSides</li>
+          <li data-i18n-zh><strong>EffectCoverflow</strong> &mdash; 3D 封面流效果（depth、rotation、scale、cropSides、staggerY、visibleSides）</li>
+          <li data-i18n-en><strong>EffectCards</strong> &mdash; Card stack, diagonal, and flip modes with overlay and shadow</li>
+          <li data-i18n-zh><strong>EffectCards</strong> &mdash; 卡片堆疊、對角、翻轉模式，含覆蓋層與陰影</li>
+          <li data-i18n-en><strong>Keyboard</strong> &mdash; Arrow key navigation with viewport-only option</li>
+          <li data-i18n-zh><strong>Keyboard</strong> &mdash; 方向鍵導航，支援僅在 viewport 內啟用</li>
+          <li data-i18n-en><strong>A11y</strong> &mdash; ARIA labels, roles, live regions, screen reader support</li>
+          <li data-i18n-zh><strong>A11y</strong> &mdash; ARIA 標籤、角色、即時區域、螢幕閱讀器支援</li>
+          <li data-i18n-en><strong>ScrollAos</strong> &mdash; AOS (Animate on Scroll) integration for scroll-triggered animations</li>
+          <li data-i18n-zh><strong>ScrollAos</strong> &mdash; AOS（滾動動畫）整合，支援滾動觸發動畫</li>
+        </ul>
+
+        <h3 data-i18n-en>Build &amp; Distribution</h3>
+        <h3 data-i18n-zh>建構與發佈</h3>
+        <ul>
+          <li data-i18n-en>ESM, CJS, and UMD builds via Rollup</li>
+          <li data-i18n-zh>透過 Rollup 產出 ESM、CJS、UMD 建構</li>
+          <li data-i18n-en>jQuery plugin build with all modules bundled</li>
+          <li data-i18n-zh>jQuery 插件建構（含所有模組）</li>
+          <li data-i18n-en>Core CSS + bundled CSS with module styles</li>
+          <li data-i18n-zh>核心 CSS + 模組樣式打包 CSS</li>
+          <li data-i18n-en>Full TypeScript type definitions</li>
+          <li data-i18n-zh>完整 TypeScript 型別定義</li>
+          <li data-i18n-en>Zero production dependencies</li>
+          <li data-i18n-zh>零生產依賴</li>
+          <li data-i18n-en>MIT License</li>
+          <li data-i18n-zh>MIT 授權</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div data-include="_includes/footer.html"></div>
+  <script src="assets/js/docs.js"></script>
+</body>
+</html>

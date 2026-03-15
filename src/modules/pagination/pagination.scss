@@ -1,0 +1,70 @@
+@use 'sass:color';
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.drift-pagination {
+  @include drift-flex-center;
+
+  position: absolute;
+  bottom: 12px;
+  left: 0;
+  right: 0;
+  z-index: $drift-z-pagination;
+  gap: $drift-pagination-bullet-gap;
+
+  // Bullets
+  &--bullets {
+    // default flex center
+  }
+
+  &__bullet {
+    display: inline-block;
+    width: $drift-pagination-bullet-size;
+    height: $drift-pagination-bullet-size;
+    border-radius: 50%;
+    background: $drift-pagination-color;
+    cursor: pointer;
+    transition: background-color $drift-transition-duration, transform $drift-transition-duration;
+
+    &:hover {
+      background: color.adjust($drift-pagination-color, $lightness: -20%);
+    }
+
+    &--active {
+      background: $drift-pagination-active-color;
+      transform: scale(1.25);
+    }
+
+    &:focus-visible {
+      outline: 2px solid $drift-theme-color;
+      outline-offset: 2px;
+    }
+  }
+
+  // Fraction
+  &--fraction {
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  }
+
+  // Progressbar
+  &--progressbar {
+    top: 0;
+    bottom: auto;
+    height: $drift-pagination-progress-height;
+    background: rgba(0, 0, 0, 0.1);
+    display: block;
+  }
+
+  &__progress {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background: $drift-pagination-active-color;
+    transform-origin: left center;
+    transform: scaleX(0);
+    transition: transform $drift-transition-duration;
+  }
+}

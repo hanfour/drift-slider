@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>API Reference — DriftSlider</title>
+  <meta name="description" content="Complete API reference for DriftSlider: options, properties, methods, events, and breakpoints.">
+  <meta name="keywords" content="DriftSlider, API, options, methods, events, breakpoints, reference">
+  <link rel="canonical" href="https://hanfour.github.io/drift-slider/api.html">
+  <meta property="og:title" content="API Reference — DriftSlider">
+  <meta property="og:description" content="Complete API reference for DriftSlider: options, properties, methods, events, and breakpoints.">
+  <meta property="og:image" content="https://hanfour.github.io/drift-slider/assets/img/og-image.svg">
+  <meta property="og:url" content="https://hanfour.github.io/drift-slider/api.html">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="API Reference — DriftSlider">
+  <meta name="twitter:description" content="Complete API reference for DriftSlider: options, properties, methods, events, and breakpoints.">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/docs.css">
+  <link rel="stylesheet" href="assets/css/prism-onedark.css">
+  <link rel="stylesheet" href="assets/lib/drift-slider-bundle.css">
+</head>
+<body>
+  <div data-include="_includes/header.html"></div>
+
+  <div class="page-body">
+    <div class="page-with-sidebar">
+
+      <!-- ═══ Sidebar ═══ -->
+      <aside class="sidebar">
+        <p class="sidebar-title" data-i18n-en>API Reference</p>
+        <p class="sidebar-title" data-i18n-zh>API 參考</p>
+        <ul class="sidebar-nav">
+          <li><a href="#constructor">Constructor</a></li>
+          <li><a href="#core-options">Core Options</a></li>
+          <li><a href="#physics-options">Physics Options</a></li>
+          <li><a href="#touch-options">Touch Options</a></li>
+          <li><a href="#css-classes">CSS Classes</a></li>
+          <li><a href="#properties">Properties</a></li>
+          <li><a href="#methods">Methods</a></li>
+          <li><a href="#events">Events</a></li>
+          <li><a href="#breakpoints">Breakpoints</a></li>
+        </ul>
+      </aside>
+
+      <!-- ═══ Content ═══ -->
+      <main class="content">
+        <h1 data-i18n-en>API Reference</h1>
+        <h1 data-i18n-zh>API 參考</h1>
+        <p class="lead" data-i18n-en>Complete reference for the DriftSlider constructor, options, properties, methods, and events.</p>
+        <p class="lead" data-i18n-zh>DriftSlider 建構函式、選項、屬性、方法和事件的完整參考。</p>
+
+        <!-- ── Constructor ── -->
+        <h2 id="constructor" data-i18n-en>Constructor</h2>
+        <h2 data-i18n-zh>建構函式</h2>
+        <p data-i18n-en>Create a new DriftSlider instance by passing a target element and an optional configuration object.</p>
+        <p data-i18n-zh>傳入目標元素和可選的設定物件來建立新的 DriftSlider 實例。</p>
+        <div class="code-block">
+          <span class="code-lang">js</span>
+          <pre><code class="language-javascript">new DriftSlider(el: string | HTMLElement, options?: DriftSliderOptions)</code></pre>
+        </div>
+        <table class="api-table">
+          <thead>
+            <tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>el</td>
+              <td>string | HTMLElement</td>
+              <td>&mdash;</td>
+              <td>CSS selector string or a direct HTMLElement reference to the slider container.</td>
+            </tr>
+            <tr>
+              <td>options</td>
+              <td>DriftSliderOptions</td>
+              <td>{}</td>
+              <td>Optional configuration object. All options listed below can be passed here.</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="code-block">
+          <span class="code-lang">js</span>
+          <pre><code class="language-javascript">// Using a CSS selector
+const slider = new DriftSlider('.drift-slider', {
+  slidesPerView: 3,
+  spaceBetween: 16,
+  loop: true,
+});
+
+// Using an HTMLElement
+const el = document.getElementById('my-slider');
+const slider = new DriftSlider(el, { speed: 600 });</code></pre>
+        </div>
+
+        <!-- ── Core Options ── -->
+        <h2 id="core-options" data-i18n-en>Core Options</h2>
+        <h2 data-i18n-zh>核心選項</h2>
+        <p data-i18n-en>Primary configuration options that control the slider's layout and behavior.</p>
+        <p data-i18n-zh>控制滑塊佈局和行為的主要設定選項。</p>
+        <table class="api-table">
+          <thead>
+            <tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>direction</td>
+              <td>'horizontal' | 'vertical'</td>
+              <td>'horizontal'</td>
+              <td>Slider direction.</td>
+            </tr>
+            <tr>
+              <td>slidesPerView</td>
+              <td>number</td>
+              <td>1</td>
+              <td>Number of slides visible at the same time.</td>
+            </tr>
+            <tr>
+              <td>spaceBetween</td>
+              <td>number</td>
+              <td>0</td>
+              <td>Gap between slides in pixels.</td>
+            </tr>
+            <tr>
+              <td>centeredSlides</td>
+              <td>boolean</td>
+              <td>false</td>
+              <td>Center the active slide within the viewport.</td>
+            </tr>
+            <tr>
+              <td>slidesPerGroup</td>
+              <td>number</td>
+              <td>1</td>
+              <td>Number of slides to advance per swipe or navigation action.</td>
+            </tr>
+            <tr>
+              <td>speed</td>
+              <td>number</td>
+              <td>400</td>
+              <td>Transition speed in milliseconds.</td>
+            </tr>
+            <tr>
+              <td>easing</td>
+              <td>string</td>
+              <td>'ease-out'</td>
+              <td>CSS easing function for transitions.</td>
+            </tr>
+            <tr>
+              <td>loop</td>
+              <td>boolean</td>
+              <td>false</td>
+              <td>Enable infinite loop mode by cloning slides.</td>
+            </tr>
+            <tr>
+              <td>loopAdditionalSlides</td>
+              <td>number</td>
+              <td>0</td>
+              <td>Number of extra clone slides to append for smoother looping.</td>
+            </tr>
+            <tr>
+              <td>initialSlide</td>
+              <td>number</td>
+              <td>0</td>
+              <td>Zero-based index of the starting slide.</td>
+            </tr>
+            <tr>
+              <td>grabCursor</td>
+              <td>boolean</td>
+              <td>false</td>
+              <td>Show a grab cursor when hovering over the slider.</td>
+            </tr>
+            <tr>
+              <td>watchOverflow</td>
+              <td>boolean</td>
+              <td>true</td>
+              <td>Automatically lock the slider when there are not enough slides to scroll.</td>
+            </tr>
+            <tr>
+              <td>effect</td>
+              <td>'slide' | 'fade' | 'coverflow' | 'cards'</td>
+              <td>'slide'</td>
+              <td>Transition effect. Requires the corresponding effect module.</td>
+            </tr>
+            <tr>
+              <td>modules</td>
+              <td>DriftSliderModule[]</td>
+              <td>[]</td>
+              <td>Array of modules to register (e.g. Navigation, Pagination, Autoplay).</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- ── Physics Options ── -->
+        <h2 id="physics-options" data-i18n-en>Physics Options</h2>
+        <h2 data-i18n-zh>物理引擎選項</h2>
+        <p data-i18n-en>Fine-tune the physics engine that powers touch/drag interactions. These values control how the slider feels when swiped.</p>
+        <p data-i18n-zh>微調驅動觸控/拖曳互動的物理引擎。這些數值控制滑動時的手感。</p>
+        <table class="api-table">
+          <thead>
+            <tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>physics.friction</td>
+              <td>number</td>
+              <td>0.92</td>
+              <td>Velocity damping factor (0&ndash;1). Higher values keep momentum longer.</td>
+            </tr>
+            <tr>
+              <td>physics.attraction</td>
+              <td>number</td>
+              <td>0.025</td>
+              <td>Pull force toward the nearest snap point. Higher values snap faster.</td>
+            </tr>
+            <tr>
+              <td>physics.bounceRate</td>
+              <td>number</td>
+              <td>0.5</td>
+              <td>Spring bounce intensity when reaching edges.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- ── Touch Options ── -->
+        <h2 id="touch-options" data-i18n-en>Touch Options</h2>
+        <h2 data-i18n-zh>觸控選項</h2>
+        <p data-i18n-en>Control how the slider responds to touch and pointer input.</p>
+        <p data-i18n-zh>控制滑塊如何回應觸控和指標輸入。</p>
+        <table class="api-table">
+          <thead>
+            <tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>touchEnabled</td>
+              <td>boolean</td>
+              <td>true</td>
+              <td>Enable touch and mouse drag interaction.</td>
+            </tr>
+            <tr>
+              <td>threshold</td>
+              <td>number</td>
+              <td>5</td>
+              <td>Minimum drag distance in pixels before the slider starts moving.</td>
+            </tr>
+            <tr>
+              <td>touchAngle</td>
+              <td>number</td>
+              <td>45</td>
+              <td>Maximum angle (in degrees) from the horizontal axis to accept as a swipe.</td>
+            </tr>
+            <tr>
+              <td>shortSwipes</td>
+              <td>boolean</td>
+              <td>true</td>
+              <td>Enable short, quick swipe gestures to advance slides.</td>
+            </tr>
+            <tr>
+              <td>longSwipesRatio</td>
+              <td>number</td>
+              <td>0.5</td>
+              <td>Ratio of the slider width that must be dragged to trigger a long swipe transition.</td>
+            </tr>
+            <tr>
+              <td>followFinger</td>
+              <td>boolean</td>
+              <td>true</td>
+              <td>Slider follows finger/pointer movement in real time.</td>
+            </tr>
+            <tr>
+              <td>resistance</td>
+              <td>boolean</td>
+              <td>true</td>
+              <td>Enable edge resistance when dragging past the first or last slide.</td>
+            </tr>
+            <tr>
+              <td>resistanceRatio</td>
+              <td>number</td>
+              <td>0.85</td>
+              <td>Edge resistance strength. Lower values create stronger resistance.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- ── CSS Classes ── -->
+        <h2 id="css-classes" data-i18n-en>CSS Classes</h2>
+        <h2 data-i18n-zh>CSS 類別</h2>
+        <p data-i18n-en>Override the default CSS class names used by DriftSlider. Useful when integrating with existing CSS frameworks or naming conventions.</p>
+        <p data-i18n-zh>覆蓋 DriftSlider 使用的預設 CSS 類別名稱。在整合現有 CSS 框架或命名慣例時很有用。</p>
+        <table class="api-table">
+          <thead>
+            <tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>containerClass</td>
+              <td>string</td>
+              <td>'drift-slider'</td>
+              <td>Class applied to the container element.</td>
+            </tr>
+            <tr>
+              <td>trackClass</td>
+              <td>string</td>
+              <td>'drift-track'</td>
+              <td>Class applied to the track element.</td>
+            </tr>
+            <tr>
+              <td>listClass</td>
+              <td>string</td>
+              <td>'drift-list'</td>
+              <td>Class applied to the list element.</td>
+            </tr>
+            <tr>
+              <td>slideClass</td>
+              <td>string</td>
+              <td>'drift-slide'</td>
+              <td>Class applied to each slide element.</td>
+            </tr>
+            <tr>
+              <td>slideActiveClass</td>
+              <td>string</td>
+              <td>'drift-slide--active'</td>
+              <td>Class applied to the currently active slide.</td>
+            </tr>
+            <tr>
+              <td>slidePrevClass</td>
+              <td>string</td>
+              <td>'drift-slide--prev'</td>
+              <td>Class applied to the slide immediately before the active slide.</td>
+            </tr>
+            <tr>
+              <td>slideNextClass</td>
+              <td>string</td>
+              <td>'drift-slide--next'</td>
+              <td>Class applied to the slide immediately after the active slide.</td>
+            </tr>
+            <tr>
+              <td>slideVisibleClass</td>
+              <td>string</td>
+              <td>'drift-slide--visible'</td>
+              <td>Class applied to all slides currently visible in the viewport.</td>
+            </tr>
+            <tr>
+              <td>slideCloneClass</td>
+              <td>string</td>
+              <td>'drift-slide--clone'</td>
+              <td>Class applied to cloned slides in loop mode.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- ── Properties ── -->
+        <h2 id="properties" data-i18n-en>Properties</h2>
+        <h2 data-i18n-zh>屬性</h2>
+        <p data-i18n-en>Read-only properties available on a DriftSlider instance after initialization.</p>
+        <p data-i18n-zh>DriftSlider 實例初始化後可用的唯讀屬性。</p>
+        <table class="api-table">
+          <thead>
+            <tr><th>Property</th><th>Type</th><th>Description</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>el</td>
+              <td>HTMLElement</td>
+              <td>The container element the slider was initialized on.</td>
+            </tr>
+            <tr>
+              <td>trackEl</td>
+              <td>HTMLElement</td>
+              <td>The track element that wraps the slide list.</td>
+            </tr>
+            <tr>
+              <td>listEl</td>
+              <td>HTMLElement</td>
+              <td>The list element that contains all slides.</td>
+            </tr>
+            <tr>
+              <td>slides</td>
+              <td>HTMLElement[]</td>
+              <td>Array of all slide elements (including clones in loop mode).</td>
+            </tr>
+            <tr>
+              <td>params</td>
+              <td>DriftSliderOptions</td>
+              <td>The current resolved parameters (merged defaults + user options + breakpoint overrides).</td>
+            </tr>
+            <tr>
+              <td>activeIndex</td>
+              <td>number</td>
+              <td>Index of the currently active slide.</td>
+            </tr>
+            <tr>
+              <td>realIndex</td>
+              <td>number</td>
+              <td>Real slide index, accounting for loop clones.</td>
+            </tr>
+            <tr>
+              <td>previousIndex</td>
+              <td>number</td>
+              <td>Index of the previously active slide.</td>
+            </tr>
+            <tr>
+              <td>progress</td>
+              <td>number</td>
+              <td>Overall slider progress from 0 (beginning) to 1 (end).</td>
+            </tr>
+            <tr>
+              <td>isBeginning</td>
+              <td>boolean</td>
+              <td>Whether the slider is at the first slide.</td>
+            </tr>
+            <tr>
+              <td>isEnd</td>
+              <td>boolean</td>
+              <td>Whether the slider is at the last slide.</td>
+            </tr>
+            <tr>
+              <td>isLocked</td>
+              <td>boolean</td>
+              <td>Whether the slider is locked due to insufficient slides (watchOverflow).</td>
+            </tr>
+            <tr>
+              <td>animating</td>
+              <td>boolean</td>
+              <td>Whether the slider is currently animating a transition.</td>
+            </tr>
+            <tr>
+              <td>translate</td>
+              <td>number</td>
+              <td>Current CSS translate value in pixels.</td>
+            </tr>
+            <tr>
+              <td>snapGrid</td>
+              <td>number[]</td>
+              <td>Array of snap positions the slider locks to.</td>
+            </tr>
+            <tr>
+              <td>slidesGrid</td>
+              <td>number[]</td>
+              <td>Array of slide position offsets.</td>
+            </tr>
+            <tr>
+              <td>containerSize</td>
+              <td>number</td>
+              <td>Container width (horizontal) or height (vertical) in pixels.</td>
+            </tr>
+            <tr>
+              <td>slideSize</td>
+              <td>number</td>
+              <td>Computed size of a single slide in pixels.</td>
+            </tr>
+            <tr>
+              <td>maxTranslate</td>
+              <td>number</td>
+              <td>Maximum translate value (usually 0).</td>
+            </tr>
+            <tr>
+              <td>minTranslate</td>
+              <td>number</td>
+              <td>Minimum translate value (negative, furthest scroll position).</td>
+            </tr>
+            <tr>
+              <td>destroyed</td>
+              <td>boolean</td>
+              <td>Whether the slider instance has been destroyed.</td>
+            </tr>
+            <tr>
+              <td>id</td>
+              <td>string</td>
+              <td>Unique identifier for this slider instance.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- ── Methods ── -->
+        <h2 id="methods" data-i18n-en>Methods</h2>
+        <h2 data-i18n-zh>方法</h2>
+        <p data-i18n-en>Public methods available on a DriftSlider instance. Methods that return <code>DriftSlider</code> are chainable.</p>
+        <p data-i18n-zh>DriftSlider 實例上可用的公開方法。回傳 <code>DriftSlider</code> 的方法可鏈式呼叫。</p>
+        <table class="api-table">
+          <thead>
+            <tr><th>Method</th><th>Return</th><th>Description</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>slideTo(index, speed?, runCallbacks?)</td>
+              <td>DriftSlider</td>
+              <td>Slide to a specific index. Optional speed overrides the default transition duration. Set <code>runCallbacks</code> to <code>false</code> to suppress events.</td>
+            </tr>
+            <tr>
+              <td>slideNext(speed?, runCallbacks?)</td>
+              <td>DriftSlider</td>
+              <td>Advance to the next slide (or group of slides).</td>
+            </tr>
+            <tr>
+              <td>slidePrev(speed?, runCallbacks?)</td>
+              <td>DriftSlider</td>
+              <td>Go back to the previous slide (or group of slides).</td>
+            </tr>
+            <tr>
+              <td>slideToClosest(speed?)</td>
+              <td>DriftSlider</td>
+              <td>Snap to the closest snap point from the current translate position.</td>
+            </tr>
+            <tr>
+              <td>update()</td>
+              <td>void</td>
+              <td>Recalculate all layout values (sizes, grids, snap points). Call after dynamically adding or removing slides.</td>
+            </tr>
+            <tr>
+              <td>destroy(cleanStyles?)</td>
+              <td>void</td>
+              <td>Destroy the slider instance, remove event listeners and classes. Pass <code>true</code> to also remove inline styles.</td>
+            </tr>
+            <tr>
+              <td>enable()</td>
+              <td>void</td>
+              <td>Re-enable a previously disabled slider.</td>
+            </tr>
+            <tr>
+              <td>disable()</td>
+              <td>void</td>
+              <td>Disable the slider (prevents touch/drag and navigation).</td>
+            </tr>
+            <tr>
+              <td>on(event, handler)</td>
+              <td>DriftSlider</td>
+              <td>Register an event listener. Returns the slider instance for chaining.</td>
+            </tr>
+            <tr>
+              <td>once(event, handler)</td>
+              <td>DriftSlider</td>
+              <td>Register a one-time event listener that is removed after its first invocation.</td>
+            </tr>
+            <tr>
+              <td>off(event, handler?)</td>
+              <td>DriftSlider</td>
+              <td>Remove an event listener. If no handler is provided, all listeners for that event are removed.</td>
+            </tr>
+            <tr>
+              <td>emit(event, ...args)</td>
+              <td>DriftSlider</td>
+              <td>Manually emit a custom event with optional arguments.</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="code-block">
+          <span class="code-lang">js</span>
+          <pre><code class="language-javascript">const slider = new DriftSlider('.drift-slider', {
+  slidesPerView: 3,
+  loop: true,
+});
+
+// Chainable navigation
+slider.slideNext().on('slideChange', (s) =&gt; {
+  console.log('Now at slide:', s.activeIndex);
+});
+
+// Destroy and clean up
+slider.destroy(true);</code></pre>
+        </div>
+
+        <!-- ── Events ── -->
+        <h2 id="events" data-i18n-en>Events</h2>
+        <h2 data-i18n-zh>事件</h2>
+        <p data-i18n-en>DriftSlider emits lifecycle and interaction events. Listen via the <code>on</code> option at init time or via the <code>.on()</code> method after initialization.</p>
+        <p data-i18n-zh>DriftSlider 會發出生命週期和互動事件。透過初始化時的 <code>on</code> 選項或初始化後的 <code>.on()</code> 方法來監聽。</p>
+        <table class="api-table">
+          <thead>
+            <tr><th>Event</th><th>Arguments</th><th>Description</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>init</td>
+              <td>(slider)</td>
+              <td>Fired after the slider is fully initialized.</td>
+            </tr>
+            <tr>
+              <td>destroy</td>
+              <td>(slider)</td>
+              <td>Fired after the slider is destroyed.</td>
+            </tr>
+            <tr>
+              <td>beforeDestroy</td>
+              <td>(slider)</td>
+              <td>Fired before the destroy process begins.</td>
+            </tr>
+            <tr>
+              <td>slideChange</td>
+              <td>(slider)</td>
+              <td>Fired when the active slide index changes.</td>
+            </tr>
+            <tr>
+              <td>slideChangeTransitionStart</td>
+              <td>(slider)</td>
+              <td>Fired when a slide change transition animation starts.</td>
+            </tr>
+            <tr>
+              <td>slideChangeTransitionEnd</td>
+              <td>(slider)</td>
+              <td>Fired when a slide change transition animation completes.</td>
+            </tr>
+            <tr>
+              <td>touchStart</td>
+              <td>(slider, event)</td>
+              <td>Fired on touch/mouse down.</td>
+            </tr>
+            <tr>
+              <td>touchMove</td>
+              <td>(slider, event)</td>
+              <td>Fired on touch/mouse move while dragging.</td>
+            </tr>
+            <tr>
+              <td>touchEnd</td>
+              <td>(slider, event)</td>
+              <td>Fired on touch/mouse up.</td>
+            </tr>
+            <tr>
+              <td>progress</td>
+              <td>(slider, progress)</td>
+              <td>Fired whenever the overall progress value updates (0 to 1).</td>
+            </tr>
+            <tr>
+              <td>reachBeginning</td>
+              <td>(slider)</td>
+              <td>Fired when the slider reaches the first slide.</td>
+            </tr>
+            <tr>
+              <td>reachEnd</td>
+              <td>(slider)</td>
+              <td>Fired when the slider reaches the last slide.</td>
+            </tr>
+            <tr>
+              <td>resize</td>
+              <td>(slider)</td>
+              <td>Fired when the window is resized and the slider recalculates.</td>
+            </tr>
+            <tr>
+              <td>breakpoint</td>
+              <td>(slider, breakpoint)</td>
+              <td>Fired when the active breakpoint changes.</td>
+            </tr>
+            <tr>
+              <td>setTranslate</td>
+              <td>(slider, translate)</td>
+              <td>Fired whenever the translate value is set.</td>
+            </tr>
+            <tr>
+              <td>setTransition</td>
+              <td>(slider, duration)</td>
+              <td>Fired whenever the transition duration is set.</td>
+            </tr>
+            <tr>
+              <td>update</td>
+              <td>(slider)</td>
+              <td>Fired after the slider layout is recalculated via <code>update()</code>.</td>
+            </tr>
+            <tr>
+              <td>autoplayStart</td>
+              <td>(slider)</td>
+              <td>Fired when autoplay begins.</td>
+            </tr>
+            <tr>
+              <td>autoplayStop</td>
+              <td>(slider)</td>
+              <td>Fired when autoplay is stopped.</td>
+            </tr>
+            <tr>
+              <td>autoplayPause</td>
+              <td>(slider)</td>
+              <td>Fired when autoplay is paused (e.g. on hover).</td>
+            </tr>
+            <tr>
+              <td>autoplayResume</td>
+              <td>(slider)</td>
+              <td>Fired when autoplay resumes after a pause.</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="code-block">
+          <span class="code-lang">js</span>
+          <pre><code class="language-javascript">// Listen via the `on` option at init
+const slider = new DriftSlider('.drift-slider', {
+  on: {
+    init: (s) =&gt; console.log('Initialized!'),
+    slideChange: (s) =&gt; console.log('Slide:', s.activeIndex),
+  },
+});
+
+// Or add listeners after init
+slider.on('progress', (s, p) =&gt; {
+  console.log('Progress:', Math.round(p * 100) + '%');
+});</code></pre>
+        </div>
+
+        <!-- ── Breakpoints ── -->
+        <h2 id="breakpoints" data-i18n-en>Breakpoints</h2>
+        <h2 data-i18n-zh>斷點</h2>
+        <p data-i18n-en>The breakpoint system lets you define responsive overrides that apply at specific viewport widths. Breakpoints use a <strong>mobile-first</strong> approach: each key is a <code>min-width</code> value in pixels, and its options override the base configuration when the viewport is at least that wide.</p>
+        <p data-i18n-zh>斷點系統讓你定義在特定視窗寬度套用的響應式覆蓋設定。斷點採用<strong>行動優先</strong>策略：每個鍵值是以像素為單位的 <code>min-width</code> 值，當視窗至少達到該寬度時，其選項會覆蓋基礎設定。</p>
+        <p data-i18n-en>The following options can be overridden inside a breakpoint:</p>
+        <p data-i18n-zh>以下選項可在斷點內覆蓋：</p>
+        <ul>
+          <li><code>slidesPerView</code></li>
+          <li><code>spaceBetween</code></li>
+          <li><code>slidesPerGroup</code></li>
+          <li><code>centeredSlides</code></li>
+          <li><code>loop</code></li>
+          <li><code>speed</code></li>
+          <li><code>grabCursor</code></li>
+        </ul>
+        <div class="code-block">
+          <span class="code-lang">js</span>
+          <pre><code class="language-javascript">new DriftSlider('.drift-slider', {
+  slidesPerView: 1,
+  spaceBetween: 16,
+  breakpoints: {
+    // when viewport &gt;= 768px
+    768: {
+      slidesPerView: 2,
+      spaceBetween: 20,
+    },
+    // when viewport &gt;= 1024px
+    1024: {
+      slidesPerView: 3,
+      spaceBetween: 24,
+    },
+  },
+});</code></pre>
+        </div>
+        <p data-i18n-en>When the viewport width crosses a breakpoint boundary, the slider automatically recalculates its layout and emits the <code>breakpoint</code> event with the new breakpoint value.</p>
+        <p data-i18n-zh>當視窗寬度跨過斷點邊界時，滑塊會自動重新計算佈局並發出帶有新斷點值的 <code>breakpoint</code> 事件。</p>
+        <div class="code-block">
+          <span class="code-lang">js</span>
+          <pre><code class="language-javascript">slider.on('breakpoint', (s, bp) =&gt; {
+  console.log('Breakpoint changed to:', bp);
+  console.log('Slides per view:', s.params.slidesPerView);
+});</code></pre>
+        </div>
+
+      </main>
+    </div><!-- .page-with-sidebar -->
+  </div><!-- .page-body -->
+
+  <div data-include="_includes/footer.html"></div>
+
+  <!-- Scripts -->
+  <script src="assets/js/prism.js"></script>
+  <script src="assets/js/docs.js"></script>
+</body>
+</html>

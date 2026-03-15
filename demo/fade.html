@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DriftSlider — 淡入淡出</title>
+  <link rel="stylesheet" href="demo-common.css">
+  <style>
+    .slide-1 { background: #2C3E50; }
+    .slide-2 { background: #8E44AD; }
+    .slide-3 { background: #16A085; }
+    .slide-4 { background: #2C3E6B; }
+  </style>
+</head>
+<body>
+  <a class="back" href="index.html">&larr; 返回展示頁</a>
+  <h1>淡入淡出效果</h1>
+  <p class="desc">使用 <code>effect: 'fade'</code> 搭配 EffectFade 模組</p>
+
+  <section class="drift-slider" aria-label="淡入淡出範例輪播">
+    <div class="drift-track">
+      <ul class="drift-list">
+        <li class="drift-slide"><div class="slide-content slide-1">Night Sky</div></li>
+        <li class="drift-slide"><div class="slide-content slide-2">Violet</div></li>
+        <li class="drift-slide"><div class="slide-content slide-3">Teal</div></li>
+        <li class="drift-slide"><div class="slide-content slide-4">Deep Blue</div></li>
+      </ul>
+    </div>
+    <button class="drift-arrow drift-arrow--prev" aria-label="上一張" type="button"></button>
+    <button class="drift-arrow drift-arrow--next" aria-label="下一張" type="button"></button>
+    <div class="drift-pagination"></div>
+  </section>
+
+  <script src="../dist/drift-slider.umd.js"></script>
+  <script>
+    var DS = DriftSlider;
+    var slider = new DS.DriftSlider('.drift-slider', {
+      modules: [DS.Navigation, DS.Pagination, DS.EffectFade, DS.A11y],
+      effect: 'fade',
+      speed: 600,
+    });
+
+    window.slider = slider;
+  </script>
+</body>
+</html>

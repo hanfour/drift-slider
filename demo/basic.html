@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DriftSlider — 基本用法</title>
+  <link rel="stylesheet" href="demo-common.css">
+</head>
+<body>
+  <a class="back" href="index.html">&larr; 返回展示頁</a>
+  <h1>基本用法</h1>
+  <p class="desc">最基本的 DriftSlider：導航箭頭 + 分頁圓點 + 觸控拖曳</p>
+
+  <section class="drift-slider" aria-label="基本範例輪播">
+    <div class="drift-track">
+      <ul class="drift-list">
+        <li class="drift-slide"><div class="slide-content slide-1">Slide 1</div></li>
+        <li class="drift-slide"><div class="slide-content slide-2">Slide 2</div></li>
+        <li class="drift-slide"><div class="slide-content slide-3">Slide 3</div></li>
+        <li class="drift-slide"><div class="slide-content slide-4">Slide 4</div></li>
+        <li class="drift-slide"><div class="slide-content slide-5">Slide 5</div></li>
+      </ul>
+    </div>
+    <button class="drift-arrow drift-arrow--prev" aria-label="上一張" type="button"></button>
+    <button class="drift-arrow drift-arrow--next" aria-label="下一張" type="button"></button>
+    <div class="drift-pagination"></div>
+  </section>
+
+  <div class="info">
+    <strong>目前 Slide：</strong><code id="current-index">1</code> / 5
+    &nbsp;|&nbsp;
+    <strong>進度：</strong><code id="current-progress">0%</code>
+  </div>
+
+  <script src="../dist/drift-slider.umd.js"></script>
+  <script>
+    var DS = DriftSlider;
+    var slider = new DS.DriftSlider('.drift-slider', {
+      modules: [DS.Navigation, DS.Pagination, DS.Keyboard, DS.A11y],
+      slidesPerView: 1,
+      spaceBetween: 20,
+      speed: 400,
+      grabCursor: true,
+      keyboard: { enabled: true },
+      on: {
+        slideChange: function(s) {
+          document.getElementById('current-index').textContent = s.realIndex + 1;
+        },
+        progress: function(s, p) {
+          document.getElementById('current-progress').textContent =
+            Math.round(p * 100) + '%';
+        },
+      },
+    });
+
+    window.slider = slider;
+  </script>
+</body>
+</html>

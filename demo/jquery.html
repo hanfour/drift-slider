@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DriftSlider — jQuery 用法</title>
+  <link rel="stylesheet" href="demo-common.css">
+</head>
+<body>
+  <a class="back" href="index.html">&larr; 返回展示頁</a>
+  <h1>jQuery 用法</h1>
+  <p class="desc">透過 <code>$.fn.driftSlider()</code> 初始化，所有模組自動載入</p>
+
+  <section class="drift-slider" aria-label="jQuery 範例輪播">
+    <div class="drift-track">
+      <ul class="drift-list">
+        <li class="drift-slide"><div class="slide-content slide-1">jQuery 1</div></li>
+        <li class="drift-slide"><div class="slide-content slide-2">jQuery 2</div></li>
+        <li class="drift-slide"><div class="slide-content slide-3">jQuery 3</div></li>
+      </ul>
+    </div>
+    <button class="drift-arrow drift-arrow--prev" aria-label="上一張" type="button"></button>
+    <button class="drift-arrow drift-arrow--next" aria-label="下一張" type="button"></button>
+    <div class="drift-pagination"></div>
+  </section>
+
+  <pre><code>// jQuery 初始化
+$('.drift-slider').driftSlider({
+  slidesPerView: 1,
+  loop: true,
+  navigation: true,
+  pagination: { type: 'bullets' },
+  autoplay: { enabled: true, delay: 4000 },
+});</code></pre>
+
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="../dist/drift-slider.jquery.js"></script>
+  <script>
+    $(function() {
+      $('.drift-slider').driftSlider({
+        slidesPerView: 1,
+        loop: true,
+        navigation: true,
+        pagination: { type: 'bullets' },
+        autoplay: { enabled: true, delay: 4000 },
+        grabCursor: true,
+      });
+    });
+  </script>
+</body>
+</html>

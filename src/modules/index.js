@@ -1,0 +1,9 @@
+export { default as Navigation } from './navigation/navigation.js';
+export { default as Pagination } from './pagination/pagination.js';
+export { default as Autoplay } from './autoplay/autoplay.js';
+export { default as EffectFade } from './effects/effect-fade.js';
+export { default as Keyboard } from './keyboard/keyboard.js';
+export { default as A11y } from './a11y/a11y.js';
+export { default as EffectCoverflow } from './effects/effect-coverflow.js';
+export { default as EffectCards } from './effects/effect-cards.js';
+export { default as ScrollAos } from './scroll-aos/scroll-aos.js';

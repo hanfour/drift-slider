@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0B1120"/>
+      <stop offset="100%" style="stop-color:#1a1f3a"/>
+    </linearGradient>
+    <linearGradient id="teal" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#48D9C1"/>
+      <stop offset="100%" style="stop-color:#2FB8A1"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <circle cx="200" cy="315" r="400" fill="rgba(72,217,193,0.06)"/>
+  <circle cx="1000" cy="315" r="300" fill="rgba(72,217,193,0.04)"/>
+  <!-- Logo icon -->
+  <g transform="translate(520, 180) scale(2.5)">
+    <rect width="40" height="40" rx="10" fill="#48D9C1"/>
+    <path d="M12 14h8a2 2 0 012 2v8a2 2 0 01-2 2h-8a2 2 0 01-2-2v-8a2 2 0 012-2z" fill="rgba(255,255,255,0.3)"/>
+    <path d="M16 12h8a2 2 0 012 2v8a2 2 0 01-2 2h-8a2 2 0 01-2-2v-8a2 2 0 012-2z" fill="rgba(255,255,255,0.55)"/>
+    <path d="M20 10h8a2 2 0 012 2v8a2 2 0 01-2 2h-8a2 2 0 01-2-2v-8a2 2 0 012-2z" fill="#fff"/>
+    <path d="M22 16l4 2-4 2v-4z" fill="#48D9C1"/>
+  </g>
+  <!-- Title -->
+  <text x="600" y="340" text-anchor="middle" font-family="Inter, -apple-system, sans-serif" font-weight="800" font-size="64" fill="#fff">
+    <tspan fill="#48D9C1">Drift</tspan>Slider
+  </text>
+  <!-- Subtitle -->
+  <text x="600" y="400" text-anchor="middle" font-family="Inter, -apple-system, sans-serif" font-weight="400" font-size="24" fill="rgba(255,255,255,0.65)">
+    Lightweight, modular slider with physics-based touch
+  </text>
+  <!-- Badges -->
+  <g transform="translate(380, 440)">
+    <rect width="100" height="32" rx="16" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+    <text x="50" y="21" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" fill="rgba(255,255,255,0.7)">v0.1.0</text>
+  </g>
+  <g transform="translate(500, 440)">
+    <rect width="120" height="32" rx="16" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+    <text x="60" y="21" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" fill="rgba(255,255,255,0.7)">&lt; 10KB gzip</text>
+  </g>
+  <g transform="translate(640, 440)">
+    <rect width="120" height="32" rx="16" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+    <text x="60" y="21" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" fill="rgba(255,255,255,0.7)">MIT License</text>
+  </g>
+</svg>

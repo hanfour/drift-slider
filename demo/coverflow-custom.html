@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DriftSlider — Coverflow 自訂尺寸</title>
+  <link rel="stylesheet" href="demo-common.css">
+  <style>
+    body { max-width: 1200px; }
+    .drift-slider { border-radius: 0; width: 1100px; margin: 0 auto; }
+
+    .slide-content {
+      border-radius: 12px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.15);
+    }
+
+    .size-info {
+      margin-top: 20px;
+      padding: 16px 20px;
+      background: #fff;
+      border-radius: 12px;
+      font-size: 14px;
+      line-height: 1.8;
+    }
+    .size-info code { background: #e8e8ed; padding: 2px 6px; border-radius: 4px; }
+    .size-info .highlight { color: #007aff; font-weight: 600; }
+
+    .controls {
+      margin-top: 24px;
+      padding: 20px;
+      background: #fff;
+      border-radius: 12px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px 24px;
+    }
+    .controls h3 {
+      grid-column: 1 / -1;
+      margin: 8px 0 0;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #86868b;
+      border-top: 1px solid #e8e8ed;
+      padding-top: 12px;
+    }
+    .controls h3:first-child { border-top: none; margin-top: 0; padding-top: 0; }
+    .controls label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+    }
+    .controls label span:first-child { min-width: 130px; }
+    .controls input[type="range"] { flex: 1; }
+    .controls .val { min-width: 56px; text-align: right; font-variant-numeric: tabular-nums; }
+    .controls select { padding: 4px 8px; border-radius: 4px; border: 1px solid #ccc; }
+
+    .presets {
+      margin-top: 16px;
+      padding: 16px 20px;
+      background: #fff;
+      border-radius: 12px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+    .presets span { font-size: 14px; font-weight: 600; color: #1d1d1f; }
+    .presets button {
+      padding: 8px 16px;
+      border: 1px solid #007aff;
+      border-radius: 8px;
+      background: #fff;
+      color: #007aff;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .presets button:hover { background: #007aff; color: #fff; }
+    .presets button.active { background: #007aff; color: #fff; }
+
+    pre { white-space: pre-wrap; word-break: break-all; }
+
+    /* Debug ruler */
+    .ruler {
+      position: relative;
+      width: 1100px;
+      margin: 12px auto 0;
+      height: 32px;
+      border-left: 1px dashed #ccc;
+      border-right: 1px dashed #ccc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      color: #86868b;
+    }
+  </style>
+</head>
+<body>
+  <a class="back" href="index.html">&larr; 返回展示頁</a>
+  <h1>Coverflow 自訂尺寸</h1>
+  <p class="desc">使用 <code>cropSides</code> 裁切兩側超出部分，或用 <code>scale</code> 縮放兩側 slide</p>
+
+  <section class="drift-slider" aria-label="自訂尺寸 Coverflow 範例">
+    <div class="drift-track">
+      <ul class="drift-list">
+        <li class="drift-slide"><div class="slide-content slide-1">Slide 1</div></li>
+        <li class="drift-slide"><div class="slide-content slide-2">Slide 2</div></li>
+        <li class="drift-slide"><div class="slide-content slide-3">Slide 3</div></li>
+        <li class="drift-slide"><div class="slide-content slide-4">Slide 4</div></li>
+        <li class="drift-slide"><div class="slide-content slide-5">Slide 5</div></li>
+        <li class="drift-slide"><div class="slide-content slide-6">Slide 6</div></li>
+      </ul>
+    </div>
+    <button class="drift-arrow drift-arrow--prev" aria-label="上一張" type="button"></button>
+    <button class="drift-arrow drift-arrow--next" aria-label="下一張" type="button"></button>
+    <div class="drift-pagination"></div>
+  </section>
+  <div class="ruler" id="ruler"></div>
+
+  <div class="size-info" id="size-info"></div>
+
+  <div class="controls">
+    <h3>模式</h3>
+    <label>
+      <span>cropSides</span>
+      <select id="ctrl-crop">
+        <option value="true" selected>true — 裁切兩側</option>
+        <option value="false">false — scale 縮放</option>
+      </select>
+    </label>
+
+    <h3>尺寸設定</h3>
+    <label>
+      <span>容器寬度 (px)</span>
+      <input type="range" id="ctrl-container" min="600" max="1400" step="10" value="1100">
+      <span class="val" id="val-container">1100</span>
+    </label>
+    <label>
+      <span>主要 slide (px)</span>
+      <input type="range" id="ctrl-center" min="200" max="1000" step="2" value="530">
+      <span class="val" id="val-center">530</span>
+    </label>
+    <label>
+      <span>間距 (px)</span>
+      <input type="range" id="ctrl-gap" min="0" max="60" step="2" value="16">
+      <span class="val" id="val-gap">16</span>
+    </label>
+    <label>
+      <span>重疊量 (px)</span>
+      <input type="range" id="ctrl-overlap" min="0" max="400" step="5" value="0">
+      <span class="val" id="val-overlap">0</span>
+    </label>
+
+    <h3>Coverflow 外觀</h3>
+    <label>
+      <span>depth</span>
+      <input type="range" id="ctrl-depth" min="0" max="500" value="0">
+      <span class="val" id="val-depth">0</span>
+    </label>
+    <label>
+      <span>rotate</span>
+      <input type="range" id="ctrl-rotate" min="0" max="90" value="0">
+      <span class="val" id="val-rotate">0</span>
+    </label>
+    <label>
+      <span>opacity</span>
+      <input type="range" id="ctrl-opacity" min="0" max="100" value="80">
+      <span class="val" id="val-opacity">0.80</span>
+    </label>
+    <label>
+      <span>overlay</span>
+      <select id="ctrl-overlay">
+        <option value="true" selected>true</option>
+        <option value="false">false</option>
+      </select>
+    </label>
+    <label>
+      <span>align</span>
+      <select id="ctrl-align">
+        <option value="center">center</option>
+        <option value="top">top</option>
+        <option value="bottom">bottom</option>
+      </select>
+    </label>
+    <label>
+      <span>staggerY (px)</span>
+      <input type="range" id="ctrl-staggerY" min="-200" max="200" step="5" value="0">
+      <span class="val" id="val-staggerY">0</span>
+    </label>
+    <label>
+      <span>visibleSides</span>
+      <select id="ctrl-visibleSides">
+        <option value="both" selected>both — 兩側都顯示</option>
+        <option value="prev">prev — 只顯示前一張</option>
+        <option value="next">next — 只顯示下一張</option>
+      </select>
+    </label>
+    <label>
+      <span>loop</span>
+      <select id="ctrl-loop">
+        <option value="false" selected>false</option>
+        <option value="true">true</option>
+      </select>
+    </label>
+  </div>
+
+  <div class="presets">
+    <span>預設佈局：</span>
+    <button type="button" onclick="applyPreset('A', this)">Layout A — 對角左上→右下</button>
+    <button type="button" onclick="applyPreset('B', this)">Layout B — 對角右上→左下</button>
+    <button type="button" onclick="applyPreset('C', this)">Layout C — 兩側上 / 中央下</button>
+    <button type="button" onclick="applyPreset('reset', this)">重設</button>
+  </div>
+
+  <pre id="code-output"></pre>
+
+  <script src="../dist/drift-slider.umd.js"></script>
+  <script>
+    var DS = DriftSlider;
+    var currentSlider = null;
+
+    function val(id) { return document.getElementById(id).value; }
+    function num(id) { return Number(val(id)); }
+    function bool(id) { return val(id) === 'true'; }
+
+    function createSlider() {
+      if (currentSlider) {
+        currentSlider.destroy(true);
+        currentSlider = null;
+      }
+
+      var containerWidth = num('ctrl-container');
+      var centerWidth = num('ctrl-center');
+      var gap = num('ctrl-gap');
+      var overlap = num('ctrl-overlap');
+      var depth = num('ctrl-depth');
+      var rotate = num('ctrl-rotate');
+      var opacity = num('ctrl-opacity') / 100;
+      var overlay = bool('ctrl-overlay');
+      var align = val('ctrl-align');
+      var staggerY = num('ctrl-staggerY');
+      var visibleSides = val('ctrl-visibleSides');
+      var isLoop = bool('ctrl-loop');
+      var cropSides = bool('ctrl-crop');
+
+      // Auto-calculate side slide size:
+      // container = center + n * side + n * gap
+      // side = (container - center - n * gap) / n
+      var n = (visibleSides === 'both') ? 2 : 1;
+      var sideVisible = Math.max(50, Math.round((containerWidth - centerWidth - n * gap) / n));
+
+      // Update display values
+      document.getElementById('val-container').textContent = containerWidth;
+      document.getElementById('val-center').textContent = centerWidth;
+      document.getElementById('val-gap').textContent = gap;
+      document.getElementById('val-overlap').textContent = overlap;
+      document.getElementById('val-depth').textContent = depth;
+      document.getElementById('val-rotate').textContent = rotate;
+      document.getElementById('val-opacity').textContent = opacity.toFixed(2);
+      document.getElementById('val-staggerY').textContent = staggerY;
+
+      var slidesPerView, scale, stretch;
+
+      if (cropSides) {
+        slidesPerView = containerWidth / centerWidth;
+        scale = 1;
+        var naturalPeek = (containerWidth - centerWidth) / 2;
+        var desiredPeek = sideVisible + gap;
+        stretch = Math.round(naturalPeek - desiredPeek) - overlap;
+
+        document.getElementById('size-info').innerHTML =
+          '<strong>cropSides 模式</strong> — 兩側 slide 保持原尺寸 (' + centerWidth + 'px)，超出容器的部分被裁切<br>' +
+          '次要 slide = (' + containerWidth + ' - ' + centerWidth + ' - ' + gap + '×' + n + ') / ' + n + ' = <span class="highlight">' + sideVisible + 'px</span><br>' +
+          '<code>slidesPerView</code> = <span class="highlight">' + slidesPerView.toFixed(3) + '</span><br>' +
+          '<code>stretch</code> = <span class="highlight">' + stretch + '</span><br>' +
+          '佈局：' + (n === 1 ? '[' + sideVisible + 'px] ' + gap + 'px [' + centerWidth + 'px 主要]' : '[' + sideVisible + 'px] ' + gap + 'px [' + centerWidth + 'px 主要] ' + gap + 'px [' + sideVisible + 'px]');
+      } else {
+        slidesPerView = containerWidth / centerWidth;
+        scale = sideVisible / centerWidth;
+        var autoStretch = -Math.round((1 - scale) * centerWidth / 2);
+        stretch = autoStretch - overlap;
+
+        document.getElementById('size-info').innerHTML =
+          '<strong>scale 模式</strong> — 次要 slide 用 CSS scale 縮小<br>' +
+          '次要 slide = (' + containerWidth + ' - ' + centerWidth + ' - ' + gap + '×' + n + ') / ' + n + ' = <span class="highlight">' + sideVisible + 'px</span><br>' +
+          '<code>slidesPerView</code> = <span class="highlight">' + slidesPerView.toFixed(3) + '</span>　' +
+          '<code>scale</code> = ' + sideVisible + ' / ' + centerWidth + ' = <span class="highlight">' + scale.toFixed(3) + '</span><br>' +
+          '<code>stretch</code> = ' + autoStretch + ' (auto) - ' + overlap + ' (overlap) = <span class="highlight">' + stretch + '</span>';
+      }
+
+      // Update container & ruler width
+      document.querySelector('.drift-slider').style.width = containerWidth + 'px';
+      var ruler = document.getElementById('ruler');
+      ruler.style.width = containerWidth + 'px';
+      ruler.innerHTML = '<span>&larr; ' + containerWidth + 'px &rarr;</span>';
+
+      // Code output
+      var lines = [
+        "// 容器: " + containerWidth + "px, 主要: " + centerWidth + "px, 次要: " + sideVisible + "px (×" + n + ")" + (cropSides ? " 裁切" : " 縮放"),
+        "",
+        "new DriftSlider('.my-slider', {",
+        "  modules: [Navigation, Pagination, EffectCoverflow, A11y],",
+        "  effect: 'coverflow',",
+        "  slidesPerView: " + slidesPerView.toFixed(3) + ",",
+        "  centeredSlides: true,",
+      ];
+      if (isLoop) lines.push("  loop: true,");
+      lines.push(
+        "  navigation: true,",
+        "  pagination: { clickable: true },",
+        "  coverflowEffect: {",
+        "    cropSides: " + cropSides + ",",
+        "    scale: " + scale.toFixed(3) + ",",
+        "    stretch: " + stretch + ",",
+        "    depth: " + depth + ",",
+        "    rotate: " + rotate + ",",
+        "    opacity: " + opacity + ",",
+        "    overlay: " + overlay + ",",
+        "    align: '" + align + "',",
+        "    staggerY: " + staggerY + ",",
+        "    visibleSides: '" + visibleSides + "',",
+        "  },",
+        "});"
+      );
+      document.getElementById('code-output').textContent = lines.join('\n');
+
+      // Create slider
+      var opts = {
+        modules: [DS.Navigation, DS.Pagination, DS.EffectCoverflow, DS.A11y],
+        effect: 'coverflow',
+        slidesPerView: slidesPerView,
+        centeredSlides: true,
+        speed: 500,
+        coverflowEffect: {
+          cropSides: cropSides,
+          scale: scale,
+          stretch: stretch,
+          depth: depth,
+          rotate: rotate,
+          opacity: opacity,
+          activeOpacity: 1,
+          overlay: overlay,
+          overlayColor: 'rgba(0,0,0,0.3)',
+          modifier: 1,
+          align: align,
+          staggerY: staggerY,
+          visibleSides: visibleSides,
+        },
+      };
+
+      if (isLoop) opts.loop = true;
+
+      currentSlider = new DS.DriftSlider('.drift-slider', opts);
+      window.slider = currentSlider;
+    }
+
+    // Bind controls
+    var controls = document.querySelectorAll('.controls input, .controls select');
+    for (var i = 0; i < controls.length; i++) {
+      controls[i].addEventListener('input', createSlider);
+      controls[i].addEventListener('change', createSlider);
+    }
+
+    function applyPreset(preset, btn) {
+      var presets = {
+        A: { container: 1100, center: 700, gap: 0, overlap: 200, depth: 0, rotate: 0, opacity: 80, overlay: 'true', crop: 'false', align: 'top', staggerY: 80, visibleSides: 'prev', loop: 'false' },
+        B: { container: 1100, center: 700, gap: 0, overlap: 200, depth: 0, rotate: 0, opacity: 80, overlay: 'true', crop: 'false', align: 'top', staggerY: 80, visibleSides: 'next', loop: 'false' },
+        C: { container: 1100, center: 500, gap: 16, overlap: 50, depth: 0, rotate: 0, opacity: 80, overlay: 'true', crop: 'false', align: 'top', staggerY: 80, visibleSides: 'both', loop: 'false' },
+        reset: { container: 1100, center: 530, gap: 16, overlap: 0, depth: 0, rotate: 0, opacity: 80, overlay: 'true', crop: 'true', align: 'center', staggerY: 0, visibleSides: 'both', loop: 'false' },
+      };
+      var p = presets[preset];
+      if (!p) return;
+
+      document.getElementById('ctrl-container').value = p.container;
+      document.getElementById('ctrl-center').value = p.center;
+      document.getElementById('ctrl-gap').value = p.gap;
+      document.getElementById('ctrl-overlap').value = p.overlap;
+      document.getElementById('ctrl-depth').value = p.depth;
+      document.getElementById('ctrl-rotate').value = p.rotate;
+      document.getElementById('ctrl-opacity').value = p.opacity;
+      document.getElementById('ctrl-overlay').value = p.overlay;
+      document.getElementById('ctrl-crop').value = p.crop;
+      document.getElementById('ctrl-align').value = p.align;
+      document.getElementById('ctrl-staggerY').value = p.staggerY;
+      document.getElementById('ctrl-visibleSides').value = p.visibleSides;
+      document.getElementById('ctrl-loop').value = p.loop;
+
+      // Highlight active preset button
+      var btns = document.querySelectorAll('.presets button');
+      for (var i = 0; i < btns.length; i++) btns[i].classList.remove('active');
+      if (preset !== 'reset' && btn) btn.classList.add('active');
+
+      createSlider();
+    }
+
+    createSlider();
+  </script>
+</body>
+</html>

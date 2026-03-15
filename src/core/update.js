@@ -1,0 +1,97 @@
+import { outerWidth, outerHeight } from '../shared/dom.js';
+
+export default function updateModule({ slider }) {
+  function calcSlides() {
+    const params = slider.params;
+    const isHorizontal = params.direction === 'horizontal';
+    const slides = slider.slides;
+
+    if (!slides.length) return;
+
+    // Container size
+    const containerSize = isHorizontal
+      ? slider.el.clientWidth
+      : slider.el.clientHeight;
+
+    slider.containerSize = containerSize;
+
+    // Calculate slide size
+    const spaceBetween = params.spaceBetween;
+    const perView = params.slidesPerView;
+    const slideSize =
+      (containerSize - spaceBetween * (perView - 1)) / perView;
+
+    slider.slideSize = slideSize;
+
+    // Calculate snap grid and slide positions
+    const snapGrid = [];
+    const slidesGrid = [];
+    const slidesSizesGrid = [];
+
+    let offset = 0;
+
+    if (params.centeredSlides) {
+      offset = containerSize / 2 - slideSize / 2;
+    }
+
+    for (let i = 0; i < slides.length; i++) {
+      const currentSlideSize = slideSize;
+      slidesSizesGrid.push(currentSlideSize);
+
+      const slidePosition = i * (currentSlideSize + spaceBetween);
+      slidesGrid.push(slidePosition);
+
+      // Snap grid (per group)
+      if (i % params.slidesPerGroup === 0) {
+        if (params.centeredSlides) {
+          snapGrid.push(slidePosition);
+        } else {
+          snapGrid.push(slidePosition);
+        }
+      }
+
+      // Set slide dimensions
+      if (isHorizontal) {
+        slides[i].style.width = `${currentSlideSize}px`;
+        slides[i].style.marginRight = `${spaceBetween}px`;
+      } else {
+        slides[i].style.height = `${currentSlideSize}px`;
+        slides[i].style.marginBottom = `${spaceBetween}px`;
+      }
+    }
+
+    slider.snapGrid = snapGrid;
+    slider.slidesGrid = slidesGrid;
+    slider.slidesSizesGrid = slidesSizesGrid;
+
+    // Total list size
+    const totalSize =
+      slides.length * slideSize + (slides.length - 1) * spaceBetween;
+
+    // Max translate
+    slider.maxTranslate = 0;
+    slider.minTranslate = -(totalSize - containerSize);
+
+    if (slider.minTranslate > 0) slider.minTranslate = 0;
+
+    // Check overflow (not enough slides)
+    slider.isLocked =
+      params.watchOverflow && snapGrid.length <= 1;
+
+    // Update list size
+    if (isHorizontal) {
+      slider.listEl.style.width = `${totalSize}px`;
+    } else {
+      slider.listEl.style.height = `${totalSize}px`;
+    }
+  }
+
+  function update() {
+    calcSlides();
+    slider.updateSlidesClasses();
+    slider.emit('update', slider);
+  }
+
+  slider.calcSlides = calcSlides;
+  slider.update = update;
+}

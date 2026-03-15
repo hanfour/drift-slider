@@ -1,0 +1,27 @@
+// DriftSlider SCSS Variables
+// Override these before importing drift-slider.scss
+
+$drift-prefix: 'drift-' !default;
+
+// Colors
+$drift-theme-color: #007aff !default;
+$drift-arrow-color: #333 !default;
+$drift-arrow-bg: rgba(255, 255, 255, 0.9) !default;
+$drift-pagination-color: #ccc !default;
+$drift-pagination-active-color: $drift-theme-color !default;
+
+// Sizes
+$drift-arrow-size: 40px !default;
+$drift-arrow-icon-size: 20px !default;
+$drift-pagination-bullet-size: 8px !default;
+$drift-pagination-bullet-gap: 6px !default;
+$drift-pagination-progress-height: 3px !default;
+
+// Transitions
+$drift-transition-duration: 0.3s !default;
+
+// Z-indexes
+$drift-z-slider: 1 !default;
+$drift-z-list: 1 !default;
+$drift-z-arrow: 10 !default;
+$drift-z-pagination: 10 !default;

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DriftSlider — 展示頁</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f5f5f7;
+      color: #1d1d1f;
+      padding: 40px 20px;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+    h1 { font-size: 2em; margin-bottom: 8px; }
+    p.lead { color: #86868b; margin-bottom: 40px; }
+    .demo-section { margin-bottom: 60px; }
+    .demo-section h2 { font-size: 1.3em; margin-bottom: 16px; }
+    .demo-section a {
+      display: inline-block;
+      padding: 10px 20px;
+      background: #007aff;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 8px;
+      margin: 4px 8px 4px 0;
+      font-size: 14px;
+    }
+    .demo-section a:hover { background: #0056cc; }
+    .demo-links { display: flex; flex-wrap: wrap; gap: 8px; }
+  </style>
+</head>
+<body>
+  <h1>DriftSlider</h1>
+  <p class="lead">輕量、模組化、物理慣性觸控的 Slider/Carousel 函式庫</p>
+
+  <div class="demo-section">
+    <h2>範例展示</h2>
+    <div class="demo-links">
+      <a href="basic.html">基本用法</a>
+      <a href="loop.html">無限循環</a>
+      <a href="fade.html">淡入淡出</a>
+      <a href="responsive.html">響應式</a>
+      <a href="jquery.html">jQuery 用法</a>
+      <a href="custom-style.html">自訂導航樣式</a>
+      <a href="coverflow.html">Coverflow 效果</a>
+      <a href="coverflow-custom.html">Coverflow 自訂尺寸</a>
+      <a href="cards.html">Cards 效果</a>
+      <a href="scroll-aos.html">AOS 滾動效果</a>
+    </div>
+  </div>
+
+  <div class="demo-section">
+    <h2>特色</h2>
+    <ul style="padding-left: 20px; line-height: 2;">
+      <li>輕量核心 — 目標 &lt; 10KB gzip</li>
+      <li>物理慣性觸控 — 速度追蹤 + 摩擦力 + 回彈</li>
+      <li>模組化架構 — Navigation / Pagination / Autoplay / Fade / Keyboard / A11y</li>
+      <li>無障礙優先 — ARIA 屬性、鍵盤導航、prefers-reduced-motion</li>
+      <li>語意化 HTML — 支援 &lt;ul&gt;&lt;li&gt; 結構</li>
+      <li>雙介面 — Vanilla JS + jQuery Plugin</li>
+      <li>BEM CSS + SCSS 變數 — 易於客製主題</li>
+      <li>響應式斷點 — 依視窗寬度調整參數</li>
+    </ul>
+  </div>
+</body>
+</html>
