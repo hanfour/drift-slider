@@ -23,7 +23,13 @@
   "scripts": {
     "build": "rollup -c rollup.config.mjs",
     "build:css": "sass src/styles/drift-slider.scss dist/drift-slider.css --style=compressed && sass src/styles/bundle.scss dist/drift-slider-bundle.css --style=compressed",
+    "build:docs": "npm run build && npm run build:css && cp dist/drift-slider.esm.js dist/drift-slider.css dist/drift-slider-bundle.css docs/assets/lib/ 2>/dev/null || true",
     "dev": "rollup -c rollup.config.mjs -w",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "release": "release-it",
+    "release:dry": "release-it --dry-run",
     "prepublishOnly": "npm run build && npm run build:css"
   },
   "keywords": [
@@ -53,8 +59,14 @@
   },
   "homepage": "https://hanfour.github.io/drift-slider/",
   "devDependencies": {
+    "@lhci/cli": "^0.15.1",
+    "@release-it/conventional-changelog": "^10.0.6",
     "@rollup/plugin-terser": "^0.4.4",
+    "@vitest/coverage-v8": "^4.1.0",
+    "jsdom": "^29.0.0",
+    "release-it": "^19.2.4",
     "rollup": "^4.9.0",
-    "sass": "^1.69.0"
+    "sass": "^1.69.0",
+    "vitest": "^4.1.0"
   }
 }

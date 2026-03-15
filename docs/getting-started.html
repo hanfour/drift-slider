@@ -15,10 +15,12 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Getting Started — DriftSlider">
   <meta name="twitter:description" content="Learn how to install and set up DriftSlider in your project using npm, CDN, or direct download.">
+  <meta name="theme-color" content="#48D9C1">
   <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
   <link rel="stylesheet" href="assets/css/docs.css">
   <link rel="stylesheet" href="assets/css/prism-onedark.css">
   <link rel="stylesheet" href="assets/lib/drift-slider-bundle.css">
@@ -254,7 +256,7 @@ const slider = new DriftSlider('.drift-slider', options);</code></pre>
   <div data-include="_includes/footer.html"></div>
 
   <!-- Scripts -->
-  <script src="assets/js/prism.js"></script>
-  <script src="assets/js/docs.js"></script>
+  <script src="assets/js/prism.js" defer></script>
+  <script src="assets/js/docs.js" defer></script>
 </body>
 </html>

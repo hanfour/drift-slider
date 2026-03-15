@@ -15,10 +15,12 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="DriftSlider — Demo Gallery">
   <meta name="twitter:description" content="Interactive demo gallery showcasing all DriftSlider effects and configurations.">
+  <meta name="theme-color" content="#48D9C1">
   <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
   <link rel="stylesheet" href="assets/css/docs.css">
 </head>
 <body>
@@ -234,6 +236,6 @@
   </div>
 
   <div data-include="_includes/footer.html"></div>
-  <script src="assets/js/docs.js"></script>
+  <script src="assets/js/docs.js" defer></script>
 </body>
 </html>

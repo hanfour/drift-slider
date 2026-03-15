@@ -1,7 +1,9 @@
+import { readFileSync } from 'node:fs';
 import terser from '@rollup/plugin-terser';
 
+const pkg = JSON.parse(readFileSync('./package.json', 'utf-8'));
 const banner = `/*!
- * DriftSlider v0.1.0
+ * DriftSlider v${pkg.version}
  * A lightweight, modular slider/carousel library
  * MIT License
  */`;

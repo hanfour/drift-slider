@@ -11,6 +11,7 @@
 
 <p align="center">
   <a href="https://www.npmjs.com/package/drift-slider"><img src="https://img.shields.io/npm/v/drift-slider.svg" alt="npm version"></a>
+  <a href="https://github.com/hanfour/drift-slider/actions/workflows/ci.yml"><img src="https://github.com/hanfour/drift-slider/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="MIT License"></a>
   <img src="https://img.shields.io/badge/gzip-<10KB-brightgreen.svg" alt="< 10KB gzipped">
   <img src="https://img.shields.io/badge/dependencies-0-brightgreen.svg" alt="Zero Dependencies">
