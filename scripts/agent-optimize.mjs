@@ -363,6 +363,10 @@ function callClaude(prompt) {
     'Bash(cat *)', 'Bash(ls *)',
   ];
 
+  // Remove CLAUDECODE env var to allow nested invocation
+  const env = { ...process.env };
+  delete env.CLAUDECODE;
+
   const result = spawnSync('claude', [
     '-p',
     '--model', MODEL,
@@ -374,6 +378,7 @@ function callClaude(prompt) {
     timeout: 5 * 60 * 1000, // 5 minutes
     stdio: ['pipe', 'pipe', 'pipe'],
     maxBuffer: 10 * 1024 * 1024,
+    env,
   });
 
   if (result.error) {
