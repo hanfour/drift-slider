@@ -627,7 +627,7 @@ h1, h2, h3, h4, h5, h6 { line-height: 1.3; font-weight: 600; }
   margin: 0 auto;
 }
 .effect-item { text-align: center; }
-.effect-item h4 { margin-top: 12px; font-size: 0.9375rem; font-weight: 600; }
+.effect-item h3 { margin-top: 12px; font-size: 0.9375rem; font-weight: 600; }
 .effect-item p { font-size: 0.8125rem; color: var(--c-text-secondary); }
 
 /* ========================================
