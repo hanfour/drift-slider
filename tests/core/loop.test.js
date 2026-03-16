@@ -64,4 +64,60 @@ describe('core/loop', () => {
     // cloneCount = perView(1) + additional(2) = 3
     expect(s.slider._loopedSlides).toBe(3)
   })
+
+  it('loopFix does nothing when loop is false', () => {
+    const s = createSlider({ slideCount: 3 })
+    cleanup = s.cleanup
+    const origIndex = s.slider.activeIndex
+    s.slider.loopFix()
+    expect(s.slider.activeIndex).toBe(origIndex)
+  })
+
+  it('loopFix does nothing when _loopedSlides is 0', () => {
+    const s = createSlider({ slideCount: 3, sliderOptions: { loop: true } })
+    cleanup = s.cleanup
+    const origIndex = s.slider.activeIndex
+    s.slider._loopedSlides = 0
+    s.slider.loopFix()
+    expect(s.slider.activeIndex).toBe(origIndex)
+  })
+
+  it('loopFix jumps forward when activeIndex is in end clone region', () => {
+    const s = createSlider({ slideCount: 3, sliderOptions: { loop: true } })
+    cleanup = s.cleanup
+    const looped = s.slider._loopedSlides
+    const totalSlides = s.slider.slides.length
+    const totalOriginal = totalSlides - looped * 2
+
+    // Set activeIndex to the first end-clone index
+    s.slider.activeIndex = totalOriginal + looped
+    s.slider.loopFix()
+
+    // Should have jumped to the corresponding real slide
+    expect(s.slider.activeIndex).toBe(looped)
+  })
+
+  it('loopFix jumps back when activeIndex is in start clone region', () => {
+    const s = createSlider({ slideCount: 3, sliderOptions: { loop: true } })
+    cleanup = s.cleanup
+    const looped = s.slider._loopedSlides
+    const totalSlides = s.slider.slides.length
+    const totalOriginal = totalSlides - looped * 2
+
+    // Set activeIndex to 0 (start clone region, before real slides)
+    s.slider.activeIndex = 0
+    s.slider.loopFix()
+
+    // Should have jumped to last real slide area
+    expect(s.slider.activeIndex).toBe(totalOriginal + 0)
+  })
+
+  it('_getRealIndex handles negative modulo (index before looped offset)', () => {
+    const s = createSlider({ slideCount: 3, sliderOptions: { loop: true } })
+    cleanup = s.cleanup
+    // Index 0 is before looped offset, gives negative modulo
+    const result = s.slider._getRealIndex(0)
+    expect(result).toBeGreaterThanOrEqual(0)
+    expect(result).toBeLessThan(3)
+  })
 })
