@@ -231,4 +231,148 @@ describe('module/effect-cards', () => {
     s.cleanup()
     expect(s.slider.slides[0].querySelector('.drift-cards-overlay')).toBeFalsy()
   })
+
+  it('active slide has no box shadow when shadow is false', () => {
+    const s = createSlider({
+      sliderOptions: {
+        modules: [EffectCards],
+        effect: 'cards',
+        cardsEffect: { shadow: false },
+      },
+    })
+    cleanup = s.cleanup
+    expect(s.slider.slides[0].style.boxShadow).toBe('none')
+  })
+
+  it('flipAxis X uses rotateX for flip transition', () => {
+    vi.useFakeTimers()
+    const s = createSlider({
+      sliderOptions: {
+        modules: [EffectCards],
+        effect: 'cards',
+        cardsEffect: { mode: 'flip', flipAxis: 'X' },
+        speed: 300,
+      },
+    })
+    cleanup = s.cleanup
+    s.slider.slideTo(1, 0)
+    expect(s.slider.slides[0].style.transform).toContain('rotateX')
+  })
+
+  it('loop mode renders correctly and uses loop peek index', () => {
+    const s = createSlider({
+      slideCount: 4,
+      sliderOptions: {
+        modules: [EffectCards],
+        effect: 'cards',
+        loop: true,
+      },
+    })
+    cleanup = s.cleanup
+    // With loop mode, slider should have clones and render correctly
+    expect(s.slider.slides.length).toBeGreaterThan(4)
+    const activeIdx = s.slider.activeIndex
+    expect(s.slider.slides[activeIdx].style.opacity).toBe('1')
+  })
+
+  it('destroy clears flip timeout if active', () => {
+    vi.useFakeTimers()
+    const s = createSlider({
+      sliderOptions: {
+        modules: [EffectCards],
+        effect: 'cards',
+        cardsEffect: { mode: 'flip', flipAxis: 'Y' },
+        speed: 300,
+      },
+    })
+    // Start a flip that has a pending timeout
+    s.slider.slideTo(1, 0)
+    // Destroy before timeout fires
+    s.cleanup()
+    // Advance timers — should not throw even though slide is gone
+    expect(() => vi.advanceTimersByTime(300)).not.toThrow()
+  })
+
+  it('second flip clears previous pending timeout', () => {
+    vi.useFakeTimers()
+    const s = createSlider({
+      slideCount: 4,
+      sliderOptions: {
+        modules: [EffectCards],
+        effect: 'cards',
+        cardsEffect: { mode: 'flip', flipAxis: 'Y' },
+        speed: 300,
+      },
+    })
+    cleanup = s.cleanup
+    s.slider.slideTo(1, 0)
+    // Start another flip before first completes (should clear pending timeout)
+    s.slider.slideTo(2, 0)
+    vi.advanceTimersByTime(200)
+    expect(s.slider.slides[2].style.zIndex).toBe('2')
+  })
+
+  it('getPeekIndex clamps to last slide when at end (non-loop)', () => {
+    const s = createSlider({
+      slideCount: 3,
+      sliderOptions: { modules: [EffectCards], effect: 'cards' },
+    })
+    cleanup = s.cleanup
+    s.slider.slideTo(2, 0)
+    // At last slide, peekIndex = Math.min(3, 2) = 2, same as active
+    // Active slide should still have opacity 1
+    expect(s.slider.slides[2].style.opacity).toBe('1')
+  })
+
+  it('onUpdate event re-applies slide transforms', () => {
+    const s = createSlider({
+      sliderOptions: { modules: [EffectCards], effect: 'cards' },
+    })
+    cleanup = s.cleanup
+    s.slider.emit('update')
+    expect(s.slider.slides[0].style.opacity).toBe('1')
+  })
+
+  it('resize event re-applies slide transforms', () => {
+    const s = createSlider({
+      sliderOptions: { modules: [EffectCards], effect: 'cards' },
+    })
+    cleanup = s.cleanup
+    s.slider.emit('resize')
+    expect(s.slider.slides[0].style.opacity).toBe('1')
+  })
+
+  it('flip setTranslate skips applyFlip when activeIndex unchanged', () => {
+    vi.useFakeTimers()
+    const s = createSlider({
+      sliderOptions: {
+        modules: [EffectCards],
+        effect: 'cards',
+        cardsEffect: { mode: 'flip', flipAxis: 'Y' },
+        speed: 300,
+      },
+    })
+    cleanup = s.cleanup
+    // Call setTranslate without changing activeIndex — no flip triggered
+    s.slider.setTranslate(s.slider.translate)
+    // Outgoing slide should not have a rotation transform at rest
+    expect(s.slider.slides[0].style.transform).not.toContain('rotateY(-90deg)')
+  })
+
+  it('onSlideChange flip skips when activeIndex unchanged', () => {
+    vi.useFakeTimers()
+    const s = createSlider({
+      sliderOptions: {
+        modules: [EffectCards],
+        effect: 'cards',
+        cardsEffect: { mode: 'flip', flipAxis: 'Y' },
+        speed: 300,
+      },
+    })
+    cleanup = s.cleanup
+    // Emit slideChange without actually changing index — should not throw or apply flip
+    expect(() => s.slider.emit('slideChange')).not.toThrow()
+    // No rotation should have been applied (flip not triggered)
+    expect(s.slider.slides[0].style.transform).not.toContain('rotateY(-90deg)')
+  })
 })

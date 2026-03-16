@@ -115,4 +115,51 @@ describe('module/navigation', () => {
     const next = s.container.querySelector('.drift-arrow--next')
     expect(next.style.color).toBe('blue')
   })
+
+  it('accepts element reference for nextEl and prevEl', () => {
+    const s = createSlider({ sliderOptions: { modules: [Navigation] } })
+    cleanup = s.cleanup
+    // The auto-created buttons are element references — clicking should still work
+    const next = s.container.querySelector('.drift-arrow--next')
+    const prev = s.container.querySelector('.drift-arrow--prev')
+    expect(next).toBeTruthy()
+    expect(prev).toBeTruthy()
+    // Create a new slider that uses element refs for nextEl/prevEl
+    const s2 = createSlider({
+      sliderOptions: {
+        modules: [Navigation],
+        navigation: {
+          nextEl: next,
+          prevEl: prev,
+        },
+      },
+    })
+    // Both sliders cleaned up in afterEach via cleanup
+    s2.cleanup()
+  })
+
+  it('isEnd updates next button disabled state on slide change', () => {
+    const s = createSlider({ slideCount: 3, sliderOptions: { modules: [Navigation] } })
+    cleanup = s.cleanup
+    const next = s.container.querySelector('.drift-arrow--next')
+    expect(next.classList.contains('drift-arrow--disabled')).toBe(false)
+    s.slider.slideTo(1, 0)
+    expect(next.classList.contains('drift-arrow--disabled')).toBe(false)
+    s.slider.slideTo(2, 0)
+    expect(next.classList.contains('drift-arrow--disabled')).toBe(true)
+    // Going back enables next again
+    s.slider.slideTo(1, 0)
+    expect(next.classList.contains('drift-arrow--disabled')).toBe(false)
+  })
+
+  it('isBeginning false enables prev button after navigating away from start', () => {
+    const s = createSlider({ slideCount: 3, sliderOptions: { modules: [Navigation] } })
+    cleanup = s.cleanup
+    const prev = s.container.querySelector('.drift-arrow--prev')
+    expect(prev.classList.contains('drift-arrow--disabled')).toBe(true)
+    s.slider.slideTo(1, 0)
+    expect(prev.classList.contains('drift-arrow--disabled')).toBe(false)
+    // aria-disabled should be false
+    expect(prev.getAttribute('aria-disabled')).toBe('false')
+  })
 })

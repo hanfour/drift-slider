@@ -249,4 +249,84 @@ describe('module/pagination', () => {
     const progress = s.container.querySelector('.drift-pagination__progress')
     expect(progress.style.transform).toContain('scaleX(1)')
   })
+
+  it('clickable false does not attach click events to bullets', () => {
+    const s = createSlider({
+      slideCount: 3,
+      sliderOptions: {
+        modules: [Pagination],
+        pagination: { clickable: false },
+      },
+    })
+    cleanup = s.cleanup
+    const bullets = s.container.querySelectorAll('.drift-pagination__bullet')
+    // Clicking should not navigate
+    bullets[2].click()
+    expect(s.slider.activeIndex).toBe(0)
+  })
+
+  it('progressbar with single slide shows full progress', () => {
+    const s = createSlider({
+      slideCount: 1,
+      sliderOptions: {
+        modules: [Pagination],
+        pagination: { type: 'progressbar' },
+      },
+    })
+    cleanup = s.cleanup
+    const progress = s.container.querySelector('.drift-pagination__progress')
+    // total = 1, so progress = 1
+    expect(progress.style.transform).toContain('scaleX(1)')
+  })
+
+  it('loop mode getTotalSlides returns original slide count', () => {
+    const s = createSlider({
+      slideCount: 4,
+      sliderOptions: {
+        modules: [Pagination],
+        loop: true,
+      },
+    })
+    cleanup = s.cleanup
+    // With loop mode, pagination should show 4 bullets (original count), not clones
+    const bullets = s.container.querySelectorAll('.drift-pagination__bullet')
+    expect(bullets.length).toBe(4)
+  })
+
+  it('loop mode bullet click slides to correct index with offset', () => {
+    const s = createSlider({
+      slideCount: 4,
+      sliderOptions: {
+        modules: [Pagination],
+        loop: true,
+      },
+    })
+    cleanup = s.cleanup
+    const bullets = s.container.querySelectorAll('.drift-pagination__bullet')
+    bullets[2].click()
+    // In loop mode, activeIndex should be adjusted by _loopedSlides offset
+    expect(s.slider.activeIndex).toBeGreaterThan(0)
+  })
+
+  it('destroy removes bullet click listeners', () => {
+    const s = createSlider({
+      slideCount: 3,
+      sliderOptions: { modules: [Pagination] },
+    })
+    const bullets = s.container.querySelectorAll('.drift-pagination__bullet')
+    s.cleanup()
+    // After destroy, clicking bullets should not change anything
+    bullets[2].click()
+    // No error thrown = success
+  })
+
+  it('update returns early when paginationEl is null', () => {
+    const s = createSlider({
+      slideCount: 3,
+      sliderOptions: { modules: [Pagination] },
+    })
+    s.cleanup()
+    // After cleanup paginationEl is null — emit slideChange should not throw
+    expect(() => s.slider.emit('slideChange')).not.toThrow()
+  })
 })

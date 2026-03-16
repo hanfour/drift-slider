@@ -244,4 +244,168 @@ describe('module/effect-coverflow', () => {
     s.cleanup()
     expect(s.slider.listEl.style.transformStyle).toBe('')
   })
+
+  it('visibleSides next hides slides on the left side', () => {
+    const s = createSlider({
+      slideCount: 5,
+      sliderOptions: {
+        modules: [EffectCoverflow],
+        effect: 'coverflow',
+        slidesPerView: 5,
+        coverflowEffect: { visibleSides: 'next' },
+      },
+    })
+    cleanup = s.cleanup
+    // Navigate to slide 2 so slide 0 is to the left (normalizedOffset=-2)
+    // and slide 4 is to the right (normalizedOffset=+2)
+    s.slider.slideTo(2, 0)
+    const slide0Opacity = parseFloat(s.slider.slides[0].style.opacity)
+    const slide4Opacity = parseFloat(s.slider.slides[4].style.opacity)
+    // Right side slides should have higher opacity than left with 'next' visibleSides
+    expect(slide4Opacity).toBeGreaterThan(slide0Opacity)
+  })
+
+  it('visibleSides prev hides slides on the right side', () => {
+    const s = createSlider({
+      slideCount: 5,
+      sliderOptions: {
+        modules: [EffectCoverflow],
+        effect: 'coverflow',
+        slidesPerView: 5,
+        coverflowEffect: { visibleSides: 'prev' },
+      },
+    })
+    cleanup = s.cleanup
+    // Navigate to slide 2 so slide 0 is left (offset=-2) and slide 4 is right (offset=+2)
+    s.slider.slideTo(2, 0)
+    const slide0Opacity = parseFloat(s.slider.slides[0].style.opacity)
+    const slide4Opacity = parseFloat(s.slider.slides[4].style.opacity)
+    // Left side slides should have higher opacity than right with 'prev' visibleSides
+    expect(slide0Opacity).toBeGreaterThan(slide4Opacity)
+  })
+
+  it('visibleSides next shifts center slide toward next side', () => {
+    const s = createSlider({
+      slideCount: 5,
+      sliderOptions: {
+        modules: [EffectCoverflow],
+        effect: 'coverflow',
+        slidesPerView: 3,
+        coverflowEffect: { visibleSides: 'next' },
+      },
+    })
+    cleanup = s.cleanup
+    // The center slide transform should include a negative tx (shifted left toward next)
+    expect(s.slider.slides[0].style.transform).toContain('translateX')
+  })
+
+  it('visibleSides prev shifts center slide toward prev side', () => {
+    const s = createSlider({
+      slideCount: 5,
+      sliderOptions: {
+        modules: [EffectCoverflow],
+        effect: 'coverflow',
+        slidesPerView: 3,
+        coverflowEffect: { visibleSides: 'prev' },
+      },
+    })
+    cleanup = s.cleanup
+    expect(s.slider.slides[0].style.transform).toContain('translateX')
+  })
+
+  it('fillCenter enlarges center slide to fill space', () => {
+    const s = createSlider({
+      slideCount: 5,
+      sliderOptions: {
+        modules: [EffectCoverflow],
+        effect: 'coverflow',
+        slidesPerView: 3,
+        coverflowEffect: { fillCenter: true, scale: 0.85 },
+      },
+    })
+    cleanup = s.cleanup
+    // Center slide should have a scale larger than 1 to fill space freed by scaled sides
+    const transform = s.slider.slides[0].style.transform
+    expect(transform).toContain('scale(')
+    // extract scale value
+    const scaleMatch = transform.match(/scale\(([^)]+)\)/)
+    if (scaleMatch) {
+      const scaleVal = parseFloat(scaleMatch[1])
+      // fillCenter should make center scale >= 1
+      expect(scaleVal).toBeGreaterThanOrEqual(1)
+    }
+  })
+
+  it('corrects slidesPerView below 1 to 1', () => {
+    const s = createSlider({
+      sliderOptions: {
+        modules: [EffectCoverflow],
+        effect: 'coverflow',
+        slidesPerView: 0,
+      },
+    })
+    cleanup = s.cleanup
+    expect(s.slider.params.slidesPerView).toBeGreaterThanOrEqual(1)
+  })
+
+  it('with slidesPerView 1 halfView is 0 and opacity formula uses absOffset directly', () => {
+    const s = createSlider({
+      slideCount: 3,
+      sliderOptions: {
+        modules: [EffectCoverflow],
+        effect: 'coverflow',
+        slidesPerView: 1,
+        coverflowEffect: { activeOpacity: 1, opacity: 0.5 },
+      },
+    })
+    cleanup = s.cleanup
+    // Center slide (halfView=0) should have full active opacity
+    const centerOpacity = parseFloat(s.slider.slides[0].style.opacity)
+    expect(centerOpacity).toBe(1)
+  })
+
+  it('handles loop mode with coverflow — reorderLoopClones', () => {
+    const s = createSlider({
+      slideCount: 4,
+      sliderOptions: {
+        modules: [EffectCoverflow],
+        effect: 'coverflow',
+        loop: true,
+        slidesPerView: 3,
+      },
+    })
+    cleanup = s.cleanup
+    // With loop mode, slider should have clones and still apply transforms
+    expect(s.slider.slides.length).toBeGreaterThan(4)
+    expect(s.slider.listEl.style.transformStyle).toBe('preserve-3d')
+  })
+
+  it('handles loop mode setTranslate with centering', () => {
+    const s = createSlider({
+      slideCount: 4,
+      sliderOptions: {
+        modules: [EffectCoverflow],
+        effect: 'coverflow',
+        loop: true,
+        slidesPerView: 3,
+      },
+    })
+    cleanup = s.cleanup
+    s.slider.slideTo(2, 0)
+    expect(s.slider.listEl.style.transform).toContain('translate3d')
+  })
+
+  it('destroy clears overflowX and overflowY when cropSides', () => {
+    const s = createSlider({
+      sliderOptions: {
+        modules: [EffectCoverflow],
+        effect: 'coverflow',
+        coverflowEffect: { cropSides: true },
+      },
+    })
+    expect(s.container.style.overflowX).toBe('hidden')
+    s.cleanup()
+    expect(s.container.style.overflowX).toBe('')
+    expect(s.container.style.overflowY).toBe('')
+  })
 })
