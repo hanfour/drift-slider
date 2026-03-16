@@ -1095,6 +1095,28 @@ html[lang="zh-Hant"] [data-i18n-en] { display: none; }
 html[lang="zh-Hant"] [data-i18n-zh] { display: unset; }
 
 /* ========================================
+   Focus Styles (Accessibility)
+   ======================================== */
+:focus-visible {
+  outline: 2px solid var(--c-primary);
+  outline-offset: 3px;
+}
+.site-header :focus-visible {
+  outline: 2px solid var(--c-primary);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+.btn:focus-visible {
+  outline: 2px solid var(--c-primary);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 4px rgba(72, 217, 193, 0.2);
+}
+.tab-btn:focus-visible {
+  outline: 2px solid var(--c-primary);
+  outline-offset: -2px;
+}
+
+/* ========================================
    Utility
    ======================================== */
 .text-center { text-align: center; }
