@@ -1,4 +1,4 @@
-import { now, clamp } from '../shared/utils.js';
+import { clamp } from '../shared/utils.js';
 import { supportsTouchEvents, supportsPointerEvents, passiveListener, activeListener } from '../shared/support.js';
 
 export default function touchModule({ slider }) {
@@ -40,12 +40,12 @@ export default function touchModule({ slider }) {
     touchData.startY = pos.y;
     touchData.currentX = pos.x;
     touchData.currentY = pos.y;
-    touchData.startTime = now();
+    touchData.startTime = Date.now();
     touchData.startTranslate = slider.getTranslate();
     touchData.isTouched = true;
     touchData.isMoved = false;
     touchData.isScrolling = undefined;
-    touchData.velocityTracker = [{ pos: isHorizontal ? pos.x : pos.y, time: now() }];
+    touchData.velocityTracker = [{ pos: isHorizontal ? pos.x : pos.y, time: Date.now() }];
 
     // Stop any ongoing transition
     slider.setTransition(0);
@@ -97,7 +97,7 @@ export default function touchModule({ slider }) {
     // Track velocity (keep last 5 points)
     touchData.velocityTracker.push({
       pos: isHorizontal ? pos.x : pos.y,
-      time: now(),
+      time: Date.now(),
     });
     if (touchData.velocityTracker.length > 5) {
       touchData.velocityTracker.shift();
@@ -153,7 +153,7 @@ export default function touchModule({ slider }) {
     }
 
     const currentTranslate = slider.getTranslate();
-    const swipeTime = now() - touchData.startTime;
+    const swipeTime = Date.now() - touchData.startTime;
 
     // Physics-based momentum
     const friction = params.physics.friction;

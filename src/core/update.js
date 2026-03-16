@@ -1,5 +1,3 @@
-import { outerWidth, outerHeight } from '../shared/dom.js';
-
 export default function updateModule({ slider }) {
   function calcSlides() {
     const params = slider.params;
@@ -35,27 +33,22 @@ export default function updateModule({ slider }) {
     }
 
     for (let i = 0; i < slides.length; i++) {
-      const currentSlideSize = slideSize;
-      slidesSizesGrid.push(currentSlideSize);
+      slidesSizesGrid.push(slideSize);
 
-      const slidePosition = i * (currentSlideSize + spaceBetween);
+      const slidePosition = i * (slideSize + spaceBetween);
       slidesGrid.push(slidePosition);
 
       // Snap grid (per group)
       if (i % params.slidesPerGroup === 0) {
-        if (params.centeredSlides) {
-          snapGrid.push(slidePosition);
-        } else {
-          snapGrid.push(slidePosition);
-        }
+        snapGrid.push(slidePosition);
       }
 
       // Set slide dimensions
       if (isHorizontal) {
-        slides[i].style.width = `${currentSlideSize}px`;
+        slides[i].style.width = `${slideSize}px`;
         slides[i].style.marginRight = `${spaceBetween}px`;
       } else {
-        slides[i].style.height = `${currentSlideSize}px`;
+        slides[i].style.height = `${slideSize}px`;
         slides[i].style.marginBottom = `${spaceBetween}px`;
       }
     }

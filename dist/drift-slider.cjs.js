@@ -200,10 +200,6 @@ function clamp(val, min, max) {
   return Math.max(min, Math.min(max, val));
 }
 
-function now() {
-  return Date.now();
-}
-
 function $(selector, context = document) {
   if (typeof selector === 'string') {
     return context.querySelector(selector);
@@ -283,27 +279,22 @@ function updateModule({ slider }) {
     if (params.centeredSlides) ;
 
     for (let i = 0; i < slides.length; i++) {
-      const currentSlideSize = slideSize;
-      slidesSizesGrid.push(currentSlideSize);
+      slidesSizesGrid.push(slideSize);
 
-      const slidePosition = i * (currentSlideSize + spaceBetween);
+      const slidePosition = i * (slideSize + spaceBetween);
       slidesGrid.push(slidePosition);
 
       // Snap grid (per group)
       if (i % params.slidesPerGroup === 0) {
-        if (params.centeredSlides) {
-          snapGrid.push(slidePosition);
-        } else {
-          snapGrid.push(slidePosition);
-        }
+        snapGrid.push(slidePosition);
       }
 
       // Set slide dimensions
       if (isHorizontal) {
-        slides[i].style.width = `${currentSlideSize}px`;
+        slides[i].style.width = `${slideSize}px`;
         slides[i].style.marginRight = `${spaceBetween}px`;
       } else {
-        slides[i].style.height = `${currentSlideSize}px`;
+        slides[i].style.height = `${slideSize}px`;
         slides[i].style.marginBottom = `${spaceBetween}px`;
       }
     }
@@ -709,12 +700,12 @@ function touchModule({ slider }) {
     touchData.startY = pos.y;
     touchData.currentX = pos.x;
     touchData.currentY = pos.y;
-    touchData.startTime = now();
+    touchData.startTime = Date.now();
     touchData.startTranslate = slider.getTranslate();
     touchData.isTouched = true;
     touchData.isMoved = false;
     touchData.isScrolling = undefined;
-    touchData.velocityTracker = [{ pos: isHorizontal ? pos.x : pos.y, time: now() }];
+    touchData.velocityTracker = [{ pos: isHorizontal ? pos.x : pos.y, time: Date.now() }];
 
     // Stop any ongoing transition
     slider.setTransition(0);
@@ -766,7 +757,7 @@ function touchModule({ slider }) {
     // Track velocity (keep last 5 points)
     touchData.velocityTracker.push({
       pos: isHorizontal ? pos.x : pos.y,
-      time: now(),
+      time: Date.now(),
     });
     if (touchData.velocityTracker.length > 5) {
       touchData.velocityTracker.shift();
@@ -822,7 +813,7 @@ function touchModule({ slider }) {
     }
 
     const currentTranslate = slider.getTranslate();
-    const swipeTime = now() - touchData.startTime;
+    const swipeTime = Date.now() - touchData.startTime;
 
     // Physics-based momentum
     const friction = params.physics.friction;
@@ -984,24 +975,20 @@ function loopModule({ slider }) {
     const loopedSlides = slider._loopedSlides;
     const totalOriginal = slider.slides.length - loopedSlides * 2;
 
-    // If past the end clones region, jump to the corresponding real slide
+    let newIdx;
     if (slider.activeIndex >= totalOriginal + loopedSlides) {
-      const newIdx = loopedSlides + (slider.activeIndex - totalOriginal - loopedSlides);
-      slider.setTransition(0);
-      slider.activeIndex = newIdx;
-      const translate = -slider.snapGrid[newIdx];
-      slider.listEl.style.transform = `translate3d(${translate}px, 0, 0)`;
-      slider.translate = translate;
+      newIdx = loopedSlides + (slider.activeIndex - totalOriginal - loopedSlides);
+    } else if (slider.activeIndex < loopedSlides) {
+      newIdx = totalOriginal + slider.activeIndex;
+    } else {
+      return;
     }
-    // If before the beginning clones region, jump to the corresponding real slide
-    else if (slider.activeIndex < loopedSlides) {
-      const newIdx = totalOriginal + slider.activeIndex;
-      slider.setTransition(0);
-      slider.activeIndex = newIdx;
-      const translate = -slider.snapGrid[newIdx];
-      slider.listEl.style.transform = `translate3d(${translate}px, 0, 0)`;
-      slider.translate = translate;
-    }
+
+    slider.setTransition(0);
+    slider.activeIndex = newIdx;
+    const translate = -slider.snapGrid[newIdx];
+    slider.listEl.style.transform = `translate3d(${translate}px, 0, 0)`;
+    slider.translate = translate;
   }
 
   function _getRealIndex(index) {
@@ -1085,7 +1072,7 @@ class DriftSlider {
     const params = deepMerge({}, defaults, options);
 
     // Store original params for breakpoints
-    this._originalParams = deepMerge({}, defaults, options);
+    this._originalParams = deepMerge({}, params);
 
     this.params = params;
     this._events = {};
@@ -1747,7 +1734,7 @@ function EffectFade({ slider, extendParams, on }) {
         slide.style.visibility = 'visible';
         slide.style.pointerEvents = 'auto';
       } else {
-        slide.style.opacity = crossFade ? '0' : '0';
+        slide.style.opacity = '0';
         slide.style.visibility = crossFade ? 'visible' : 'hidden';
         slide.style.pointerEvents = 'none';
       }

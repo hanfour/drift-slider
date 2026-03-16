@@ -18,7 +18,7 @@ export default function EffectFade({ slider, extendParams, on }) {
         slide.style.visibility = 'visible';
         slide.style.pointerEvents = 'auto';
       } else {
-        slide.style.opacity = crossFade ? '0' : '0';
+        slide.style.opacity = '0';
         slide.style.visibility = crossFade ? 'visible' : 'hidden';
         slide.style.pointerEvents = 'none';
       }
