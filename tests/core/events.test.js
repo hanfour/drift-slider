@@ -28,8 +28,14 @@ describe('core/events', () => {
   it('attaches transitionend listener on list element', () => {
     const s = createSlider()
     cleanup = s.cleanup
-    // We can't easily check this directly, but we can verify the slider works
-    expect(s.slider.listEl).toBeTruthy()
+    const spy = vi.spyOn(s.slider, 'onTransitionEnd')
+    s.slider.animating = true
+    const event = new TransitionEvent('transitionend', {
+      propertyName: 'transform',
+      bubbles: false,
+    })
+    s.slider.listEl.dispatchEvent(event)
+    expect(spy).toHaveBeenCalled()
   })
 
   it('handles resize event with debounce', async () => {

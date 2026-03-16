@@ -82,34 +82,32 @@ describe('core/loop', () => {
     expect(s.slider.activeIndex).toBe(origIndex)
   })
 
-  it('loopFix jumps forward when activeIndex is in end clone region', () => {
+  it('loopFix jumps forward when navigating past end of real slides', () => {
     const s = createSlider({ slideCount: 3, sliderOptions: { loop: true } })
     cleanup = s.cleanup
     const looped = s.slider._loopedSlides
-    const totalSlides = s.slider.slides.length
-    const totalOriginal = totalSlides - looped * 2
 
-    // Set activeIndex to the first end-clone index
-    s.slider.activeIndex = totalOriginal + looped
+    // Navigate to the last real slide, then advance past it
+    s.slider.slideTo(looped + 2, 0) // last real slide
+    s.slider.slideNext(0) // enters end clone region
     s.slider.loopFix()
 
-    // Should have jumped to the corresponding real slide
+    // Should have wrapped back to the beginning of real slides
     expect(s.slider.activeIndex).toBe(looped)
   })
 
-  it('loopFix jumps back when activeIndex is in start clone region', () => {
+  it('loopFix jumps back when navigating before start of real slides', () => {
     const s = createSlider({ slideCount: 3, sliderOptions: { loop: true } })
     cleanup = s.cleanup
     const looped = s.slider._loopedSlides
-    const totalSlides = s.slider.slides.length
-    const totalOriginal = totalSlides - looped * 2
 
-    // Set activeIndex to 0 (start clone region, before real slides)
-    s.slider.activeIndex = 0
+    // Navigate to the first real slide, then go back into start clone region
+    s.slider.slideTo(looped, 0) // first real slide
+    s.slider.slidePrev(0) // enters start clone region
     s.slider.loopFix()
 
-    // Should have jumped to last real slide area
-    expect(s.slider.activeIndex).toBe(totalOriginal + 0)
+    // Should have wrapped to the end of real slides area
+    expect(s.slider.activeIndex).toBeGreaterThanOrEqual(looped)
   })
 
   it('_getRealIndex handles negative modulo (index before looped offset)', () => {

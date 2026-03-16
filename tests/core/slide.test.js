@@ -126,8 +126,8 @@ describe('core/slide', () => {
       cleanup = s.cleanup
       const initialIndex = s.slider.activeIndex
       s.slider.slideNext(0)
-      // Should have moved forward
-      expect(s.slider.activeIndex).toBeGreaterThanOrEqual(initialIndex)
+      // Should have moved forward by exactly one
+      expect(s.slider.activeIndex).toBe(initialIndex + 1)
     })
   })
 

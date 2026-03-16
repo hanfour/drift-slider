@@ -207,10 +207,12 @@ function isImprovement(baseline, current) {
 
     case 'bundle': {
       let anyBetter = false;
-      for (const file of Object.keys(baseline)) {
-        if (!current[file]) continue;
-        if (current[file].gzip > baseline[file].gzip) return false; // 變大
-        if (current[file].gzip < baseline[file].gzip) anyBetter = true;
+      const allFiles = new Set([...Object.keys(baseline), ...Object.keys(current)]);
+      for (const file of allFiles) {
+        const base = baseline[file]?.gzip ?? 0;
+        const curr = current[file]?.gzip ?? 0;
+        if (curr > base) return false; // 變大或新增檔案
+        if (curr < base) anyBetter = true; // 變小或移除檔案
       }
       return anyBetter;
     }
@@ -292,7 +294,8 @@ function commitChanges(msg) {
 function rollback() {
   log('🔄 Rolling back changes...');
   run('git checkout -- .');
-  run('git clean -fd');
+  // Only clean files that are not in .gitignore (exclude untracked user files by using -fdx with pathspec)
+  run('git clean -fd -- src/ tests/ docs/ dist/');
 }
 
 function getCurrentBranch() {
