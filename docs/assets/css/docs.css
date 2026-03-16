@@ -29,7 +29,7 @@
    Reset & Base
    ======================================== */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; scroll-padding-top: calc(var(--header-h) + 24px); }
+html { scroll-behavior: smooth; scroll-padding-top: calc(var(--header-h) + 24px); max-width: 100dvw; overflow-x: hidden; }
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   background: var(--c-bg);
