@@ -64,4 +64,58 @@ describe('core/loop', () => {
     // cloneCount = perView(1) + additional(2) = 3
     expect(s.slider._loopedSlides).toBe(3)
   })
+
+  it('loopFix does nothing when loop is false', () => {
+    const s = createSlider({ slideCount: 3 })
+    cleanup = s.cleanup
+    const origIndex = s.slider.activeIndex
+    s.slider.loopFix()
+    expect(s.slider.activeIndex).toBe(origIndex)
+  })
+
+  it('loopFix does nothing when _loopedSlides is 0', () => {
+    const s = createSlider({ slideCount: 3, sliderOptions: { loop: true } })
+    cleanup = s.cleanup
+    const origIndex = s.slider.activeIndex
+    s.slider._loopedSlides = 0
+    s.slider.loopFix()
+    expect(s.slider.activeIndex).toBe(origIndex)
+  })
+
+  it('loopFix jumps forward when navigating past end of real slides', () => {
+    const s = createSlider({ slideCount: 3, sliderOptions: { loop: true } })
+    cleanup = s.cleanup
+    const looped = s.slider._loopedSlides
+
+    // Navigate to the last real slide, then advance past it
+    s.slider.slideTo(looped + 2, 0) // last real slide
+    s.slider.slideNext(0) // enters end clone region
+    s.slider.loopFix()
+
+    // Should have wrapped back to the beginning of real slides
+    expect(s.slider.activeIndex).toBe(looped)
+  })
+
+  it('loopFix jumps back when navigating before start of real slides', () => {
+    const s = createSlider({ slideCount: 3, sliderOptions: { loop: true } })
+    cleanup = s.cleanup
+    const looped = s.slider._loopedSlides
+
+    // Navigate to the first real slide, then go back into start clone region
+    s.slider.slideTo(looped, 0) // first real slide
+    s.slider.slidePrev(0) // enters start clone region
+    s.slider.loopFix()
+
+    // Should have wrapped to the end of real slides area
+    expect(s.slider.activeIndex).toBeGreaterThanOrEqual(looped)
+  })
+
+  it('_getRealIndex handles negative modulo (index before looped offset)', () => {
+    const s = createSlider({ slideCount: 3, sliderOptions: { loop: true } })
+    cleanup = s.cleanup
+    // Index 0 is before looped offset, gives negative modulo
+    const result = s.slider._getRealIndex(0)
+    expect(result).toBeGreaterThanOrEqual(0)
+    expect(result).toBeLessThan(3)
+  })
 })

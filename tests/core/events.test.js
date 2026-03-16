@@ -28,8 +28,14 @@ describe('core/events', () => {
   it('attaches transitionend listener on list element', () => {
     const s = createSlider()
     cleanup = s.cleanup
-    // We can't easily check this directly, but we can verify the slider works
-    expect(s.slider.listEl).toBeTruthy()
+    const spy = vi.spyOn(s.slider, 'onTransitionEnd')
+    s.slider.animating = true
+    const event = new TransitionEvent('transitionend', {
+      propertyName: 'transform',
+      bubbles: false,
+    })
+    s.slider.listEl.dispatchEvent(event)
+    expect(spy).toHaveBeenCalled()
   })
 
   it('handles resize event with debounce', async () => {
@@ -43,5 +49,55 @@ describe('core/events', () => {
     vi.advanceTimersByTime(250)
     expect(handler).toHaveBeenCalled()
     vi.useRealTimers()
+  })
+
+  it('onListTransitionEnd ignores transitionend from non-list elements', () => {
+    const s = createSlider()
+    cleanup = s.cleanup
+    s.slider.animating = true
+    const spy = vi.spyOn(s.slider, 'onTransitionEnd')
+
+    // Dispatch transitionend from a child element (e.target !== listEl)
+    const child = document.createElement('span')
+    s.slider.listEl.appendChild(child)
+    child.dispatchEvent(new Event('transitionend', { bubbles: true }))
+
+    expect(spy).not.toHaveBeenCalled()
+  })
+
+  it('onListTransitionEnd ignores non-transform property transitions', () => {
+    const s = createSlider()
+    cleanup = s.cleanup
+    const spy = vi.spyOn(s.slider, 'onTransitionEnd')
+
+    const event = new TransitionEvent('transitionend', {
+      propertyName: 'opacity',
+      bubbles: false,
+    })
+    s.slider.listEl.dispatchEvent(event)
+
+    expect(spy).not.toHaveBeenCalled()
+  })
+
+  it('onListTransitionEnd calls onTransitionEnd for transform transitions', () => {
+    const s = createSlider()
+    cleanup = s.cleanup
+    s.slider.animating = true
+    const spy = vi.spyOn(s.slider, 'onTransitionEnd')
+
+    const event = new TransitionEvent('transitionend', {
+      propertyName: 'transform',
+      bubbles: false,
+    })
+    s.slider.listEl.dispatchEvent(event)
+
+    expect(spy).toHaveBeenCalled()
+  })
+
+  it('detachEvents is safe to call when resizeHandler was never set', () => {
+    const s = createSlider()
+    cleanup = s.cleanup
+    // destroy already calls detachEvents; calling again should not throw
+    expect(() => s.slider.detachEvents()).not.toThrow()
   })
 })
