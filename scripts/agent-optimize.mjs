@@ -11,7 +11,7 @@
  */
 
 import { execSync, spawnSync } from 'node:child_process';
-import { readFileSync, writeFileSync, existsSync, readdirSync, statSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync, readdirSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { gzipSync } from 'node:zlib';
 import { parseArgs } from 'node:util';
@@ -278,7 +278,13 @@ function commitChanges(msg) {
     log('ℹ️  No changes to commit');
     return false;
   }
-  run(`git commit -m "${msg.replace(/"/g, '\\"')}"`);
+  const commitResult = spawnSync('git', ['commit', '-m', msg], {
+    cwd: ROOT, encoding: 'utf-8', stdio: 'pipe',
+  });
+  if (commitResult.status !== 0) {
+    log(`⚠️  Commit failed: ${commitResult.stderr}`);
+    return false;
+  }
   log('✅ Committed changes');
   return true;
 }
@@ -463,9 +469,12 @@ async function main() {
       if (currentBranch !== logData.branch) {
         run(`git checkout ${logData.branch}`);
       }
+    } else if (logData) {
+      console.error(`❌ Log target mismatch: log has "${logData.target}" but --target is "${TARGET}"`);
+      process.exit(1);
     } else {
-      log('⚠️  No compatible log found, starting fresh');
-      logData = null;
+      console.error('❌ No log file found to resume from');
+      process.exit(1);
     }
   }
 
@@ -530,8 +539,8 @@ async function main() {
       continue;
     }
 
-    // 3. Validate
-    if (!validate()) {
+    // 3. Validate (skip for coverage — collectMetrics already runs tests)
+    if (TARGET !== 'coverage' && !validate()) {
       log('❌ Validation failed, rolling back');
       rollback();
       logData.iterations.push({

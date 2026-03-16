@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import DriftSlider from '../../src/drift-slider.js'
 
 /**
