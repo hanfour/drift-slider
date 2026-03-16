@@ -6,7 +6,6 @@ import {
   deepMergeDefaults,
   debounce,
   clamp,
-  now,
   noop,
 } from '../../src/shared/utils.js'
 
@@ -148,18 +147,6 @@ describe('clamp', () => {
 
   it('clamps to max', () => {
     expect(clamp(15, 0, 10)).toBe(10)
-  })
-})
-
-describe('now', () => {
-  it('returns a number', () => {
-    expect(typeof now()).toBe('number')
-  })
-
-  it('returns current timestamp', () => {
-    const before = Date.now()
-    const result = now()
-    expect(result).toBeGreaterThanOrEqual(before)
   })
 })
 

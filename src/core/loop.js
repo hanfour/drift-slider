@@ -64,24 +64,20 @@ export default function loopModule({ slider }) {
     const loopedSlides = slider._loopedSlides;
     const totalOriginal = slider.slides.length - loopedSlides * 2;
 
-    // If past the end clones region, jump to the corresponding real slide
+    let newIdx;
     if (slider.activeIndex >= totalOriginal + loopedSlides) {
-      const newIdx = loopedSlides + (slider.activeIndex - totalOriginal - loopedSlides);
-      slider.setTransition(0);
-      slider.activeIndex = newIdx;
-      const translate = -slider.snapGrid[newIdx];
-      slider.listEl.style.transform = `translate3d(${translate}px, 0, 0)`;
-      slider.translate = translate;
+      newIdx = loopedSlides + (slider.activeIndex - totalOriginal - loopedSlides);
+    } else if (slider.activeIndex < loopedSlides) {
+      newIdx = totalOriginal + slider.activeIndex;
+    } else {
+      return;
     }
-    // If before the beginning clones region, jump to the corresponding real slide
-    else if (slider.activeIndex < loopedSlides) {
-      const newIdx = totalOriginal + slider.activeIndex;
-      slider.setTransition(0);
-      slider.activeIndex = newIdx;
-      const translate = -slider.snapGrid[newIdx];
-      slider.listEl.style.transform = `translate3d(${translate}px, 0, 0)`;
-      slider.translate = translate;
-    }
+
+    slider.setTransition(0);
+    slider.activeIndex = newIdx;
+    const translate = -slider.snapGrid[newIdx];
+    slider.listEl.style.transform = `translate3d(${translate}px, 0, 0)`;
+    slider.translate = translate;
   }
 
   function _getRealIndex(index) {

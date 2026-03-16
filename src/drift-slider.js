@@ -24,7 +24,7 @@ class DriftSlider {
     const params = deepMerge({}, defaults, options);
 
     // Store original params for breakpoints
-    this._originalParams = deepMerge({}, defaults, options);
+    this._originalParams = deepMerge({}, params);
 
     this.params = params;
     this._events = {};

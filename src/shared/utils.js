@@ -61,8 +61,4 @@ export function clamp(val, min, max) {
   return Math.max(min, Math.min(max, val));
 }
 
-export function now() {
-  return Date.now();
-}
-
 export function noop() {}
