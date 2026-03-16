@@ -375,7 +375,7 @@ function callClaude(prompt) {
     input: prompt,
     cwd: ROOT,
     encoding: 'utf-8',
-    timeout: 5 * 60 * 1000, // 5 minutes
+    timeout: 10 * 60 * 1000, // 10 minutes
     stdio: ['pipe', 'pipe', 'pipe'],
     maxBuffer: 10 * 1024 * 1024,
     env,
