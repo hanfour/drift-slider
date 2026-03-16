@@ -151,8 +151,8 @@ describe('module/effect-coverflow', () => {
     const initialTransform = s.slider.slides[1].style.transform
     s.slider.slideTo(1, 0)
     const newTransform = s.slider.slides[0].style.transform
-    // After moving to slide 1, slide 0 should now have an offset transform
-    expect(newTransform).toBeTruthy()
+    // After moving to slide 1, slide 0 should now have a different transform (offset position)
+    expect(newTransform).toContain('rotateY')
     expect(s.slider.slides[1].style.transform).not.toBe(initialTransform)
   })
 
@@ -295,8 +295,9 @@ describe('module/effect-coverflow', () => {
       },
     })
     cleanup = s.cleanup
-    // The center slide transform should include a negative tx (shifted left toward next)
-    expect(s.slider.slides[0].style.transform).toContain('translateX')
+    // visibleSides: 'next' hides prev slides — slide before active should have opacity 0
+    const prevSlide = s.slider.slides[s.slider.slides.length - 1]
+    expect(parseFloat(prevSlide.style.opacity)).toBeLessThanOrEqual(0)
   })
 
   it('visibleSides prev shifts center slide toward prev side', () => {
@@ -310,7 +311,9 @@ describe('module/effect-coverflow', () => {
       },
     })
     cleanup = s.cleanup
-    expect(s.slider.slides[0].style.transform).toContain('translateX')
+    // visibleSides: 'prev' hides next slides — slide after active should have opacity 0
+    const nextSlide = s.slider.slides[s.slider.slides.length - 1]
+    expect(parseFloat(nextSlide.style.opacity)).toBeLessThanOrEqual(0)
   })
 
   it('fillCenter enlarges center slide to fill space', () => {
@@ -329,11 +332,10 @@ describe('module/effect-coverflow', () => {
     expect(transform).toContain('scale(')
     // extract scale value
     const scaleMatch = transform.match(/scale\(([^)]+)\)/)
-    if (scaleMatch) {
-      const scaleVal = parseFloat(scaleMatch[1])
-      // fillCenter should make center scale >= 1
-      expect(scaleVal).toBeGreaterThanOrEqual(1)
-    }
+    expect(scaleMatch).not.toBeNull()
+    const scaleVal = parseFloat(scaleMatch[1])
+    // fillCenter should make center scale >= 1
+    expect(scaleVal).toBeGreaterThanOrEqual(1)
   })
 
   it('corrects slidesPerView below 1 to 1', () => {

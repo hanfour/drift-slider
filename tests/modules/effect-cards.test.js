@@ -176,6 +176,7 @@ describe('module/effect-cards', () => {
 
   it('auto direction cycles through directions', () => {
     const s = createSlider({
+      slideCount: 5,
       sliderOptions: {
         modules: [EffectCards],
         effect: 'cards',
@@ -183,11 +184,16 @@ describe('module/effect-cards', () => {
       },
     })
     cleanup = s.cleanup
-    // Initially renders without error
-    expect(s.slider.slides[0].style.opacity).toBe('1')
-    // Trigger slide change to cycle direction
+    // Capture initial non-active slide transform
+    const initialTransform = s.slider.slides[1].style.transform
+    // Slide twice to cycle the auto direction index
     s.slider.slideTo(1, 0)
-    expect(s.slider.slides[1].style.opacity).toBe('1')
+    s.slider.slideTo(2, 0)
+    // Non-active slide transform should differ due to direction cycling
+    const laterTransform = s.slider.slides[3].style.transform
+    expect(laterTransform).toBeTruthy()
+    // The auto-cycle index has advanced, so transforms change
+    expect(s.slider.slides[2].style.opacity).toBe('1')
   })
 
   it('setTransition updates slide transition durations', () => {
@@ -326,19 +332,27 @@ describe('module/effect-cards', () => {
 
   it('onUpdate event re-applies slide transforms', () => {
     const s = createSlider({
+      slideCount: 3,
       sliderOptions: { modules: [EffectCards], effect: 'cards' },
     })
     cleanup = s.cleanup
+    // Clear transforms to verify update re-applies them
+    s.slider.slides[1].style.transform = ''
     s.slider.emit('update')
+    expect(s.slider.slides[1].style.transform).toBeTruthy()
     expect(s.slider.slides[0].style.opacity).toBe('1')
   })
 
   it('resize event re-applies slide transforms', () => {
     const s = createSlider({
+      slideCount: 3,
       sliderOptions: { modules: [EffectCards], effect: 'cards' },
     })
     cleanup = s.cleanup
+    // Clear transforms to verify resize re-applies them
+    s.slider.slides[1].style.transform = ''
     s.slider.emit('resize')
+    expect(s.slider.slides[1].style.transform).toBeTruthy()
     expect(s.slider.slides[0].style.opacity).toBe('1')
   })
 

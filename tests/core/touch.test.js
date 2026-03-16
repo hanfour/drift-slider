@@ -250,7 +250,8 @@ describe('core/touch', () => {
       pointerId: 1, clientX: 200, clientY: 0, bubbles: true,
     }))
 
-    expect(s.slider.activeIndex).toBeGreaterThanOrEqual(0)
+    // After drag completes, slider should snap to a valid slide index
+    expect(Number.isInteger(s.slider.activeIndex)).toBe(true)
     expect(s.slider.activeIndex).toBeLessThan(s.slider.slides.length)
   })
 
@@ -267,8 +268,9 @@ describe('core/touch', () => {
       pointerId: 1, clientX: 500, clientY: 0, bubbles: true,
     }))
 
-    // Translate should be less than the raw diff due to resistance
-    expect(s.slider.translate).toBeDefined()
+    // Translate should be reduced by resistance — less than the raw 500px drag
+    expect(s.slider.translate).toBeGreaterThanOrEqual(0)
+    expect(s.slider.translate).toBeLessThan(500)
   })
 
   it('clamps translate when resistance is disabled', () => {
@@ -356,7 +358,9 @@ describe('core/touch', () => {
       pointerId: 1, clientX: 460, clientY: 0, bubbles: true,
     }))
 
-    expect(s.slider.activeIndex).toBeGreaterThanOrEqual(0)
+    // After 7 moves, slider should resolve to a valid integer index
+    expect(Number.isInteger(s.slider.activeIndex)).toBe(true)
+    expect(s.slider.activeIndex).toBeLessThan(s.slider.slides.length)
   })
 
   it('handles pointercancel the same as pointerup', () => {

@@ -92,7 +92,6 @@ describe('core/events', () => {
     const s = createSlider()
     cleanup = s.cleanup
     // destroy already calls detachEvents; calling again should not throw
-    s.slider.detachEvents()
-    expect(true).toBe(true)
+    expect(() => s.slider.detachEvents()).not.toThrow()
   })
 })

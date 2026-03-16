@@ -305,7 +305,8 @@ describe('module/pagination', () => {
     const bullets = s.container.querySelectorAll('.drift-pagination__bullet')
     bullets[2].click()
     // In loop mode, activeIndex should be adjusted by _loopedSlides offset
-    expect(s.slider.activeIndex).toBeGreaterThan(0)
+    const looped = s.slider._loopedSlides
+    expect(s.slider.activeIndex).toBe(looped + 2)
   })
 
   it('destroy removes bullet click listeners', () => {
@@ -314,10 +315,11 @@ describe('module/pagination', () => {
       sliderOptions: { modules: [Pagination] },
     })
     const bullets = s.container.querySelectorAll('.drift-pagination__bullet')
+    const indexBeforeDestroy = s.slider.activeIndex
     s.cleanup()
     // After destroy, clicking bullets should not change anything
-    bullets[2].click()
-    // No error thrown = success
+    expect(() => bullets[2].click()).not.toThrow()
+    expect(s.slider.activeIndex).toBe(indexBeforeDestroy)
   })
 
   it('update returns early when paginationEl is null', () => {
