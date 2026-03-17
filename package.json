@@ -62,7 +62,7 @@
   "devDependencies": {
     "@lhci/cli": "^0.15.1",
     "@release-it/conventional-changelog": "^10.0.6",
-    "@rollup/plugin-terser": "^0.4.4",
+    "@rollup/plugin-terser": "^1.0.0",
     "@vitest/coverage-v8": "^4.1.0",
     "jsdom": "^29.0.0",
     "release-it": "^19.2.4",
