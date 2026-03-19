@@ -9,6 +9,7 @@ export {
   EffectFade,
   EffectCoverflow,
   EffectCards,
+  EffectShowcase,
   Keyboard,
   A11y,
   ScrollAos,

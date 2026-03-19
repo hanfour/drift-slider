@@ -55,6 +55,9 @@ export default function transitionModule({ slider }) {
   }
 
   function onTransitionEnd() {
+    // CSS transitionend fired — clear safety timer to prevent double call
+    clearTimeout(_safetyTimer);
+    _safetyTimer = null;
     transitionEnd(true);
   }
 

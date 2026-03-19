@@ -20,7 +20,7 @@ export default function translateModule({ slider }) {
   }
 
   function getTranslate() {
-    return slider.translate || 0;
+    return slider.translate ?? 0;
   }
 
   /**
@@ -32,7 +32,7 @@ export default function translateModule({ slider }) {
   function getComputedTranslate() {
     const style = window.getComputedStyle(slider.listEl);
     const transform = style.transform || style.webkitTransform;
-    if (!transform || transform === 'none') return slider.translate || 0;
+    if (!transform || transform === 'none') return slider.translate ?? 0;
 
     const isHorizontal = slider.params.direction === 'horizontal';
     const m3d = transform.match(/matrix3d\((.+)\)/);
@@ -45,7 +45,7 @@ export default function translateModule({ slider }) {
       const v = m2d[1].split(',');
       return parseFloat(v[isHorizontal ? 4 : 5]);
     }
-    return slider.translate || 0;
+    return slider.translate ?? 0;
   }
 
   slider.setTranslate = setTranslate;

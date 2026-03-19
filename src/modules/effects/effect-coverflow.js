@@ -20,13 +20,14 @@ export default function EffectCoverflow({ slider, extendParams, on }) {
 
   const overlayEls = [];
 
-  // Detect once whether actual 3D transforms are used (depth or rotate > 0).
-  // When they're not, we skip preserve-3d / perspective / backface-visibility
-  // to avoid Mobile Safari GPU compositing bugs that cause slides to vanish.
-  function needs3D() {
+  // Cached once during init — whether actual 3D transforms are used.
+  // When depth and rotate are both 0, we skip preserve-3d / perspective /
+  // backface-visibility to avoid Mobile Safari GPU compositing bugs.
+  let _use3D = false;
+
+  function computeUse3D() {
     const p = slider.params.coverflowEffect;
-    return (p.depth !== 0 && p.modifier !== 0) ||
-           (p.rotate !== 0 && p.modifier !== 0);
+    return p.modifier !== 0 && (p.depth !== 0 || p.rotate !== 0);
   }
 
   function setSlideTransforms() {
@@ -40,7 +41,7 @@ export default function EffectCoverflow({ slider, extendParams, on }) {
     const slides = slider.slides;
     if (!slider.slideSize) return; // guard against zero division when container is hidden
 
-    const use3D = needs3D();
+    const use3D = _use3D;
 
     // Continuous half-view for smooth opacity gradients at any slidesPerView
     const halfView = Math.max(0, (slider.params.slidesPerView - 1) / 2);
@@ -93,9 +94,12 @@ export default function EffectCoverflow({ slider, extendParams, on }) {
       const isInRange = absOffset < renderRange;
 
       if (!isInRange) {
-        // Far-off slide: skip expensive style updates, just hide it
+        // Far-off slide: clear stale styles and hide
         slide.style.visibility = 'hidden';
         slide.style.willChange = '';
+        slide.style.opacity = '0';
+        slide.style.zIndex = '0';
+        slide.style.pointerEvents = 'none';
         if (overlay && overlayEls[i]) {
           overlayEls[i].style.display = 'none';
         }
@@ -168,7 +172,7 @@ export default function EffectCoverflow({ slider, extendParams, on }) {
       bottom: 'center bottom',
     };
     const transformOrigin = originMap[align] || 'center center';
-    const use3D = needs3D();
+    const use3D = _use3D;
 
     // Only enable 3D CSS when actual 3D transforms are used.
     // Mobile Safari has a compositing bug where preserve-3d +
@@ -242,8 +246,10 @@ export default function EffectCoverflow({ slider, extendParams, on }) {
     }
   }
 
+  let _ancestorCheckRAF = null;
+
   function setupSlides() {
-    const use3D = needs3D();
+    const use3D = _use3D;
 
     // Only set perspective and preserve-3d when actual 3D transforms are used.
     // Skipping these avoids Mobile Safari GPU compositing bugs.
@@ -260,18 +266,23 @@ export default function EffectCoverflow({ slider, extendParams, on }) {
     // Detect and warn about problematic ancestor (overflow:hidden + transform).
     // This is a deferred check — runs after the browser has applied styles
     // (including animation libraries like AOS).
-    requestAnimationFrame(() => {
-      const badAncestor = detectProblematicAncestor();
-      if (badAncestor) {
-        console.warn(
-          'DriftSlider Coverflow: an ancestor element has both overflow:hidden ' +
-          'and a CSS transform. This combination causes slides to vanish on ' +
-          'Mobile Safari. Fix: separate overflow:hidden and the transform ' +
-          'onto different elements. Offending element:',
-          badAncestor
-        );
-      }
-    });
+    // Only in development (non-production) environments.
+    if (typeof process === 'undefined' || !process.env || process.env.NODE_ENV !== 'production') {
+      _ancestorCheckRAF = requestAnimationFrame(() => {
+        _ancestorCheckRAF = null;
+        if (slider.destroyed) return;
+        const badAncestor = detectProblematicAncestor();
+        if (badAncestor) {
+          console.warn(
+            'DriftSlider Coverflow: an ancestor element has both overflow:hidden ' +
+            'and a CSS transform. This combination causes slides to vanish on ' +
+            'Mobile Safari. Fix: separate overflow:hidden and the transform ' +
+            'onto different elements. Offending element:',
+            badAncestor
+          );
+        }
+      });
+    }
 
     // cropSides: clip sides horizontally; keep vertical visible for staggerY
     const cropSides = slider.params.coverflowEffect.cropSides;
@@ -331,8 +342,17 @@ export default function EffectCoverflow({ slider, extendParams, on }) {
     );
   }
 
+  // Store original methods for cleanup on destroy
+  let _coreSetTranslate = null;
+  let _coreSetTransition = null;
+  let _coreGetComputedTranslate = null;
+  let _coreLoopFix = null;
+
   function init() {
     if (slider.params.effect !== 'coverflow') return;
+
+    // Cache 3D detection result (params don't change after init)
+    _use3D = computeUse3D();
 
     // Coverflow needs at least 1 slidesPerView
     if (slider.params.slidesPerView < 1) {
@@ -343,6 +363,12 @@ export default function EffectCoverflow({ slider, extendParams, on }) {
     if (slider.params.loop && slider._loopedSlides) {
       reorderLoopClones();
     }
+
+    // Save original methods before overriding
+    _coreSetTranslate = slider.setTranslate;
+    _coreSetTransition = slider.setTransition;
+    _coreGetComputedTranslate = slider.getComputedTranslate;
+    _coreLoopFix = slider.loopFix;
 
     setupSlides();
 
@@ -362,7 +388,7 @@ export default function EffectCoverflow({ slider, extendParams, on }) {
       const centeringOffset = slider.containerSize / 2 - slider.slideSize / 2;
       const listX = translate + centeringOffset;
       // Use 2D translate when 3D is not needed to avoid Safari compositing bugs
-      slider.listEl.style.transform = needs3D()
+      slider.listEl.style.transform = _use3D
         ? `translate3d(${listX}px, 0, 0)`
         : `translateX(${listX}px)`;
 
@@ -387,7 +413,6 @@ export default function EffectCoverflow({ slider, extendParams, on }) {
     // Override getComputedTranslate — the core version reads the raw
     // listEl transform, but coverflow adds a centering offset.
     // Subtract it so callers get the logical translate value.
-    const _coreGetComputedTranslate = slider.getComputedTranslate;
     slider.getComputedTranslate = function () {
       const raw = _coreGetComputedTranslate.call(slider);
       const centeringOffset = slider.containerSize / 2 - slider.slideSize / 2;
@@ -436,6 +461,18 @@ export default function EffectCoverflow({ slider, extendParams, on }) {
   }
 
   function destroy() {
+    // Cancel pending rAF if still queued
+    if (_ancestorCheckRAF !== null) {
+      cancelAnimationFrame(_ancestorCheckRAF);
+      _ancestorCheckRAF = null;
+    }
+
+    // Restore original core methods
+    if (_coreSetTranslate) slider.setTranslate = _coreSetTranslate;
+    if (_coreSetTransition) slider.setTransition = _coreSetTransition;
+    if (_coreGetComputedTranslate) slider.getComputedTranslate = _coreGetComputedTranslate;
+    if (_coreLoopFix) slider.loopFix = _coreLoopFix;
+
     slider.el.classList.remove('drift-slider--coverflow');
     slider.el.style.overflow = '';
     slider.el.style.overflowX = '';
