@@ -41,17 +41,25 @@ export default function touchModule({ slider }) {
     touchData.currentX = pos.x;
     touchData.currentY = pos.y;
     touchData.startTime = Date.now();
-    touchData.startTranslate = slider.getTranslate();
     touchData.isTouched = true;
     touchData.isMoved = false;
     touchData.isScrolling = undefined;
     touchData.velocityTracker = [{ pos: isHorizontal ? pos.x : pos.y, time: Date.now() }];
 
-    // Stop any ongoing transition
+    // Stop any ongoing transition and sync to actual visual position.
+    // When interrupting a CSS transition, slider.translate holds the
+    // transition TARGET but the element is frozen at an intermediate
+    // position. We must read the real DOM position first.
+    const wasAnimating = slider.animating;
     slider.setTransition(0);
-    if (slider.animating) {
+    if (wasAnimating) {
+      // Read where the element actually is in the DOM
+      const computedTranslate = slider.getComputedTranslate();
+      // Sync internal state + slide transforms to the actual visual position
+      slider.setTranslate(computedTranslate);
       slider.transitionEnd(false);
     }
+    touchData.startTranslate = slider.getTranslate();
 
     slider.setGrabCursor(true);
     slider.emit('touchStart', slider, e);

@@ -23,6 +23,32 @@ export default function translateModule({ slider }) {
     return slider.translate || 0;
   }
 
+  /**
+   * Read the current visual translate from the DOM computed style.
+   * Crucial for mid-transition interruption: slider.translate holds the
+   * transition TARGET, but the element may be frozen at an intermediate
+   * position after setTransition(0).
+   */
+  function getComputedTranslate() {
+    const style = window.getComputedStyle(slider.listEl);
+    const transform = style.transform || style.webkitTransform;
+    if (!transform || transform === 'none') return slider.translate || 0;
+
+    const isHorizontal = slider.params.direction === 'horizontal';
+    const m3d = transform.match(/matrix3d\((.+)\)/);
+    if (m3d) {
+      const v = m3d[1].split(',');
+      return parseFloat(v[isHorizontal ? 12 : 13]);
+    }
+    const m2d = transform.match(/matrix\((.+)\)/);
+    if (m2d) {
+      const v = m2d[1].split(',');
+      return parseFloat(v[isHorizontal ? 4 : 5]);
+    }
+    return slider.translate || 0;
+  }
+
   slider.setTranslate = setTranslate;
   slider.getTranslate = getTranslate;
+  slider.getComputedTranslate = getComputedTranslate;
 }

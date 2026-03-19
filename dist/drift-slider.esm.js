@@ -1,5 +1,5 @@
 /*!
- * DriftSlider v0.1.0
+ * DriftSlider v0.2.0
  * A lightweight, modular slider/carousel library
  * MIT License
  */
@@ -356,11 +356,39 @@ function translateModule({ slider }) {
     return slider.translate || 0;
   }
 
+  /**
+   * Read the current visual translate from the DOM computed style.
+   * Crucial for mid-transition interruption: slider.translate holds the
+   * transition TARGET, but the element may be frozen at an intermediate
+   * position after setTransition(0).
+   */
+  function getComputedTranslate() {
+    const style = window.getComputedStyle(slider.listEl);
+    const transform = style.transform || style.webkitTransform;
+    if (!transform || transform === 'none') return slider.translate || 0;
+
+    const isHorizontal = slider.params.direction === 'horizontal';
+    const m3d = transform.match(/matrix3d\((.+)\)/);
+    if (m3d) {
+      const v = m3d[1].split(',');
+      return parseFloat(v[isHorizontal ? 12 : 13]);
+    }
+    const m2d = transform.match(/matrix\((.+)\)/);
+    if (m2d) {
+      const v = m2d[1].split(',');
+      return parseFloat(v[isHorizontal ? 4 : 5]);
+    }
+    return slider.translate || 0;
+  }
+
   slider.setTranslate = setTranslate;
   slider.getTranslate = getTranslate;
+  slider.getComputedTranslate = getComputedTranslate;
 }
 
 function transitionModule({ slider }) {
+  let _safetyTimer = null;
+
   function setTransition(duration) {
     slider.listEl.style.transitionDuration = `${duration}ms`;
     slider.emit('setTransition', slider, duration);
@@ -368,6 +396,21 @@ function transitionModule({ slider }) {
 
   function transitionStart(runCallbacks = true) {
     slider.animating = true;
+
+    // Safety timer: if CSS transitionend doesn't fire (common on mobile
+    // for very short moves), force transitionEnd after the expected duration.
+    clearTimeout(_safetyTimer);
+    _safetyTimer = null;
+    const speed = parseFloat(slider.listEl.style.transitionDuration) || 0;
+    if (speed > 0) {
+      _safetyTimer = setTimeout(() => {
+        _safetyTimer = null;
+        if (slider.animating && !slider.destroyed) {
+          transitionEnd(true);
+        }
+      }, speed + 50); // small buffer for timing variance
+    }
+
     if (runCallbacks) {
       slider.emit('slideChangeTransitionStart', slider);
 
@@ -380,7 +423,15 @@ function transitionModule({ slider }) {
   function transitionEnd(runCallbacks = true) {
     if (!slider.animating) return;
     slider.animating = false;
-    setTransition(0);
+
+    clearTimeout(_safetyTimer);
+    _safetyTimer = null;
+
+    // Use slider.setTransition (possibly overridden by effects like
+    // coverflow) so that ALL elements (list + slides + overlays) are reset,
+    // not just the listEl.
+    slider.setTransition(0);
+
     if (runCallbacks) {
       slider.emit('slideChangeTransitionEnd', slider);
     }
@@ -697,17 +748,25 @@ function touchModule({ slider }) {
     touchData.currentX = pos.x;
     touchData.currentY = pos.y;
     touchData.startTime = Date.now();
-    touchData.startTranslate = slider.getTranslate();
     touchData.isTouched = true;
     touchData.isMoved = false;
     touchData.isScrolling = undefined;
     touchData.velocityTracker = [{ pos: isHorizontal ? pos.x : pos.y, time: Date.now() }];
 
-    // Stop any ongoing transition
+    // Stop any ongoing transition and sync to actual visual position.
+    // When interrupting a CSS transition, slider.translate holds the
+    // transition TARGET but the element is frozen at an intermediate
+    // position. We must read the real DOM position first.
+    const wasAnimating = slider.animating;
     slider.setTransition(0);
-    if (slider.animating) {
+    if (wasAnimating) {
+      // Read where the element actually is in the DOM
+      const computedTranslate = slider.getComputedTranslate();
+      // Sync internal state + slide transforms to the actual visual position
+      slider.setTranslate(computedTranslate);
       slider.transitionEnd(false);
     }
+    touchData.startTranslate = slider.getTranslate();
 
     slider.setGrabCursor(true);
     slider.emit('touchStart', slider, e);
@@ -971,14 +1030,22 @@ function loopModule({ slider }) {
     const loopedSlides = slider._loopedSlides;
     const totalOriginal = slider.slides.length - loopedSlides * 2;
 
-    let newIdx;
-    if (slider.activeIndex >= totalOriginal + loopedSlides) {
-      newIdx = loopedSlides + (slider.activeIndex - totalOriginal - loopedSlides);
-    } else if (slider.activeIndex < loopedSlides) {
-      newIdx = totalOriginal + slider.activeIndex;
-    } else {
-      return;
+    let newIdx = slider.activeIndex;
+
+    // When loopedSlides > totalOriginal, a single jump may land in the
+    // clone range again. Use a while loop to keep jumping until we reach
+    // the valid original-slide range [loopedSlides, loopedSlides + totalOriginal).
+    let needsJump = false;
+    while (newIdx >= totalOriginal + loopedSlides) {
+      newIdx = newIdx - totalOriginal;
+      needsJump = true;
     }
+    while (newIdx < loopedSlides) {
+      newIdx = newIdx + totalOriginal;
+      needsJump = true;
+    }
+
+    if (!needsJump) return;
 
     slider.setTransition(0);
     slider.activeIndex = newIdx;
@@ -2039,6 +2106,15 @@ function EffectCoverflow({ slider, extendParams, on }) {
 
   const overlayEls = [];
 
+  // Detect once whether actual 3D transforms are used (depth or rotate > 0).
+  // When they're not, we skip preserve-3d / perspective / backface-visibility
+  // to avoid Mobile Safari GPU compositing bugs that cause slides to vanish.
+  function needs3D() {
+    const p = slider.params.coverflowEffect;
+    return (p.depth !== 0 && p.modifier !== 0) ||
+           (p.rotate !== 0 && p.modifier !== 0);
+  }
+
   function setSlideTransforms() {
     const params = slider.params.coverflowEffect;
     const {
@@ -2049,6 +2125,8 @@ function EffectCoverflow({ slider, extendParams, on }) {
 
     const slides = slider.slides;
     if (!slider.slideSize) return; // guard against zero division when container is hidden
+
+    const use3D = needs3D();
 
     // Continuous half-view for smooth opacity gradients at any slidesPerView
     const halfView = Math.max(0, (slider.params.slidesPerView - 1) / 2);
@@ -2092,8 +2170,36 @@ function EffectCoverflow({ slider, extendParams, on }) {
         s = centerScale;
       }
 
-      slide.style.transform =
-        `translateX(${tx}px) translateY(${ty}px) translateZ(${tz}px) rotateY(${ry}deg) scale(${s})`;
+      // Mobile Safari GPU fix: hide slides far from center to reduce
+      // compositing layer count. Only slides within rendering range are
+      // painted; the rest are visibility:hidden (preserves layout, skips paint).
+      // Use a generous margin (halfView + 2) so slides entering view during
+      // drag are already visible.
+      const renderRange = halfView + 2;
+      const isInRange = absOffset < renderRange;
+
+      if (!isInRange) {
+        // Far-off slide: skip expensive style updates, just hide it
+        slide.style.visibility = 'hidden';
+        slide.style.willChange = '';
+        if (overlay && overlayEls[i]) {
+          overlayEls[i].style.display = 'none';
+        }
+        continue;
+      }
+
+      slide.style.visibility = 'visible';
+      slide.style.willChange = 'transform, opacity';
+
+      // Use 2D transforms when depth/rotate are 0 to avoid Mobile Safari
+      // GPU compositing bugs (slides vanishing inside preserve-3d contexts).
+      if (use3D) {
+        slide.style.transform =
+          `translateX(${tx}px) translateY(${ty}px) translateZ(${tz}px) rotateY(${ry}deg) scale(${s})`;
+      } else {
+        slide.style.transform =
+          `translateX(${tx}px) translateY(${ty}px) scale(${s})`;
+      }
 
       // Opacity: within halfView → normal interpolation,
       //          beyond halfView → quickly fade to 0 by halfView+1
@@ -2125,9 +2231,16 @@ function EffectCoverflow({ slider, extendParams, on }) {
 
       // Overlay
       if (overlay && overlayEls[i]) {
-        const overlayOpacity = absOffset < 0.01 ? 0 : Math.min(absOffset / Math.max(halfView, 1), 1);
-        overlayEls[i].style.background = overlayColor;
-        overlayEls[i].style.opacity = String(overlayOpacity);
+        if (absOffset < 0.01) {
+          // Center slide: hide overlay completely (not just opacity:0)
+          // to prevent any rendering interference on mobile Safari
+          overlayEls[i].style.display = 'none';
+        } else {
+          overlayEls[i].style.display = '';
+          const overlayOpacity = Math.min(absOffset / Math.max(halfView, 1), 1);
+          overlayEls[i].style.background = overlayColor;
+          overlayEls[i].style.opacity = String(overlayOpacity);
+        }
       }
     }
   }
@@ -2141,9 +2254,18 @@ function EffectCoverflow({ slider, extendParams, on }) {
       bottom: 'center bottom',
     };
     const transformOrigin = originMap[align] || 'center center';
+    const use3D = needs3D();
 
-    slide.style.transformStyle = 'preserve-3d';
-    slide.style.backfaceVisibility = 'hidden';
+    // Only enable 3D CSS when actual 3D transforms are used.
+    // Mobile Safari has a compositing bug where preserve-3d +
+    // backface-visibility:hidden causes slides to vanish during
+    // touch interactions — skip when not needed.
+    if (use3D) {
+      slide.style.transformStyle = 'preserve-3d';
+      slide.style.backfaceVisibility = 'hidden';
+    }
+    // will-change is managed dynamically per-slide in setSlideTransforms
+    // to limit the number of GPU compositing layers on mobile.
     slide.style.transformOrigin = transformOrigin;
     slide.style.transitionProperty = 'transform, opacity';
     slide.style.transitionDuration = `${slider.params.speed}ms`;
@@ -2160,17 +2282,82 @@ function EffectCoverflow({ slider, extendParams, on }) {
     }
   }
 
-  function setupSlides() {
-    // Perspective on the track (stationary parent) so vanishing point stays fixed
-    if (slider.trackEl) {
-      slider.trackEl.style.perspective = '1200px';
+  /**
+   * Mobile Safari workaround: detect ancestor elements that have BOTH
+   * overflow:hidden AND a CSS transform. This combination causes Safari's
+   * GPU compositor to skip repainting dynamically-transformed descendants.
+   *
+   * Common trigger: animation libraries (AOS, GSAP ScrollTrigger, etc.)
+   * leave transform:translate3d(0,0,0) on elements after animation, and
+   * if that element also has overflow:hidden, slides inside the coverflow
+   * will intermittently vanish.
+   *
+   * Returns the offending element (for dev warning) or null.
+   */
+  function detectProblematicAncestor() {
+    let el = slider.el.parentElement;
+    while (el && el !== document.body) {
+      const style = window.getComputedStyle(el);
+      const hasOverflowHidden =
+        style.overflow === 'hidden' ||
+        style.overflowX === 'hidden' ||
+        style.overflowY === 'hidden';
+      const hasTransform =
+        style.transform !== 'none' && style.transform !== '';
+      if (hasOverflowHidden && hasTransform) {
+        return el;
+      }
+      el = el.parentElement;
     }
+    return null;
+  }
 
-    // The list needs preserve-3d so children's 3D transforms aren't flattened
-    slider.listEl.style.transformStyle = 'preserve-3d';
+  /**
+   * Force GPU compositing layers on direct children (images, divs) of
+   * each slide. This prevents Mobile Safari from skipping repaint of
+   * content inside dynamically-transformed slides.
+   */
+  function promoteSlideContent(slide) {
+    const children = slide.children;
+    for (let j = 0; j < children.length; j++) {
+      const child = children[j];
+      // Skip the overlay div we created
+      if (child.classList.contains('drift-coverflow-overlay')) continue;
+      child.style.backfaceVisibility = 'hidden';
+      child.style.webkitBackfaceVisibility = 'hidden';
+    }
+  }
+
+  function setupSlides() {
+    const use3D = needs3D();
+
+    // Only set perspective and preserve-3d when actual 3D transforms are used.
+    // Skipping these avoids Mobile Safari GPU compositing bugs.
+    if (use3D) {
+      if (slider.trackEl) {
+        slider.trackEl.style.perspective = '1200px';
+      }
+      slider.listEl.style.transformStyle = 'preserve-3d';
+    }
 
     // Add container class
     slider.el.classList.add('drift-slider--coverflow');
+
+    // Detect and warn about problematic ancestor (overflow:hidden + transform).
+    // This is a deferred check — runs after the browser has applied styles
+    // (including animation libraries like AOS).
+    requestAnimationFrame(() => {
+      const badAncestor = detectProblematicAncestor();
+      if (badAncestor) {
+        console.warn(
+          'DriftSlider Coverflow: an ancestor element has both overflow:hidden ' +
+          'and a CSS transform. This combination causes slides to vanish on ' +
+          'Mobile Safari. Fix: separate overflow:hidden and the transform ' +
+          'onto different elements. Offending element:',
+          badAncestor
+        );
+      }
+    });
 
     // cropSides: clip sides horizontally; keep vertical visible for staggerY
     const cropSides = slider.params.coverflowEffect.cropSides;
@@ -2202,6 +2389,8 @@ function EffectCoverflow({ slider, extendParams, on }) {
     // Apply styles to ALL slides (including loop clones)
     for (let i = 0; i < slider.slides.length; i++) {
       applySlideStyles(slider.slides[i], i);
+      // Force GPU layers on slide content to prevent Safari repaint issues
+      promoteSlideContent(slider.slides[i]);
     }
   }
 
@@ -2258,7 +2447,10 @@ function EffectCoverflow({ slider, extendParams, on }) {
       // Move the list: original translate + centering offset
       const centeringOffset = slider.containerSize / 2 - slider.slideSize / 2;
       const listX = translate + centeringOffset;
-      slider.listEl.style.transform = `translate3d(${listX}px, 0, 0)`;
+      // Use 2D translate when 3D is not needed to avoid Safari compositing bugs
+      slider.listEl.style.transform = needs3D()
+        ? `translate3d(${listX}px, 0, 0)`
+        : `translateX(${listX}px)`;
 
       slider.emit('setTranslate', slider, translate);
       slider.emit('progress', slider, slider.progress);
@@ -2278,8 +2470,19 @@ function EffectCoverflow({ slider, extendParams, on }) {
       slider.emit('setTransition', slider, duration);
     };
 
+    // Override getComputedTranslate — the core version reads the raw
+    // listEl transform, but coverflow adds a centering offset.
+    // Subtract it so callers get the logical translate value.
+    const _coreGetComputedTranslate = slider.getComputedTranslate;
+    slider.getComputedTranslate = function () {
+      const raw = _coreGetComputedTranslate.call(slider);
+      const centeringOffset = slider.containerSize / 2 - slider.slideSize / 2;
+      return raw - centeringOffset;
+    };
+
     // Override loopFix — the original directly sets listEl.style.transform,
     // bypassing our centering offset and setSlideTransforms.
+    // Also handles loopedSlides > totalOriginal with a while loop.
     if (slider.params.loop && slider._loopedSlides) {
       slider.loopFix = function () {
         if (!slider.params.loop || !slider._loopedSlides) return;
@@ -2287,14 +2490,15 @@ function EffectCoverflow({ slider, extendParams, on }) {
         const loopedSlides = slider._loopedSlides;
         const totalOriginal = slider.slides.length - loopedSlides * 2;
 
+        let newIdx = slider.activeIndex;
         let needsJump = false;
-        let newIdx;
 
-        if (slider.activeIndex >= totalOriginal + loopedSlides) {
-          newIdx = loopedSlides + (slider.activeIndex - totalOriginal - loopedSlides);
+        while (newIdx >= totalOriginal + loopedSlides) {
+          newIdx = newIdx - totalOriginal;
           needsJump = true;
-        } else if (slider.activeIndex < loopedSlides) {
-          newIdx = totalOriginal + slider.activeIndex;
+        }
+        while (newIdx < loopedSlides) {
+          newIdx = newIdx + totalOriginal;
           needsJump = true;
         }
 
@@ -2337,14 +2541,25 @@ function EffectCoverflow({ slider, extendParams, on }) {
       const slide = slider.slides[i];
       slide.style.transform = '';
       slide.style.opacity = '';
+      slide.style.visibility = '';
       slide.style.zIndex = '';
       slide.style.transformStyle = '';
       slide.style.backfaceVisibility = '';
+      slide.style.willChange = '';
       slide.style.transitionProperty = '';
       slide.style.transitionDuration = '';
       slide.style.transformOrigin = '';
       slide.style.pointerEvents = '';
       slide.style.position = '';
+
+      // Clean up promoted slide content styles
+      const children = slide.children;
+      for (let j = 0; j < children.length; j++) {
+        const child = children[j];
+        if (child.classList.contains('drift-coverflow-overlay')) continue;
+        child.style.backfaceVisibility = '';
+        child.style.webkitBackfaceVisibility = '';
+      }
 
       // Remove overlay divs
       if (overlayEls[i] && overlayEls[i].parentNode) {
