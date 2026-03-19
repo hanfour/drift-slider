@@ -64,14 +64,22 @@ export default function loopModule({ slider }) {
     const loopedSlides = slider._loopedSlides;
     const totalOriginal = slider.slides.length - loopedSlides * 2;
 
-    let newIdx;
-    if (slider.activeIndex >= totalOriginal + loopedSlides) {
-      newIdx = loopedSlides + (slider.activeIndex - totalOriginal - loopedSlides);
-    } else if (slider.activeIndex < loopedSlides) {
-      newIdx = totalOriginal + slider.activeIndex;
-    } else {
-      return;
+    let newIdx = slider.activeIndex;
+
+    // When loopedSlides > totalOriginal, a single jump may land in the
+    // clone range again. Use a while loop to keep jumping until we reach
+    // the valid original-slide range [loopedSlides, loopedSlides + totalOriginal).
+    let needsJump = false;
+    while (newIdx >= totalOriginal + loopedSlides) {
+      newIdx = newIdx - totalOriginal;
+      needsJump = true;
     }
+    while (newIdx < loopedSlides) {
+      newIdx = newIdx + totalOriginal;
+      needsJump = true;
+    }
+
+    if (!needsJump) return;
 
     slider.setTransition(0);
     slider.activeIndex = newIdx;

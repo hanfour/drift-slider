@@ -1,4 +1,6 @@
 export default function transitionModule({ slider }) {
+  let _safetyTimer = null;
+
   function setTransition(duration) {
     slider.listEl.style.transitionDuration = `${duration}ms`;
     slider.emit('setTransition', slider, duration);
@@ -6,6 +8,21 @@ export default function transitionModule({ slider }) {
 
   function transitionStart(runCallbacks = true) {
     slider.animating = true;
+
+    // Safety timer: if CSS transitionend doesn't fire (common on mobile
+    // for very short moves), force transitionEnd after the expected duration.
+    clearTimeout(_safetyTimer);
+    _safetyTimer = null;
+    const speed = parseFloat(slider.listEl.style.transitionDuration) || 0;
+    if (speed > 0) {
+      _safetyTimer = setTimeout(() => {
+        _safetyTimer = null;
+        if (slider.animating && !slider.destroyed) {
+          transitionEnd(true);
+        }
+      }, speed + 50); // small buffer for timing variance
+    }
+
     if (runCallbacks) {
       slider.emit('slideChangeTransitionStart', slider);
 
@@ -18,7 +35,17 @@ export default function transitionModule({ slider }) {
   function transitionEnd(runCallbacks = true) {
     if (!slider.animating) return;
     slider.animating = false;
-    setTransition(0);
+
+    clearTimeout(_safetyTimer);
+    _safetyTimer = null;
+
+    // Use slider.setTransition (possibly overridden by effects like
+    // coverflow/showcase) so that ALL elements (list + slides + overlays)
+    // are reset, not just the listEl.
+    // NOTE: effect overrides may emit 'setTransition' as a side effect —
+    // this is expected and harmless for current effects.
+    slider.setTransition(0);
+
     if (runCallbacks) {
       slider.emit('slideChangeTransitionEnd', slider);
     }
@@ -30,6 +57,9 @@ export default function transitionModule({ slider }) {
   }
 
   function onTransitionEnd() {
+    // CSS transitionend fired — clear safety timer to prevent double call
+    clearTimeout(_safetyTimer);
+    _safetyTimer = null;
     transitionEnd(true);
   }
 
