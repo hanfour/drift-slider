@@ -1,5 +1,6 @@
-import { describe, it, expect, afterEach } from 'vitest'
+import { describe, it, expect, vi, afterEach } from 'vitest'
 import { createSlider } from '../helpers/create-slider.js'
+import DriftSlider from '../../src/drift-slider.js'
 import EffectCoverflow from '../../src/modules/effects/effect-coverflow.js'
 
 describe('module/effect-coverflow – Mobile Safari fixes', () => {
@@ -138,22 +139,55 @@ describe('module/effect-coverflow – Mobile Safari fixes', () => {
   })
 
   describe('GPU layer promotion', () => {
-    it('adds backface-visibility to slide children', () => {
-      const s = createSlider({
-        slideCount: 3,
-        sliderOptions: {
-          modules: [EffectCoverflow],
-          effect: 'coverflow',
-        },
+    it('adds backface-visibility:hidden to element children of slides', () => {
+      // Build DOM manually so slides have element children BEFORE init
+      const container = document.createElement('section')
+      container.className = 'drift-slider'
+      const track = document.createElement('div')
+      track.className = 'drift-track'
+      const list = document.createElement('ul')
+      list.className = 'drift-list'
+
+      for (let i = 0; i < 3; i++) {
+        const slide = document.createElement('li')
+        slide.className = 'drift-slide'
+        const img = document.createElement('img')
+        slide.appendChild(img)
+        list.appendChild(slide)
+        Object.defineProperty(slide, 'offsetWidth', { value: 800, configurable: true })
+        Object.defineProperty(slide, 'offsetHeight', { value: 400, configurable: true })
+      }
+      track.appendChild(list)
+      container.appendChild(track)
+      document.body.appendChild(container)
+      Object.defineProperty(container, 'clientWidth', { value: 800, configurable: true })
+      Object.defineProperty(container, 'clientHeight', { value: 400, configurable: true })
+
+      const originalGCS = window.getComputedStyle
+      vi.spyOn(window, 'getComputedStyle').mockImplementation((el) => {
+        const real = originalGCS(el)
+        return new Proxy(real, {
+          get(target, prop) {
+            if (prop === 'transform' || prop === 'webkitTransform') {
+              return el.style.transform || 'matrix(1, 0, 0, 1, 0, 0)'
+            }
+            if (prop === 'marginLeft' || prop === 'marginRight' ||
+                prop === 'marginTop' || prop === 'marginBottom') {
+              return '0px'
+            }
+            return target[prop]
+          },
+        })
       })
-      cleanup = s.cleanup
 
-      // Add a child element to test
-      const img = document.createElement('img')
-      s.slider.slides[0].appendChild(img)
+      const slider = new DriftSlider(container, {
+        modules: [EffectCoverflow],
+        effect: 'coverflow',
+      })
+      cleanup = () => { slider.destroy(); container.remove(); vi.restoreAllMocks() }
 
-      // Re-init to trigger promoteSlideContent again
-      // (already done during init for existing children)
+      const img = list.querySelector('.drift-slide img')
+      expect(img.style.backfaceVisibility).toBe('hidden')
     })
 
     it('destroy cleans up child backface-visibility styles', () => {

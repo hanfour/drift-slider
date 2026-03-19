@@ -1,10 +1,10 @@
 export default function translateModule({ slider }) {
-  function setTranslate(translate) {
-    const isHorizontal = slider.params.direction === 'horizontal';
-    const x = isHorizontal ? translate : 0;
-    const y = isHorizontal ? 0 : translate;
-
-    slider.listEl.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+  /**
+   * Update progress, isBeginning, isEnd and emit events.
+   * Shared by core setTranslate and effect overrides (coverflow, showcase)
+   * to avoid duplicating this logic.
+   */
+  function updateProgress(translate) {
     slider.translate = translate;
 
     slider.progress = slider.maxTranslate === slider.minTranslate
@@ -17,6 +17,15 @@ export default function translateModule({ slider }) {
 
     slider.emit('setTranslate', slider, translate);
     slider.emit('progress', slider, slider.progress);
+  }
+
+  function setTranslate(translate) {
+    const isHorizontal = slider.params.direction === 'horizontal';
+    const x = isHorizontal ? translate : 0;
+    const y = isHorizontal ? 0 : translate;
+
+    slider.listEl.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+    updateProgress(translate);
   }
 
   function getTranslate() {
@@ -51,4 +60,5 @@ export default function translateModule({ slider }) {
   slider.setTranslate = setTranslate;
   slider.getTranslate = getTranslate;
   slider.getComputedTranslate = getComputedTranslate;
+  slider.updateProgress = updateProgress;
 }

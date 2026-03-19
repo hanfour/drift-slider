@@ -40,8 +40,10 @@ export default function transitionModule({ slider }) {
     _safetyTimer = null;
 
     // Use slider.setTransition (possibly overridden by effects like
-    // coverflow) so that ALL elements (list + slides + overlays) are reset,
-    // not just the listEl.
+    // coverflow/showcase) so that ALL elements (list + slides + overlays)
+    // are reset, not just the listEl.
+    // NOTE: effect overrides may emit 'setTransition' as a side effect —
+    // this is expected and harmless for current effects.
     slider.setTransition(0);
 
     if (runCallbacks) {

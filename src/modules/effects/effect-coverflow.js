@@ -374,16 +374,6 @@ export default function EffectCoverflow({ slider, extendParams, on }) {
 
     // Override setTranslate — translate list WITH centering offset, then per-slide 3D
     slider.setTranslate = function (translate) {
-      slider.translate = translate;
-
-      slider.progress = slider.maxTranslate === slider.minTranslate
-        ? 0
-        : (translate - slider.maxTranslate) /
-          (slider.minTranslate - slider.maxTranslate);
-
-      slider.isBeginning = slider.activeIndex === 0;
-      slider.isEnd = slider.activeIndex === slider.snapGrid.length - 1;
-
       // Move the list: original translate + centering offset
       const centeringOffset = slider.containerSize / 2 - slider.slideSize / 2;
       const listX = translate + centeringOffset;
@@ -392,9 +382,7 @@ export default function EffectCoverflow({ slider, extendParams, on }) {
         ? `translate3d(${listX}px, 0, 0)`
         : `translateX(${listX}px)`;
 
-      slider.emit('setTranslate', slider, translate);
-      slider.emit('progress', slider, slider.progress);
-
+      slider.updateProgress(translate);
       setSlideTransforms();
     };
 

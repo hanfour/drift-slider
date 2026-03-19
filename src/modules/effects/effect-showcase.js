@@ -138,26 +138,13 @@ export default function EffectShowcase({ slider, extendParams, on }) {
 
     // Override setTranslate — translate list with centering offset, then per-slide transforms
     slider.setTranslate = function (translate) {
-      slider.translate = translate;
-
-      slider.progress =
-        slider.maxTranslate === slider.minTranslate
-          ? 0
-          : (translate - slider.maxTranslate) /
-            (slider.minTranslate - slider.maxTranslate);
-
-      slider.isBeginning = slider.activeIndex === 0;
-      slider.isEnd = slider.activeIndex === slider.snapGrid.length - 1;
-
       // Centering offset
       const centeringOffset =
         slider.containerSize / 2 - slider.slideSize / 2;
       const listX = translate + centeringOffset;
       slider.listEl.style.transform = `translateX(${listX}px)`;
 
-      slider.emit('setTranslate', slider, translate);
-      slider.emit('progress', slider, slider.progress);
-
+      slider.updateProgress(translate);
       setSlideTransforms();
     };
 
