@@ -109,14 +109,17 @@ export default function EffectCoverflow({ slider, extendParams, on }) {
       slide.style.visibility = 'visible';
       slide.style.willChange = 'transform, opacity';
 
-      // Use 2D transforms when depth/rotate are 0 to avoid Mobile Safari
-      // GPU compositing bugs (slides vanishing inside preserve-3d contexts).
+      // Always use translate3d to force GPU compositing layer creation.
+      // translate3d(x, y, 0) promotes the element to its own GPU layer
+      // WITHOUT needing preserve-3d on the parent — avoiding Mobile Safari's
+      // compositor bug where slides inside overflow:hidden + transformed
+      // ancestors fail to repaint.
       if (use3D) {
         slide.style.transform =
-          `translateX(${tx}px) translateY(${ty}px) translateZ(${tz}px) rotateY(${ry}deg) scale(${s})`;
+          `translate3d(${tx}px, ${ty}px, ${tz}px) rotateY(${ry}deg) scale(${s})`;
       } else {
         slide.style.transform =
-          `translateX(${tx}px) translateY(${ty}px) scale(${s})`;
+          `translate3d(${tx}px, ${ty}px, 0) scale(${s})`;
       }
 
       // Opacity: within halfView → normal interpolation,
@@ -201,19 +204,23 @@ export default function EffectCoverflow({ slider, extendParams, on }) {
   }
 
   /**
-   * Mobile Safari workaround: detect ancestor elements that have BOTH
-   * overflow:hidden AND a CSS transform. This combination causes Safari's
-   * GPU compositor to skip repainting dynamically-transformed descendants.
+   * Mobile Safari workaround: detect ancestor elements that create
+   * problematic GPU compositing contexts. Two patterns cause slides
+   * to intermittently vanish:
+   *
+   * 1. Single element with BOTH overflow:hidden AND a CSS transform.
+   * 2. An overflow:hidden element nested inside a transformed ancestor
+   *    (e.g. AOS adds transform on a wrapper, and a child has
+   *    overflow:hidden — common in "peek" slider layouts).
    *
    * Common trigger: animation libraries (AOS, GSAP ScrollTrigger, etc.)
-   * leave transform:translate3d(0,0,0) on elements after animation, and
-   * if that element also has overflow:hidden, slides inside the coverflow
-   * will intermittently vanish.
+   * leave transform:translate3d(0,0,0) on elements after animation.
    *
    * Returns the offending element (for dev warning) or null.
    */
   function detectProblematicAncestor() {
     let el = slider.el.parentElement;
+    let sawOverflowHidden = false;
     while (el && el !== document.body) {
       const style = window.getComputedStyle(el);
       const hasOverflowHidden =
@@ -222,7 +229,16 @@ export default function EffectCoverflow({ slider, extendParams, on }) {
         style.overflowY === 'hidden';
       const hasTransform =
         style.transform !== 'none' && style.transform !== '';
+
+      if (hasOverflowHidden) sawOverflowHidden = true;
+
+      // Pattern 1: same element has both
       if (hasOverflowHidden && hasTransform) {
+        return el;
+      }
+      // Pattern 2: this ancestor has a transform, and a descendant
+      // closer to the slider had overflow:hidden
+      if (hasTransform && sawOverflowHidden) {
         return el;
       }
       el = el.parentElement;
@@ -241,8 +257,19 @@ export default function EffectCoverflow({ slider, extendParams, on }) {
       const child = children[j];
       // Skip the overlay div we created
       if (child.classList.contains('drift-coverflow-overlay')) continue;
-      child.style.backfaceVisibility = 'hidden';
-      child.style.webkitBackfaceVisibility = 'hidden';
+
+      if (_use3D) {
+        // In 3D mode: backface-visibility promotes to GPU layer
+        child.style.backfaceVisibility = 'hidden';
+        child.style.webkitBackfaceVisibility = 'hidden';
+      } else {
+        // In 2D mode: will-change promotes to GPU layer without
+        // triggering the Safari backface-visibility compositing bug.
+        // This ensures slide content (images) gets its own compositing
+        // layer and is repainted independently — critical when an
+        // ancestor has overflow:hidden + transform (e.g. AOS).
+        child.style.willChange = 'transform';
+      }
     }
   }
 
@@ -274,10 +301,12 @@ export default function EffectCoverflow({ slider, extendParams, on }) {
         const badAncestor = detectProblematicAncestor();
         if (badAncestor) {
           console.warn(
-            'DriftSlider Coverflow: an ancestor element has both overflow:hidden ' +
-            'and a CSS transform. This combination causes slides to vanish on ' +
-            'Mobile Safari. Fix: separate overflow:hidden and the transform ' +
-            'onto different elements. Offending element:',
+            'DriftSlider Coverflow: an ancestor has overflow:hidden combined ' +
+            'with a CSS transform (on the same or a parent element). This causes ' +
+            'Mobile Safari to skip repainting dynamically-transformed slides. ' +
+            'Fix: remove the transform from the ancestor after animation completes ' +
+            '(e.g. for AOS: add CSS `[data-aos].aos-animate { transform: none !important; }` ' +
+            'scoped to this section). Offending element:',
             badAncestor
           );
         }
@@ -377,10 +406,8 @@ export default function EffectCoverflow({ slider, extendParams, on }) {
       // Move the list: original translate + centering offset
       const centeringOffset = slider.containerSize / 2 - slider.slideSize / 2;
       const listX = translate + centeringOffset;
-      // Use 2D translate when 3D is not needed to avoid Safari compositing bugs
-      slider.listEl.style.transform = _use3D
-        ? `translate3d(${listX}px, 0, 0)`
-        : `translateX(${listX}px)`;
+      // Always use translate3d for GPU layer promotion on Mobile Safari
+      slider.listEl.style.transform = `translate3d(${listX}px, 0, 0)`;
 
       slider.updateProgress(translate);
       setSlideTransforms();
@@ -498,6 +525,7 @@ export default function EffectCoverflow({ slider, extendParams, on }) {
         if (child.classList.contains('drift-coverflow-overlay')) continue;
         child.style.backfaceVisibility = '';
         child.style.webkitBackfaceVisibility = '';
+        child.style.willChange = '';
       }
 
       // Remove overlay divs
