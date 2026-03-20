@@ -21,7 +21,8 @@
     "types/"
   ],
   "scripts": {
-    "build": "rollup -c rollup.config.mjs",
+    "build": "rollup -c rollup.config.mjs && npm run build:types",
+    "build:types": "node scripts/build-types.mjs",
     "build:css": "node scripts/build-css.mjs",
     "build:docs": "npm run build && npm run build:css && cp dist/drift-slider.esm.js dist/drift-slider.css dist/drift-slider-bundle.css docs/assets/lib/ 2>/dev/null || true",
     "dev": "rollup -c rollup.config.mjs -w",
