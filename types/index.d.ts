@@ -1,3 +1,6 @@
+// Source of truth for TypeScript definitions.
+// build-types.mjs reads this file and generates dist/types/*.d.ts (per-module splits).
+// Do NOT delete — it is the build input, not published directly.
 declare module 'drift-slider' {
   export interface PhysicsOptions {
     friction?: number;

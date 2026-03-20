@@ -1,5 +1,5 @@
 import { execSync } from 'node:child_process';
-import { mkdirSync, writeFileSync, existsSync } from 'node:fs';
+import { mkdirSync, writeFileSync, copyFileSync, existsSync } from 'node:fs';
 
 mkdirSync('dist/css', { recursive: true });
 
@@ -9,7 +9,7 @@ execSync('sass src/styles/drift-slider.scss dist/css/core.css --style=compressed
 // Bundle CSS (core + all modules)
 execSync('sass src/styles/bundle.scss dist/drift-slider-bundle.css --style=compressed --no-source-map');
 // Also copy to dist/css/ for exports map
-execSync('cp dist/drift-slider-bundle.css dist/css/bundle.css');
+copyFileSync('dist/drift-slider-bundle.css', 'dist/css/bundle.css');
 
 // Per-module CSS
 const modules = [
