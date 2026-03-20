@@ -39,6 +39,8 @@ declare module 'drift-slider' {
     pauseOnMouseEnter?: boolean;
     stopOnLastSlide?: boolean;
     reverseDirection?: boolean;
+    ticker?: boolean;
+    tickerSpeed?: number;
   }
 
   export interface KeyboardOptions {
@@ -78,6 +80,28 @@ declare module 'drift-slider' {
     shadow?: boolean;
     shadowColor?: string;
     shadowBlur?: number;
+  }
+
+  export interface CreativeEffectTransform {
+    translate?: [string | number, string | number, string | number];
+    rotate?: [number, number, number];
+    scale?: number;
+    opacity?: number;
+    origin?: string;
+  }
+
+  export interface CreativeEffectOptions {
+    prev?: CreativeEffectTransform;
+    next?: CreativeEffectTransform;
+    active?: CreativeEffectTransform;
+    perspective?: boolean;
+  }
+
+  export interface ThumbsOptions {
+    slider?: DriftSlider;
+    slideThumbActiveClass?: string;
+    autoScrollThumbs?: boolean;
+    multipleActiveThumbs?: boolean;
   }
 
   export interface ScrollAosOptions {
@@ -178,10 +202,12 @@ declare module 'drift-slider' {
     pagination?: boolean | PaginationOptions;
     keyboard?: boolean | KeyboardOptions;
     a11y?: boolean | A11yOptions;
-    effect?: 'slide' | 'fade' | 'coverflow' | 'cards';
+    effect?: 'slide' | 'fade' | 'coverflow' | 'cards' | 'creative' | 'showcase';
     fadeEffect?: FadeEffectOptions;
     cardsEffect?: CardsEffectOptions;
     coverflowEffect?: CoverflowEffectOptions;
+    creativeEffect?: CreativeEffectOptions;
+    thumbs?: ThumbsOptions;
     scrollAos?: boolean | ScrollAosOptions;
     breakpoints?: Record<number, BreakpointOptions> | null;
     initialSlide?: number;
@@ -288,6 +314,9 @@ declare module 'drift-slider' {
   export const EffectCards: DriftSliderModule;
   export const Keyboard: DriftSliderModule;
   export const A11y: DriftSliderModule;
+  export const EffectCreative: DriftSliderModule;
+  export const EffectShowcase: DriftSliderModule;
+  export const Thumbs: DriftSliderModule;
   export const ScrollAos: DriftSliderModule;
 
   export default DriftSlider;
