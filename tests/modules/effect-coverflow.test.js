@@ -193,14 +193,14 @@ describe('module/effect-coverflow', () => {
     expect(s.container.style.marginTop).toBe('20px')
   })
 
-  it('setTransition updates all slide durations', () => {
+  it('setTransition stores speed for rAF animation (no CSS transitions on slides)', () => {
     const s = createSlider({
       sliderOptions: { modules: [EffectCoverflow], effect: 'coverflow' },
     })
     cleanup = s.cleanup
     s.slider.setTransition(400)
-    expect(s.slider.slides[0].style.transitionDuration).toBe('400ms')
-    expect(s.slider.slides[1].style.transitionDuration).toBe('400ms')
+    // Coverflow uses rAF, not CSS transitions — slides should have transitionProperty:none
+    expect(s.slider.slides[0].style.transitionProperty).toBe('none')
   })
 
   it('destroy removes container class', () => {

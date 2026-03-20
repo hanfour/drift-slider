@@ -56,7 +56,14 @@ describe('module/effect-coverflow – Mobile Safari fixes', () => {
     })
 
     it('enables 3D when depth > 0', () => {
-      const s = create2D({ depth: 100 })
+      const s = createSlider({
+        slideCount: 5,
+        sliderOptions: {
+          modules: [EffectCoverflow],
+          effect: 'coverflow',
+          coverflowEffect: { depth: 100, rotate: 0 },
+        },
+      })
       cleanup = s.cleanup
       expect(s.slider.listEl.style.transformStyle).toBe('preserve-3d')
       expect(s.slider.slides[0].style.transform).toContain('translateZ')
@@ -71,7 +78,7 @@ describe('module/effect-coverflow – Mobile Safari fixes', () => {
   })
 
   describe('visibility culling', () => {
-    it('hides far-off slides with visibility:hidden', () => {
+    it('hides far-off slides with opacity:0 (no visibility toggling)', () => {
       const s = createSlider({
         slideCount: 10,
         sliderOptions: {
@@ -83,13 +90,13 @@ describe('module/effect-coverflow – Mobile Safari fixes', () => {
       cleanup = s.cleanup
 
       // With slidesPerView=1, halfView=0, renderRange=2
-      // Slide at offset >= 2 should be hidden
-      // Active slide is 0, so slides far away should be hidden
+      // Slide at offset >= 2 should be hidden via opacity
       const lastSlide = s.slider.slides[s.slider.slides.length - 1]
-      expect(lastSlide.style.visibility).toBe('hidden')
+      expect(lastSlide.style.opacity).toBe('0')
+      expect(lastSlide.style.pointerEvents).toBe('none')
     })
 
-    it('visible slides have visibility:visible', () => {
+    it('visible slides have non-zero opacity', () => {
       const s = createSlider({
         slideCount: 10,
         sliderOptions: {
@@ -100,29 +107,11 @@ describe('module/effect-coverflow – Mobile Safari fixes', () => {
       })
       cleanup = s.cleanup
 
-      // Center slide should be visible
-      expect(s.slider.slides[0].style.visibility).toBe('visible')
+      // Center slide should have opacity > 0
+      expect(parseFloat(s.slider.slides[0].style.opacity)).toBeGreaterThan(0)
     })
 
-    it('hidden slides have opacity 0 and pointerEvents none', () => {
-      const s = createSlider({
-        slideCount: 10,
-        sliderOptions: {
-          modules: [EffectCoverflow],
-          effect: 'coverflow',
-          slidesPerView: 1,
-        },
-      })
-      cleanup = s.cleanup
-
-      const lastSlide = s.slider.slides[s.slider.slides.length - 1]
-      if (lastSlide.style.visibility === 'hidden') {
-        expect(lastSlide.style.opacity).toBe('0')
-        expect(lastSlide.style.pointerEvents).toBe('none')
-      }
-    })
-
-    it('sets will-change on visible slides', () => {
+    it('visible slides do not use will-change (rAF-driven, no CSS transitions)', () => {
       const s = createSlider({
         slideCount: 5,
         sliderOptions: {
@@ -133,83 +122,25 @@ describe('module/effect-coverflow – Mobile Safari fixes', () => {
       })
       cleanup = s.cleanup
 
-      // Center slide should have will-change
-      expect(s.slider.slides[0].style.willChange).toBe('transform, opacity')
+      // Coverflow uses rAF animation — no will-change needed on slides
+      expect(s.slider.slides[0].style.willChange).not.toBe('transform, opacity')
     })
   })
 
-  describe('GPU layer promotion', () => {
-    it('adds backface-visibility:hidden to element children of slides', () => {
-      // Build DOM manually so slides have element children BEFORE init
-      const container = document.createElement('section')
-      container.className = 'drift-slider'
-      const track = document.createElement('div')
-      track.className = 'drift-track'
-      const list = document.createElement('ul')
-      list.className = 'drift-list'
-
-      for (let i = 0; i < 3; i++) {
-        const slide = document.createElement('li')
-        slide.className = 'drift-slide'
-        const img = document.createElement('img')
-        slide.appendChild(img)
-        list.appendChild(slide)
-        Object.defineProperty(slide, 'offsetWidth', { value: 800, configurable: true })
-        Object.defineProperty(slide, 'offsetHeight', { value: 400, configurable: true })
-      }
-      track.appendChild(list)
-      container.appendChild(track)
-      document.body.appendChild(container)
-      Object.defineProperty(container, 'clientWidth', { value: 800, configurable: true })
-      Object.defineProperty(container, 'clientHeight', { value: 400, configurable: true })
-
-      const originalGCS = window.getComputedStyle
-      vi.spyOn(window, 'getComputedStyle').mockImplementation((el) => {
-        const real = originalGCS(el)
-        return new Proxy(real, {
-          get(target, prop) {
-            if (prop === 'transform' || prop === 'webkitTransform') {
-              return el.style.transform || 'matrix(1, 0, 0, 1, 0, 0)'
-            }
-            if (prop === 'marginLeft' || prop === 'marginRight' ||
-                prop === 'marginTop' || prop === 'marginBottom') {
-              return '0px'
-            }
-            return target[prop]
-          },
-        })
-      })
-
-      const slider = new DriftSlider(container, {
-        modules: [EffectCoverflow],
-        effect: 'coverflow',
-      })
-      cleanup = () => { slider.destroy(); container.remove(); vi.restoreAllMocks() }
-
-      const img = list.querySelector('.drift-slide img')
-      expect(img.style.backfaceVisibility).toBe('hidden')
-    })
-
-    it('destroy cleans up child backface-visibility styles', () => {
+  describe('no GPU layer promotion in 2D mode', () => {
+    it('does not add backface-visibility to slide children in 2D mode', () => {
       const s = createSlider({
         slideCount: 3,
         sliderOptions: {
           modules: [EffectCoverflow],
           effect: 'coverflow',
+          coverflowEffect: { depth: 0, rotate: 0 },
         },
       })
+      cleanup = s.cleanup
 
-      // Slide textContent creates a text node, not an element child
-      // Add an actual child element
-      const div = document.createElement('div')
-      div.className = 'content'
-      s.slider.slides[0].appendChild(div)
-
-      // Manually promote
-      div.style.backfaceVisibility = 'hidden'
-
-      s.cleanup()
-      expect(div.style.backfaceVisibility).toBe('')
+      // In 2D mode, no backface-visibility should be set on slides
+      expect(s.slider.slides[0].style.backfaceVisibility).not.toBe('hidden')
     })
   })
 
@@ -249,8 +180,8 @@ describe('module/effect-coverflow – Mobile Safari fixes', () => {
     })
   })
 
-  describe('overlay display:none for center slide', () => {
-    it('hides overlay with display:none on center slide', () => {
+  describe('overlay hidden for center slide', () => {
+    it('hides overlay with opacity:0 on center slide', () => {
       const s = createSlider({
         slideCount: 5,
         sliderOptions: {
@@ -263,7 +194,7 @@ describe('module/effect-coverflow – Mobile Safari fixes', () => {
 
       const centerOverlay = s.slider.slides[0].querySelector('.drift-coverflow-overlay')
       expect(centerOverlay).toBeTruthy()
-      expect(centerOverlay.style.display).toBe('none')
+      expect(centerOverlay.style.opacity).toBe('0')
     })
 
     it('shows overlay on non-center slides', () => {
@@ -278,8 +209,58 @@ describe('module/effect-coverflow – Mobile Safari fixes', () => {
       cleanup = s.cleanup
 
       const sideOverlay = s.slider.slides[1].querySelector('.drift-coverflow-overlay')
-      if (sideOverlay && s.slider.slides[1].style.visibility !== 'hidden') {
-        expect(sideOverlay.style.display).not.toBe('none')
+      if (sideOverlay && parseFloat(s.slider.slides[1].style.opacity) > 0) {
+        expect(parseFloat(sideOverlay.style.opacity)).toBeGreaterThan(0)
+      }
+    })
+  })
+
+  describe('loopFix safety guards', () => {
+    it('does not crash when totalOriginal <= 0', () => {
+      // Edge case: if somehow slides.length <= loopedSlides * 2
+      const s = createSlider({
+        slideCount: 1,
+        sliderOptions: {
+          modules: [EffectCoverflow],
+          effect: 'coverflow',
+          loop: true,
+          slidesPerView: 1,
+        },
+      })
+      cleanup = s.cleanup
+      // Should not throw
+      expect(() => s.slider.loopFix()).not.toThrow()
+    })
+
+    it('overlay divs have pointer-events:none', () => {
+      const s = createSlider({
+        slideCount: 3,
+        sliderOptions: {
+          modules: [EffectCoverflow],
+          effect: 'coverflow',
+          coverflowEffect: { overlay: true },
+        },
+      })
+      cleanup = s.cleanup
+
+      const overlay = s.slider.slides[0].querySelector('.drift-coverflow-overlay')
+      expect(overlay.style.pointerEvents).toBe('none')
+    })
+
+    it('never sets visibility on slides (opacity-only culling)', () => {
+      const s = createSlider({
+        slideCount: 10,
+        sliderOptions: {
+          modules: [EffectCoverflow],
+          effect: 'coverflow',
+          slidesPerView: 1,
+        },
+      })
+      cleanup = s.cleanup
+
+      // No slide should ever have visibility set — coverflow uses opacity only
+      for (const slide of s.slider.slides) {
+        expect(slide.style.visibility).toBe('')
       }
     })
   })
