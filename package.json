@@ -2,23 +2,39 @@
   "name": "drift-slider",
   "version": "0.4.0",
   "description": "A lightweight, modular slider/carousel library with physics-based touch interaction",
-  "main": "dist/drift-slider.cjs.js",
-  "module": "dist/drift-slider.esm.js",
-  "types": "types/index.d.ts",
+  "type": "module",
+  "main": "./dist/esm/index.mjs",
+  "module": "./dist/esm/index.mjs",
+  "types": "./dist/types/index.d.ts",
+  "sideEffects": ["*.css"],
   "exports": {
     ".": {
-      "import": "./dist/drift-slider.esm.js",
-      "require": "./dist/drift-slider.cjs.js"
+      "types": "./dist/types/index.d.ts",
+      "default": "./dist/esm/index.mjs"
     },
-    "./modules": "./src/modules/index.js",
-    "./css": "./dist/drift-slider.css",
+    "./core": {
+      "types": "./dist/types/core.d.ts",
+      "default": "./dist/esm/core.mjs"
+    },
+    "./modules": {
+      "types": "./dist/types/modules/index.d.ts",
+      "default": "./dist/esm/modules/index.mjs"
+    },
+    "./modules/*": {
+      "types": "./dist/types/modules/*.d.ts",
+      "default": "./dist/esm/modules/*.mjs"
+    },
+    "./css": "./dist/css/core.css",
+    "./css/*": "./dist/css/*.css",
     "./css/bundle": "./dist/drift-slider-bundle.css",
-    "./jquery": "./dist/drift-slider.jquery.js"
+    "./bundle": "./dist/drift-slider.umd.js",
+    "./jquery": "./dist/drift-slider.jquery.js",
+    "./package.json": "./package.json"
   },
   "files": [
     "dist/",
     "src/",
-    "types/"
+    "package.json"
   ],
   "scripts": {
     "build": "rollup -c rollup.config.mjs && npm run build:types",
