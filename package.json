@@ -1,6 +1,6 @@
 {
   "name": "drift-slider",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "description": "A lightweight, modular slider/carousel library with physics-based touch interaction",
   "main": "dist/drift-slider.cjs.js",
   "module": "dist/drift-slider.esm.js",

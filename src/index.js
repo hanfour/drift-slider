@@ -10,7 +10,9 @@ export {
   EffectCoverflow,
   EffectCards,
   EffectShowcase,
+  EffectCreative,
   Keyboard,
   A11y,
   ScrollAos,
+  Thumbs,
 } from './modules/index.js';
