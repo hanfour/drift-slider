@@ -9,3 +9,4 @@ export { default as EffectCards } from './effects/effect-cards.js';
 export { default as ScrollAos } from './scroll-aos/scroll-aos.js';
 export { default as EffectShowcase } from './effects/effect-showcase.js';
 export { default as EffectCreative } from './effects/effect-creative.js';
+export { default as Thumbs } from './thumbs/thumbs.js';
