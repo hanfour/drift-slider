@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DriftSlider — Dual Ticker</title>
+  <meta name="description" content="DriftSlider dual-row ticker demo with opposite scrolling directions.">
+  <meta name="keywords" content="DriftSlider, demo, ticker, marquee, dual, opposite direction">
+  <link rel="canonical" href="https://hanfour.github.io/drift-slider/demos/ticker-dual.html">
+  <meta property="og:title" content="DriftSlider — Dual Ticker">
+  <meta property="og:description" content="DriftSlider dual-row ticker demo with opposite scrolling directions.">
+  <meta property="og:image" content="https://hanfour.github.io/drift-slider/assets/img/og-image.svg">
+  <meta property="og:url" content="https://hanfour.github.io/drift-slider/demos/ticker-dual.html">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="DriftSlider — Dual Ticker">
+  <meta name="twitter:description" content="DriftSlider dual-row ticker demo with opposite scrolling directions.">
+  <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/docs.css">
+  <link rel="stylesheet" href="../assets/css/prism-onedark.css">
+  <link rel="stylesheet" href="../assets/lib/drift-slider-bundle.css">
+  <style>
+    .demo-page { max-width: 960px; }
+
+    .ticker-row + .ticker-row { margin-top: 16px; }
+
+    .tag-slide {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 64px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #fff;
+      letter-spacing: 0.02em;
+      user-select: none;
+    }
+
+    pre#code-output {
+      margin-top: 24px;
+      padding: 16px 20px;
+      background: #1e1e1e;
+      color: #d4d4d4;
+      border-radius: 12px;
+      font-size: 13px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+  </style>
+</head>
+<body>
+  <div data-include="../_includes/header.html"></div>
+  <div class="page-body">
+    <div class="demo-page">
+      <a href="../demos.html" class="demo-back">&larr; Back to Demos</a>
+      <h1 data-i18n-en>Dual Ticker</h1>
+      <h1 data-i18n-zh>雙向跑馬燈</h1>
+      <p class="demo-desc" data-i18n-en>Two ticker rows scrolling in opposite directions at different speeds — a popular visual pattern for showcasing categories or tags.</p>
+      <p class="demo-desc" data-i18n-zh>兩列跑馬燈以不同速度反向滾動 — 常見於展示分類或標籤的視覺設計。</p>
+
+      <!-- Top row: left to right -->
+      <div class="drift-slider ticker-row" id="ticker-top" style="margin-top:24px;">
+        <div class="drift-track"><ul class="drift-list">
+          <li class="drift-slide"><div class="tag-slide" style="background:#3B82F6;">Design</div></li>
+          <li class="drift-slide"><div class="tag-slide" style="background:#EF4444;">Marketing</div></li>
+          <li class="drift-slide"><div class="tag-slide" style="background:#10B981;">Engineering</div></li>
+          <li class="drift-slide"><div class="tag-slide" style="background:#F59E0B;">Analytics</div></li>
+          <li class="drift-slide"><div class="tag-slide" style="background:#8B5CF6;">Product</div></li>
+          <li class="drift-slide"><div class="tag-slide" style="background:#EC4899;">Growth</div></li>
+          <li class="drift-slide"><div class="tag-slide" style="background:#14B8A6;">Research</div></li>
+          <li class="drift-slide"><div class="tag-slide" style="background:#6366F1;">Strategy</div></li>
+        </ul></div>
+      </div>
+
+      <!-- Bottom row: right to left (reverse) -->
+      <div class="drift-slider ticker-row" id="ticker-bottom">
+        <div class="drift-track"><ul class="drift-list">
+          <li class="drift-slide"><div class="tag-slide" style="background:#06B6D4;">Finance</div></li>
+          <li class="drift-slide"><div class="tag-slide" style="background:#F97316;">Operations</div></li>
+          <li class="drift-slide"><div class="tag-slide" style="background:#84CC16;">DevOps</div></li>
+          <li class="drift-slide"><div class="tag-slide" style="background:#E11D48;">Security</div></li>
+          <li class="drift-slide"><div class="tag-slide" style="background:#7C3AED;">Platform</div></li>
+          <li class="drift-slide"><div class="tag-slide" style="background:#0EA5E9;">Support</div></li>
+          <li class="drift-slide"><div class="tag-slide" style="background:#D946EF;">Creative</div></li>
+          <li class="drift-slide"><div class="tag-slide" style="background:#059669;">Data</div></li>
+        </ul></div>
+      </div>
+
+      <!-- Live Code Output -->
+      <pre id="code-output"></pre>
+
+      <!-- Source Code section -->
+      <h2 class="demo-section-title">Source Code</h2>
+      <div class="code-block">
+        <span class="code-lang">js</span>
+        <pre><code class="language-javascript">var DS = DriftSlider;
+
+// Top row — normal direction
+var top = new DS.DriftSlider('#ticker-top', {
+  modules: [DS.Autoplay],
+  slidesPerView: 5,
+  spaceBetween: 16,
+  loop: true,
+  speed: 3000,
+  grabCursor: true,
+  autoplay: {
+    enabled: true,
+    ticker: true,
+    tickerSpeed: 1,
+    pauseOnMouseEnter: true,
+  },
+});
+
+// Bottom row — reverse direction, slightly slower
+var bottom = new DS.DriftSlider('#ticker-bottom', {
+  modules: [DS.Autoplay],
+  slidesPerView: 5,
+  spaceBetween: 16,
+  loop: true,
+  speed: 3000,
+  grabCursor: true,
+  autoplay: {
+    enabled: true,
+    ticker: true,
+    tickerSpeed: 0.7,
+    reverseDirection: true,
+    pauseOnMouseEnter: true,
+  },
+});</code></pre>
+      </div>
+    </div>
+  </div>
+  <div data-include="../_includes/footer.html"></div>
+  <script src="../assets/lib/drift-slider.umd.js"></script>
+  <script src="../assets/js/prism.js"></script>
+  <script src="../assets/js/docs.js"></script>
+  <script>
+    var DS = DriftSlider;
+
+    // Top row — normal direction
+    var topSlider = new DS.DriftSlider('#ticker-top', {
+      modules: [DS.Autoplay],
+      slidesPerView: 5,
+      spaceBetween: 16,
+      loop: true,
+      speed: 3000,
+      grabCursor: true,
+      autoplay: {
+        enabled: true,
+        ticker: true,
+        tickerSpeed: 1,
+        pauseOnMouseEnter: true,
+      },
+    });
+
+    // Bottom row — reverse direction, slightly slower
+    var bottomSlider = new DS.DriftSlider('#ticker-bottom', {
+      modules: [DS.Autoplay],
+      slidesPerView: 5,
+      spaceBetween: 16,
+      loop: true,
+      speed: 3000,
+      grabCursor: true,
+      autoplay: {
+        enabled: true,
+        ticker: true,
+        tickerSpeed: 0.7,
+        reverseDirection: true,
+        pauseOnMouseEnter: true,
+      },
+    });
+
+    // Show code
+    document.getElementById('code-output').textContent = document.querySelector('.code-block code').textContent;
+  </script>
+</body>
+</html>

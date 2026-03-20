@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DriftSlider — Ticker / Marquee</title>
+  <meta name="description" content="DriftSlider ticker marquee demo with continuous scroll for logos, partners, and news.">
+  <meta name="keywords" content="DriftSlider, demo, ticker, marquee, continuous scroll, logo wall">
+  <link rel="canonical" href="https://hanfour.github.io/drift-slider/demos/ticker.html">
+  <meta property="og:title" content="DriftSlider — Ticker / Marquee">
+  <meta property="og:description" content="DriftSlider ticker marquee demo with continuous scroll for logos, partners, and news.">
+  <meta property="og:image" content="https://hanfour.github.io/drift-slider/assets/img/og-image.svg">
+  <meta property="og:url" content="https://hanfour.github.io/drift-slider/demos/ticker.html">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="DriftSlider — Ticker / Marquee">
+  <meta name="twitter:description" content="DriftSlider ticker marquee demo with continuous scroll for logos, partners, and news.">
+  <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/docs.css">
+  <link rel="stylesheet" href="../assets/css/prism-onedark.css">
+  <link rel="stylesheet" href="../assets/lib/drift-slider-bundle.css">
+  <style>
+    .demo-page { max-width: 960px; }
+
+    .logo-slide {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 80px;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 600;
+      color: #fff;
+      letter-spacing: 0.02em;
+      user-select: none;
+    }
+
+    .controls {
+      margin-top: 24px;
+      padding: 20px;
+      background: #fff;
+      border-radius: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px 24px;
+      align-items: center;
+    }
+    .controls label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+    }
+    .controls label span:first-child { min-width: 80px; }
+    .controls input[type="range"] { width: 120px; }
+    .controls button {
+      padding: 6px 16px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+      background: #f5f5f7;
+      cursor: pointer;
+    }
+    .controls button:hover { background: #e8e8ea; }
+    .controls .value { font-variant-numeric: tabular-nums; min-width: 28px; text-align: right; }
+
+    pre#code-output {
+      margin-top: 24px;
+      padding: 16px 20px;
+      background: #1e1e1e;
+      color: #d4d4d4;
+      border-radius: 12px;
+      font-size: 13px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+  </style>
+</head>
+<body>
+  <div data-include="../_includes/header.html"></div>
+  <div class="page-body">
+    <div class="demo-page">
+      <a href="../demos.html" class="demo-back">&larr; Back to Demos</a>
+      <h1 data-i18n-en>Ticker / Marquee</h1>
+      <h1 data-i18n-zh>跑馬燈</h1>
+      <p class="demo-desc" data-i18n-en>Continuous scrolling marquee — ideal for logo walls, partner showcases, and news tickers. Hover to pause.</p>
+      <p class="demo-desc" data-i18n-zh>連續滾動跑馬燈 — 適合品牌牆、合作夥伴展示及新聞跑馬燈。滑鼠移入暫停。</p>
+
+      <!-- Controls -->
+      <div class="controls">
+        <label>
+          <span>Speed</span>
+          <input type="range" id="ctrl-speed" min="0.5" max="3" step="0.1" value="1">
+          <span class="value" id="ctrl-speed-val">1</span>
+        </label>
+        <button type="button" id="ctrl-pause">Pause</button>
+        <button type="button" id="ctrl-reverse">Reverse</button>
+      </div>
+
+      <!-- Live slider demo -->
+      <div class="drift-slider" id="ticker-slider" style="margin-top:24px;">
+        <div class="drift-track"><ul class="drift-list">
+          <li class="drift-slide"><div class="logo-slide" style="background:#3B82F6;">Brand A</div></li>
+          <li class="drift-slide"><div class="logo-slide" style="background:#EF4444;">Brand B</div></li>
+          <li class="drift-slide"><div class="logo-slide" style="background:#10B981;">Brand C</div></li>
+          <li class="drift-slide"><div class="logo-slide" style="background:#F59E0B;">Brand D</div></li>
+          <li class="drift-slide"><div class="logo-slide" style="background:#8B5CF6;">Brand E</div></li>
+          <li class="drift-slide"><div class="logo-slide" style="background:#EC4899;">Brand F</div></li>
+          <li class="drift-slide"><div class="logo-slide" style="background:#14B8A6;">Brand G</div></li>
+          <li class="drift-slide"><div class="logo-slide" style="background:#F97316;">Brand H</div></li>
+          <li class="drift-slide"><div class="logo-slide" style="background:#6366F1;">Brand I</div></li>
+          <li class="drift-slide"><div class="logo-slide" style="background:#06B6D4;">Brand J</div></li>
+        </ul></div>
+      </div>
+
+      <!-- Live Code Output -->
+      <pre id="code-output"></pre>
+
+      <!-- Source Code section -->
+      <h2 class="demo-section-title">Source Code</h2>
+      <div class="code-block">
+        <span class="code-lang">js</span>
+        <pre><code class="language-javascript">var DS = DriftSlider;
+var slider = new DS.DriftSlider('#ticker-slider', {
+  modules: [DS.Autoplay],
+  slidesPerView: 5,
+  spaceBetween: 24,
+  loop: true,
+  speed: 3000,
+  grabCursor: true,
+  autoplay: {
+    enabled: true,
+    ticker: true,
+    tickerSpeed: 1,
+    pauseOnMouseEnter: true,
+  },
+});</code></pre>
+      </div>
+    </div>
+  </div>
+  <div data-include="../_includes/footer.html"></div>
+  <script src="../assets/lib/drift-slider.umd.js"></script>
+  <script src="../assets/js/prism.js"></script>
+  <script src="../assets/js/docs.js"></script>
+  <script>
+    var DS = DriftSlider;
+    var slider = null;
+    var reversed = false;
+    var paused = false;
+
+    function currentSpeed() {
+      return parseFloat(document.getElementById('ctrl-speed').value);
+    }
+
+    function createSlider() {
+      if (slider) { slider.destroy(true); slider = null; }
+      slider = new DS.DriftSlider('#ticker-slider', {
+        modules: [DS.Autoplay],
+        slidesPerView: 5,
+        spaceBetween: 24,
+        loop: true,
+        speed: 3000,
+        grabCursor: true,
+        autoplay: {
+          enabled: true,
+          ticker: true,
+          tickerSpeed: currentSpeed(),
+          reverseDirection: reversed,
+          pauseOnMouseEnter: true,
+        },
+      });
+      if (paused) slider.autoplay.stop();
+      updateCode();
+    }
+
+    function updateCode() {
+      var speed = currentSpeed();
+      var lines = [
+        "var DS = DriftSlider;",
+        "var slider = new DS.DriftSlider('#ticker-slider', {",
+        "  modules: [DS.Autoplay],",
+        "  slidesPerView: 5,",
+        "  spaceBetween: 24,",
+        "  loop: true,",
+        "  speed: 3000,",
+        "  grabCursor: true,",
+        "  autoplay: {",
+        "    enabled: true,",
+        "    ticker: true,",
+        "    tickerSpeed: " + speed + ",",
+      ];
+      if (reversed) lines.push("    reverseDirection: true,");
+      lines.push("    pauseOnMouseEnter: true,");
+      lines.push("  },");
+      lines.push("});");
+      document.getElementById('code-output').textContent = lines.join('\n');
+    }
+
+    // Speed slider
+    var speedCtrl = document.getElementById('ctrl-speed');
+    var speedVal = document.getElementById('ctrl-speed-val');
+    speedCtrl.addEventListener('input', function () {
+      speedVal.textContent = this.value;
+      createSlider();
+    });
+
+    // Pause / Resume
+    document.getElementById('ctrl-pause').addEventListener('click', function () {
+      if (!slider) return;
+      if (paused) {
+        slider.autoplay.start();
+        this.textContent = 'Pause';
+        paused = false;
+      } else {
+        slider.autoplay.stop();
+        this.textContent = 'Resume';
+        paused = true;
+      }
+    });
+
+    // Reverse direction
+    document.getElementById('ctrl-reverse').addEventListener('click', function () {
+      reversed = !reversed;
+      this.textContent = reversed ? 'Forward' : 'Reverse';
+      createSlider();
+    });
+
+    createSlider();
+  </script>
+</body>
+</html>
