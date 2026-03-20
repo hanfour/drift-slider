@@ -64,6 +64,9 @@ export default function loopModule({ slider }) {
     const loopedSlides = slider._loopedSlides;
     const totalOriginal = slider.slides.length - loopedSlides * 2;
 
+    // Guard against infinite loop if totalOriginal <= 0
+    if (totalOriginal <= 0) return;
+
     let newIdx = slider.activeIndex;
 
     // When loopedSlides > totalOriginal, a single jump may land in the
@@ -83,6 +86,8 @@ export default function loopModule({ slider }) {
 
     slider.setTransition(0);
     slider.activeIndex = newIdx;
+    // Guard against snapGrid out-of-bounds
+    if (newIdx >= slider.snapGrid.length) return;
     const translate = -slider.snapGrid[newIdx];
     slider.listEl.style.transform = `translate3d(${translate}px, 0, 0)`;
     slider.translate = translate;
