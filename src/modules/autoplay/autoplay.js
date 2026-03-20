@@ -7,12 +7,20 @@ export default function Autoplay({ slider, extendParams, on }) {
       pauseOnMouseEnter: true,
       stopOnLastSlide: false,
       reverseDirection: false,
+      ticker: false,
+      tickerSpeed: 1,
     },
   });
 
   let timer = null;
   let paused = false;
   let running = false;
+
+  // Ticker state
+  let _tickerRafId = null;
+  let _tickerCurrentSpeed = 0;
+  let _tickerTargetSpeed = 0;
+  let _tickerLastTime = 0;
 
   function run() {
     if (slider.destroyed || !running) return;
@@ -38,17 +46,87 @@ export default function Autoplay({ slider, extendParams, on }) {
     }, params.delay);
   }
 
+  function getTickerBaseSpeed() {
+    const params = slider.params.autoplay;
+    const speed = slider.params.speed || 3000;
+    let baseSpeed = (slider.slideSize || 300) / speed * (params.tickerSpeed || 1);
+    if (params.reverseDirection) baseSpeed = -baseSpeed;
+    return baseSpeed;
+  }
+
+  function tickerStart() {
+    const baseSpeed = getTickerBaseSpeed();
+    _tickerTargetSpeed = baseSpeed;
+    _tickerCurrentSpeed = baseSpeed;
+    _tickerLastTime = performance.now();
+    slider.listEl.style.transitionProperty = 'none';
+    _tickerRafId = requestAnimationFrame(tickerTick);
+  }
+
+  function tickerTick(now) {
+    if (slider.destroyed || !running) return;
+
+    let elapsed = now - _tickerLastTime;
+    if (elapsed > 100) elapsed = 100;
+
+    _tickerCurrentSpeed += (_tickerTargetSpeed - _tickerCurrentSpeed) * 0.1;
+
+    const delta = _tickerCurrentSpeed * elapsed;
+    let newTranslate = slider.translate - delta;
+
+    if (slider.params.loop) {
+      slider.setTranslate(newTranslate);
+      slider.loopFix();
+    } else {
+      const min = typeof slider.minTranslate === 'function' ? slider.minTranslate() : 0;
+      const max = typeof slider.maxTranslate === 'function' ? slider.maxTranslate() : -Infinity;
+      if (newTranslate > min) {
+        newTranslate = min;
+        _tickerTargetSpeed = -Math.abs(_tickerTargetSpeed);
+      } else if (newTranslate < max) {
+        newTranslate = max;
+        _tickerTargetSpeed = Math.abs(_tickerTargetSpeed);
+      }
+      slider.setTranslate(newTranslate);
+    }
+
+    _tickerLastTime = now;
+    _tickerRafId = requestAnimationFrame(tickerTick);
+  }
+
+  function tickerStop() {
+    cancelAnimationFrame(_tickerRafId);
+    _tickerRafId = null;
+  }
+
+  function tickerPause() {
+    _tickerTargetSpeed = 0;
+  }
+
+  function tickerResume() {
+    _tickerTargetSpeed = getTickerBaseSpeed();
+  }
+
   function start() {
     if (running) return;
     running = true;
     paused = false;
-    run();
+    const params = slider.params.autoplay;
+    if (params.ticker) {
+      tickerStart();
+    } else {
+      run();
+    }
     slider.emit('autoplayStart', slider);
   }
 
   function stop() {
     if (!running) return;
     running = false;
+    const params = slider.params.autoplay;
+    if (params.ticker) {
+      tickerStop();
+    }
     clearTimeout(timer);
     timer = null;
     slider.emit('autoplayStop', slider);
@@ -57,14 +135,24 @@ export default function Autoplay({ slider, extendParams, on }) {
   function pause() {
     if (!running || paused) return;
     paused = true;
-    clearTimeout(timer);
+    const params = slider.params.autoplay;
+    if (params.ticker) {
+      tickerPause();
+    } else {
+      clearTimeout(timer);
+    }
     slider.emit('autoplayPause', slider);
   }
 
   function resume() {
     if (!running || !paused) return;
     paused = false;
-    run();
+    const params = slider.params.autoplay;
+    if (params.ticker) {
+      tickerResume();
+    } else {
+      run();
+    }
     slider.emit('autoplayResume', slider);
   }
 
@@ -100,11 +188,20 @@ export default function Autoplay({ slider, extendParams, on }) {
     slider.el.addEventListener('mouseenter', onMouseEnter);
     slider.el.addEventListener('mouseleave', onMouseLeave);
 
+    if (params.ticker) {
+      slider.listEl.style.transitionProperty = 'none';
+      tickerStart();
+      slider.emit('autoplayStart', slider);
+      running = true;
+      return;
+    }
+
     start();
   }
 
   function destroy() {
     stop();
+    tickerStop();
     slider.el.removeEventListener('mouseenter', onMouseEnter);
     slider.el.removeEventListener('mouseleave', onMouseLeave);
   }
