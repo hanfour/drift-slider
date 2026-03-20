@@ -1092,7 +1092,7 @@ h1, h2, h3, h4, h5, h6 { line-height: 1.3; font-weight: 600; }
    ======================================== */
 [data-i18n-zh] { display: none; }
 html[lang="zh-Hant"] [data-i18n-en] { display: none; }
-html[lang="zh-Hant"] [data-i18n-zh] { display: unset; }
+html[lang="zh-Hant"] [data-i18n-zh] { display: revert; }
 
 /* ========================================
    Focus Styles (Accessibility)
