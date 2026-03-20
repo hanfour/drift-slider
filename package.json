@@ -22,7 +22,7 @@
   ],
   "scripts": {
     "build": "rollup -c rollup.config.mjs",
-    "build:css": "sass src/styles/drift-slider.scss dist/drift-slider.css --style=compressed && sass src/styles/bundle.scss dist/drift-slider-bundle.css --style=compressed",
+    "build:css": "node scripts/build-css.mjs",
     "build:docs": "npm run build && npm run build:css && cp dist/drift-slider.esm.js dist/drift-slider.css dist/drift-slider-bundle.css docs/assets/lib/ 2>/dev/null || true",
     "dev": "rollup -c rollup.config.mjs -w",
     "test": "vitest run",
