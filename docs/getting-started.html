@@ -127,7 +127,11 @@
 import 'drift-slider/css/bundle';
 
 // Or core only
-import 'drift-slider/css';</code></pre>
+import 'drift-slider/css';
+
+// Or per-module (for tree-shaking)
+import 'drift-slider/css/navigation';
+import 'drift-slider/css/pagination';</code></pre>
         </div>
       </section>
 
@@ -148,6 +152,8 @@ import 'drift-slider/css';</code></pre>
               <span class="code-lang">javascript</span>
               <pre><code class="language-javascript">import DriftSlider from 'drift-slider';
 import { Navigation, Pagination, Autoplay, A11y } from 'drift-slider/modules';
+// Or import individual modules for smaller bundles:
+// import Navigation from 'drift-slider/modules/navigation';
 
 const slider = new DriftSlider('.drift-slider', {
   modules: [Navigation, Pagination, Autoplay, A11y],

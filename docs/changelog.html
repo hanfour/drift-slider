@@ -33,6 +33,116 @@
       <p class="lead" data-i18n-en>All notable changes to DriftSlider will be documented here.</p>
       <p class="lead" data-i18n-zh>DriftSlider 所有重要變更都記錄在此。</p>
 
+      <!-- v0.5.0 -->
+      <div class="changelog-entry">
+        <h2 class="changelog-version">v0.5.0</h2>
+        <p class="changelog-date">2026-03-20 &mdash; Package Modernization</p>
+
+        <h3 data-i18n-en>Build &amp; Distribution</h3>
+        <h3 data-i18n-zh>建構與發佈</h3>
+        <ul>
+          <li data-i18n-en>Per-module ESM output &mdash; <code>import { Navigation } from 'drift-slider/modules/navigation'</code></li>
+          <li data-i18n-zh>獨立模組 ESM 輸出 &mdash; <code>import { Navigation } from 'drift-slider/modules/navigation'</code></li>
+          <li data-i18n-en>Complete <code>exports</code> map for all subpath imports (JS, CSS, types)</li>
+          <li data-i18n-zh>完整的 <code>exports</code> map，支援所有子路徑匯入（JS、CSS、型別）</li>
+          <li data-i18n-en>Per-module CSS &mdash; <code>import 'drift-slider/css/navigation'</code></li>
+          <li data-i18n-zh>獨立模組 CSS &mdash; <code>import 'drift-slider/css/navigation'</code></li>
+          <li data-i18n-en>Per-module TypeScript definitions for better IDE support</li>
+          <li data-i18n-zh>獨立模組 TypeScript 型別定義，提升 IDE 支援</li>
+          <li data-i18n-en><code>type: "module"</code> and <code>sideEffects: ["*.css"]</code> for tree-shaking</li>
+          <li data-i18n-zh><code>type: "module"</code> 與 <code>sideEffects: ["*.css"]</code> 支援 tree-shaking</li>
+          <li data-i18n-en>Added <code>publint</code> quality gate to prepublish</li>
+          <li data-i18n-zh>新增 <code>publint</code> 品質檢查至 prepublish</li>
+          <li data-i18n-en>Removed CJS output (ESM + UMD only)</li>
+          <li data-i18n-zh>移除 CJS 輸出（僅保留 ESM + UMD）</li>
+        </ul>
+      </div>
+
+      <!-- v0.4.0 -->
+      <div class="changelog-entry">
+        <h2 class="changelog-version">v0.4.0</h2>
+        <p class="changelog-date">2026-03-18 &mdash; Creative Effect, Ticker &amp; Thumbs</p>
+
+        <h3 data-i18n-en>New Modules</h3>
+        <h3 data-i18n-zh>新增模組</h3>
+        <ul>
+          <li data-i18n-en><strong>EffectCreative</strong> &mdash; Declarative transform-based transitions with 8 presets</li>
+          <li data-i18n-zh><strong>EffectCreative</strong> &mdash; 宣告式 transform 轉場，內建 8 種預設效果</li>
+          <li data-i18n-en><strong>Thumbs</strong> &mdash; Sync module for main/thumbnail slider linking</li>
+          <li data-i18n-zh><strong>Thumbs</strong> &mdash; 主圖/縮圖滑塊同步模組</li>
+        </ul>
+
+        <h3 data-i18n-en>Enhancements</h3>
+        <h3 data-i18n-zh>功能增強</h3>
+        <ul>
+          <li data-i18n-en><strong>Ticker mode</strong> for Autoplay &mdash; continuous scroll marquee effect</li>
+          <li data-i18n-zh>Autoplay <strong>Ticker 模式</strong> &mdash; 持續捲動跑馬燈效果</li>
+          <li data-i18n-en>Updated TypeScript definitions for Creative, Ticker, and Thumbs</li>
+          <li data-i18n-zh>更新 TypeScript 型別定義，涵蓋 Creative、Ticker、Thumbs</li>
+        </ul>
+
+        <h3 data-i18n-en>Docs</h3>
+        <h3 data-i18n-zh>文件</h3>
+        <ul>
+          <li data-i18n-en>New demos: Creative presets, Ticker marquee, Product gallery, Vertical thumbs</li>
+          <li data-i18n-zh>新增範例：Creative 預設效果、Ticker 跑馬燈、產品圖庫、垂直縮圖</li>
+        </ul>
+      </div>
+
+      <!-- v0.3.1 -->
+      <div class="changelog-entry">
+        <h2 class="changelog-version">v0.3.1</h2>
+        <p class="changelog-date">2026-03-17</p>
+
+        <h3 data-i18n-en>Bug Fixes</h3>
+        <h3 data-i18n-zh>錯誤修正</h3>
+        <ul>
+          <li data-i18n-en>Fix EffectCoverflow image vanishing on loop cycle in Mobile Safari</li>
+          <li data-i18n-zh>修正 EffectCoverflow 在 Mobile Safari 循環切換時圖片消失的問題</li>
+        </ul>
+      </div>
+
+      <!-- v0.3.0 -->
+      <div class="changelog-entry">
+        <h2 class="changelog-version">v0.3.0</h2>
+        <p class="changelog-date">2026-03-16 &mdash; EffectShowcase</p>
+
+        <h3 data-i18n-en>New Modules</h3>
+        <h3 data-i18n-zh>新增模組</h3>
+        <ul>
+          <li data-i18n-en><strong>EffectShowcase</strong> &mdash; Spotlight showcase effect with scaling and depth</li>
+          <li data-i18n-zh><strong>EffectShowcase</strong> &mdash; 聚光燈展示效果，含縮放與景深</li>
+        </ul>
+
+        <h3 data-i18n-en>Bug Fixes</h3>
+        <h3 data-i18n-zh>錯誤修正</h3>
+        <ul>
+          <li data-i18n-en>Fix Mobile Safari rendering issues for effect modules</li>
+          <li data-i18n-zh>修正效果模組在 Mobile Safari 的渲染問題</li>
+          <li data-i18n-en>Fix loop transition bugs in several effect modules</li>
+          <li data-i18n-zh>修正多個效果模組的循環轉場錯誤</li>
+        </ul>
+      </div>
+
+      <!-- v0.2.0 -->
+      <div class="changelog-entry">
+        <h2 class="changelog-version">v0.2.0</h2>
+        <p class="changelog-date">2026-03-15 &mdash; Quality &amp; Testing</p>
+
+        <h3 data-i18n-en>Improvements</h3>
+        <h3 data-i18n-zh>改善</h3>
+        <ul>
+          <li data-i18n-en>Agentic optimization loop for automated test coverage and bundle size improvements</li>
+          <li data-i18n-zh>自動化代理優化迴圈，提升測試覆蓋率與 bundle 大小</li>
+          <li data-i18n-en>Comprehensive test suite (425 tests) with strong assertions</li>
+          <li data-i18n-zh>完整測試套件（425 個測試），強化斷言</li>
+          <li data-i18n-en>Code review fixes (H1/H2/M1-M7 issues resolved)</li>
+          <li data-i18n-zh>程式碼審查修正（H1/H2/M1-M7 問題已解決）</li>
+          <li data-i18n-en>Lighthouse accessibility and performance optimizations</li>
+          <li data-i18n-zh>Lighthouse 無障礙與效能優化</li>
+        </ul>
+      </div>
+
       <!-- v0.1.0 -->
       <div class="changelog-entry">
         <h2 class="changelog-version">v0.1.0</h2>

@@ -42,7 +42,7 @@
     "build": "rollup -c rollup.config.mjs && npm run build:types",
     "build:types": "node scripts/build-types.mjs",
     "build:css": "node scripts/build-css.mjs",
-    "build:docs": "npm run build && npm run build:css && cp dist/esm/index.mjs dist/css/core.css dist/drift-slider-bundle.css docs/assets/lib/ 2>/dev/null || true",
+    "build:docs": "npm run build && npm run build:css && cp dist/esm/index.mjs dist/css/core.css dist/drift-slider-bundle.css dist/drift-slider.umd.js dist/drift-slider.jquery.js docs/assets/lib/ 2>/dev/null || true",
     "dev": "rollup -c rollup.config.mjs -w",
     "test": "vitest run",
     "test:watch": "vitest",
