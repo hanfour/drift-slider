@@ -147,6 +147,40 @@ describe('module/effect-creative', () => {
     expect(slide.style.opacity).toBe('')
   })
 
+  it('applies active scale to center slide', () => {
+    const s = createSlider({
+      sliderOptions: {
+        modules: [EffectCreative],
+        effect: 'creative',
+        creativeEffect: {
+          active: { scale: 1.2 },
+          prev: { scale: 0.8, translate: [-100, 0, 0] },
+          next: { scale: 0.8, translate: [100, 0, 0] },
+        },
+      },
+    })
+    cleanup = s.cleanup
+    const centerTransform = s.slider.slides[0].style.transform
+    expect(centerTransform).toContain('scale(1.2)')
+  })
+
+  it('sets transformOrigin from origin config', () => {
+    const s = createSlider({
+      sliderOptions: {
+        modules: [EffectCreative],
+        effect: 'creative',
+        creativeEffect: {
+          prev: { translate: [-100, 0, 0], origin: 'left center' },
+          next: { translate: [100, 0, 0], origin: 'right center' },
+        },
+      },
+    })
+    cleanup = s.cleanup
+    // Next slide (index 1) should have origin from next config
+    const nextOrigin = s.slider.slides[1].style.transformOrigin
+    expect(nextOrigin).toBe('right center')
+  })
+
   it('handles rotate in transform string', () => {
     const s = createSlider({
       sliderOptions: {

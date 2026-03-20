@@ -21,7 +21,7 @@ export default function EffectCreative({ slider, extendParams, on }) {
 
   function setSlideTransforms() {
     const params = slider.params.creativeEffect;
-    const { prev: prevCfg, next: nextCfg } = params;
+    const { prev: prevCfg, next: nextCfg, active: activeCfg = {} } = params;
     const slides = slider.slides;
     const slideSize = slider.slideSize;
 
@@ -37,31 +37,47 @@ export default function EffectCreative({ slider, extendParams, on }) {
       // Pick config: prev side (offset < 0), next side (offset > 0)
       const cfg = normalizedOffset < 0 ? prevCfg : nextCfg;
 
-      // Translate
+      // Active (center) base values
+      const activeTranslate = activeCfg.translate || [0, 0, 0];
+      const activeRotate = activeCfg.rotate || [0, 0, 0];
+      const activeScale = activeCfg.scale ?? 1;
+      const activeOpacity = activeCfg.opacity ?? 1;
+
+      // Translate: interpolate from active toward cfg
       const translate = cfg.translate || [0, 0, 0];
-      const tx = resolveValue(translate[0], slideSize) * absOffset;
-      const ty = resolveValue(translate[1], slideSize) * absOffset;
-      const tz = resolveValue(translate[2], slideSize) * absOffset;
+      const atx = resolveValue(activeTranslate[0], slideSize);
+      const aty = resolveValue(activeTranslate[1], slideSize);
+      const atz = resolveValue(activeTranslate[2], slideSize);
+      const tx = atx + (resolveValue(translate[0], slideSize) - atx) * absOffset;
+      const ty = aty + (resolveValue(translate[1], slideSize) - aty) * absOffset;
+      const tz = atz + (resolveValue(translate[2], slideSize) - atz) * absOffset;
 
-      // Rotate
+      // Rotate: interpolate from active toward cfg
       const rotate = cfg.rotate || [0, 0, 0];
-      const rx = (Number(rotate[0]) || 0) * absOffset;
-      const ry = (Number(rotate[1]) || 0) * absOffset;
-      const rz = (Number(rotate[2]) || 0) * absOffset;
+      const arx = Number(activeRotate[0]) || 0;
+      const ary = Number(activeRotate[1]) || 0;
+      const arz = Number(activeRotate[2]) || 0;
+      const rx = arx + ((Number(rotate[0]) || 0) - arx) * absOffset;
+      const ry = ary + ((Number(rotate[1]) || 0) - ary) * absOffset;
+      const rz = arz + ((Number(rotate[2]) || 0) - arz) * absOffset;
 
-      // Scale: interpolate from 1 toward config scale
-      const targetScale = cfg.scale != null ? Number(cfg.scale) : 1;
-      const s = 1 - (1 - targetScale) * absOffset;
+      // Scale: interpolate from active toward cfg
+      const targetScale = cfg.scale ?? 1;
+      const s = activeScale + (targetScale - activeScale) * absOffset;
 
-      // Opacity: interpolate from 1 toward config opacity
-      const targetOpacity = cfg.opacity != null ? Number(cfg.opacity) : 1;
-      const opacity = 1 - (1 - targetOpacity) * absOffset;
+      // Opacity: interpolate from active toward cfg
+      const targetOpacity = cfg.opacity ?? 1;
+      const opacity = activeOpacity + (targetOpacity - activeOpacity) * absOffset;
 
       slide.style.transform =
         `translateX(${tx}px) translateY(${ty}px) translateZ(${tz}px) ` +
         `rotateX(${rx}deg) rotateY(${ry}deg) rotateZ(${rz}deg) scale(${s})`;
 
       slide.style.opacity = String(opacity);
+
+      // Transform origin: use applicable config's origin, falling back to active, then default
+      const applicableOrigin = cfg.origin || activeCfg.origin || 'center center';
+      slide.style.transformOrigin = applicableOrigin;
 
       // z-index: center slide on top
       slide.style.zIndex = String(
