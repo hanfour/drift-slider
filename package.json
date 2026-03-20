@@ -1,36 +1,56 @@
 {
   "name": "drift-slider",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "A lightweight, modular slider/carousel library with physics-based touch interaction",
-  "main": "dist/drift-slider.cjs.js",
-  "module": "dist/drift-slider.esm.js",
-  "types": "types/index.d.ts",
+  "type": "module",
+  "main": "./dist/esm/index.mjs",
+  "module": "./dist/esm/index.mjs",
+  "types": "./dist/types/index.d.ts",
+  "sideEffects": [
+    "*.css"
+  ],
   "exports": {
     ".": {
-      "import": "./dist/drift-slider.esm.js",
-      "require": "./dist/drift-slider.cjs.js"
+      "types": "./dist/types/index.d.ts",
+      "default": "./dist/esm/index.mjs"
     },
-    "./modules": "./src/modules/index.js",
-    "./css": "./dist/drift-slider.css",
+    "./core": {
+      "types": "./dist/types/core.d.ts",
+      "default": "./dist/esm/core.mjs"
+    },
+    "./modules": {
+      "types": "./dist/types/modules/index.d.ts",
+      "default": "./dist/esm/modules/index.mjs"
+    },
+    "./modules/*": {
+      "types": "./dist/types/modules/*.d.ts",
+      "default": "./dist/esm/modules/*.mjs"
+    },
+    "./css": "./dist/css/core.css",
+    "./css/*": "./dist/css/*.css",
     "./css/bundle": "./dist/drift-slider-bundle.css",
-    "./jquery": "./dist/drift-slider.jquery.js"
+    "./bundle": "./dist/drift-slider.umd.js",
+    "./jquery": "./dist/drift-slider.jquery.js",
+    "./package.json": "./package.json"
   },
   "files": [
     "dist/",
     "src/",
-    "types/"
+    "package.json"
   ],
   "scripts": {
-    "build": "rollup -c rollup.config.mjs",
-    "build:css": "sass src/styles/drift-slider.scss dist/drift-slider.css --style=compressed && sass src/styles/bundle.scss dist/drift-slider-bundle.css --style=compressed",
-    "build:docs": "npm run build && npm run build:css && cp dist/drift-slider.esm.js dist/drift-slider.css dist/drift-slider-bundle.css docs/assets/lib/ 2>/dev/null || true",
+    "build": "rollup -c rollup.config.mjs && npm run build:types",
+    "build:types": "node scripts/build-types.mjs",
+    "build:css": "node scripts/build-css.mjs",
+    "build:docs": "npm run build && npm run build:css && cp dist/esm/index.mjs dist/css/core.css dist/drift-slider-bundle.css docs/assets/lib/ 2>/dev/null || true",
     "dev": "rollup -c rollup.config.mjs -w",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "release": "release-it",
     "release:dry": "release-it --dry-run",
-    "prepublishOnly": "npm run build && npm run build:css",
+    "publint": "publint",
+    "prepublishOnly": "npm run build && npm run build:css && npm run publint",
     "optimize": "node scripts/agent-optimize.mjs"
   },
   "keywords": [
@@ -53,7 +73,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/hanfour/drift-slider.git"
+    "url": "git+https://github.com/hanfour/drift-slider.git"
   },
   "bugs": {
     "url": "https://github.com/hanfour/drift-slider/issues"
@@ -65,6 +85,7 @@
     "@rollup/plugin-terser": "^1.0.0",
     "@vitest/coverage-v8": "^4.1.0",
     "jsdom": "^29.0.0",
+    "publint": "^0.3.18",
     "release-it": "^19.2.4",
     "rollup": "^4.9.0",
     "sass": "^1.69.0",
