@@ -60,22 +60,34 @@
       height: 6px;
       cursor: pointer;
     }
-    .control-group.checkbox-group {
-      flex-direction: row;
-      align-items: center;
-      gap: 10px;
+    .presets-bar {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
     }
-    .control-group.checkbox-group label {
-      order: 2;
+    .presets-bar button {
+      padding: 6px 14px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: #1d1d1f;
       color: #f5f5f7;
-      font-size: 14px;
-    }
-    .control-group.checkbox-group input {
-      order: 1;
-      accent-color: #0071e3;
-      width: 18px;
-      height: 18px;
+      font-size: 13px;
       cursor: pointer;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .presets-bar button:hover { background: #2d2d2f; }
+    .presets-bar button.active {
+      background: #0071e3;
+      border-color: #0071e3;
+      color: #fff;
+    }
+    .hint {
+      color: #86868b;
+      font-size: 13px;
+      margin-top: 12px;
+      text-align: center;
+      font-style: italic;
     }
     #code-output {
       background: #1d1d1f;
@@ -91,9 +103,7 @@
       white-space: pre;
     }
     @media (max-width: 600px) {
-      .controls {
-        grid-template-columns: 1fr;
-      }
+      .controls { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -105,6 +115,15 @@
       <h1>Physics Playground</h1>
       <p class="demo-desc">Interactive playground to experiment with DriftSlider's physics-based touch parameters.</p>
 
+      <!-- Preset buttons -->
+      <div class="presets-bar">
+        <button class="active" data-preset="default">Default</button>
+        <button data-preset="snappy">Snappy</button>
+        <button data-preset="floaty">Floaty</button>
+        <button data-preset="bouncy">Bouncy</button>
+        <button data-preset="heavy">Heavy</button>
+      </div>
+
       <!-- Controls panel -->
       <div class="controls">
         <div class="control-group">
@@ -112,16 +131,16 @@
           <input type="range" id="ctrl-speed" min="100" max="1500" value="400" step="50">
         </div>
         <div class="control-group">
-          <label>tension <span id="tension-value">50</span></label>
-          <input type="range" id="ctrl-tension" min="10" max="300" value="50" step="5">
+          <label>physics.friction <span id="friction-value">0.92</span></label>
+          <input type="range" id="ctrl-friction" min="0.5" max="0.99" value="0.92" step="0.01">
         </div>
         <div class="control-group">
-          <label>friction <span id="friction-value">26</span></label>
-          <input type="range" id="ctrl-friction" min="5" max="50" value="26" step="1">
+          <label>physics.attraction <span id="attraction-value">0.025</span></label>
+          <input type="range" id="ctrl-attraction" min="0.005" max="0.15" value="0.025" step="0.005">
         </div>
-        <div class="control-group checkbox-group">
-          <input type="checkbox" id="ctrl-edge-bounce" checked>
-          <label>edgeBounce</label>
+        <div class="control-group">
+          <label>physics.bounceRate <span id="bounce-value">0.5</span></label>
+          <input type="range" id="ctrl-bounce" min="0" max="1" value="0.5" step="0.05">
         </div>
       </div>
 
@@ -138,6 +157,7 @@
         <button class="drift-arrow drift-arrow--next" aria-label="Next" type="button"></button>
         <div class="drift-pagination"></div>
       </div>
+      <p class="hint">Drag the slider to feel the difference — physics only affects touch/drag interactions.</p>
 
       <!-- Live config output -->
       <pre id="code-output"></pre>
@@ -149,54 +169,23 @@
         <pre><code class="language-javascript">var DS = DriftSlider;
 var slider;
 
-function getConfig() {
-  return {
+function createSlider() {
+  if (slider) slider.destroy();
+  slider = new DS.DriftSlider('.drift-slider', {
     modules: [DS.Navigation, DS.Pagination, DS.A11y],
     slidesPerView: 1,
     spaceBetween: 20,
     grabCursor: true,
-    speed: parseInt(document.getElementById('ctrl-speed').value),
+    speed: 400,
     physics: {
-      tension: parseInt(document.getElementById('ctrl-tension').value),
-      friction: parseInt(document.getElementById('ctrl-friction').value),
+      friction: 0.92,    // 0–1, higher = more momentum
+      attraction: 0.025,  // snap pull force, higher = snappier
+      bounceRate: 0.5,    // edge bounce intensity
     },
-    edgeBounce: document.getElementById('ctrl-edge-bounce').checked,
-  };
-}
-
-function createSlider() {
-  if (slider) slider.destroy();
-  var config = getConfig();
-  slider = new DS.DriftSlider('.drift-slider', config);
-  updateCodeOutput(config);
-}
-
-function updateCodeOutput(config) {
-  var output = 'new DS.DriftSlider(\'.drift-slider\', {\n';
-  output += '  speed: ' + config.speed + ',\n';
-  output += '  physics: {\n';
-  output += '    tension: ' + config.physics.tension + ',\n';
-  output += '    friction: ' + config.physics.friction + ',\n';
-  output += '  },\n';
-  output += '  edgeBounce: ' + config.edgeBounce + ',\n';
-  output += '  grabCursor: true,\n';
-  output += '});';
-  document.getElementById('code-output').textContent = output;
-}
-
-createSlider();
-
-document.querySelectorAll('.controls input').forEach(function(input) {
-  input.addEventListener('input', function() {
-    document.getElementById('speed-value').textContent =
-      document.getElementById('ctrl-speed').value;
-    document.getElementById('tension-value').textContent =
-      document.getElementById('ctrl-tension').value;
-    document.getElementById('friction-value').textContent =
-      document.getElementById('ctrl-friction').value;
-    createSlider();
   });
-});</code></pre>
+}
+
+createSlider();</code></pre>
       </div>
     </div>
   </div>
@@ -208,54 +197,94 @@ document.querySelectorAll('.controls input').forEach(function(input) {
     var DS = DriftSlider;
     var slider;
 
-    function getConfig() {
+    var presets = {
+      default:  { speed: 400, friction: 0.92, attraction: 0.025, bounceRate: 0.5 },
+      snappy:   { speed: 200, friction: 0.75, attraction: 0.12,  bounceRate: 0.2 },
+      floaty:   { speed: 800, friction: 0.98, attraction: 0.008, bounceRate: 0.3 },
+      bouncy:   { speed: 500, friction: 0.90, attraction: 0.04,  bounceRate: 1.0 },
+      heavy:    { speed: 600, friction: 0.60, attraction: 0.10,  bounceRate: 0.0 },
+    };
+
+    var ctrlSpeed      = document.getElementById('ctrl-speed');
+    var ctrlFriction   = document.getElementById('ctrl-friction');
+    var ctrlAttraction = document.getElementById('ctrl-attraction');
+    var ctrlBounce     = document.getElementById('ctrl-bounce');
+
+    function readControls() {
       return {
-        modules: [DS.Navigation, DS.Pagination, DS.A11y],
-        slidesPerView: 1,
-        spaceBetween: 20,
-        grabCursor: true,
-        speed: parseInt(document.getElementById('ctrl-speed').value),
-        physics: {
-          tension: parseInt(document.getElementById('ctrl-tension').value),
-          friction: parseInt(document.getElementById('ctrl-friction').value),
-        },
-        edgeBounce: document.getElementById('ctrl-edge-bounce').checked,
+        speed:      parseInt(ctrlSpeed.value),
+        friction:   parseFloat(ctrlFriction.value),
+        attraction: parseFloat(ctrlAttraction.value),
+        bounceRate: parseFloat(ctrlBounce.value),
       };
+    }
+
+    function setControls(p) {
+      ctrlSpeed.value      = p.speed;
+      ctrlFriction.value   = p.friction;
+      ctrlAttraction.value = p.attraction;
+      ctrlBounce.value     = p.bounceRate;
+      updateLabels();
+    }
+
+    function updateLabels() {
+      document.getElementById('speed-value').textContent      = ctrlSpeed.value;
+      document.getElementById('friction-value').textContent   = parseFloat(ctrlFriction.value).toFixed(2);
+      document.getElementById('attraction-value').textContent = parseFloat(ctrlAttraction.value).toFixed(3);
+      document.getElementById('bounce-value').textContent     = parseFloat(ctrlBounce.value).toFixed(2);
     }
 
     function createSlider() {
       if (slider) slider.destroy();
-      var config = getConfig();
-      slider = new DS.DriftSlider('.drift-slider', config);
-      updateCodeOutput(config);
+      var p = readControls();
+      slider = new DS.DriftSlider('.drift-slider', {
+        modules: [DS.Navigation, DS.Pagination, DS.A11y],
+        slidesPerView: 1,
+        spaceBetween: 20,
+        grabCursor: true,
+        speed: p.speed,
+        physics: {
+          friction: p.friction,
+          attraction: p.attraction,
+          bounceRate: p.bounceRate,
+        },
+      });
+      updateCodeOutput(p);
     }
 
-    function updateCodeOutput(config) {
-      var output = 'new DS.DriftSlider(\'.drift-slider\', {\n';
-      output += '  speed: ' + config.speed + ',\n';
+    function updateCodeOutput(p) {
+      var output = "new DS.DriftSlider('.drift-slider', {\n";
+      output += '  speed: ' + p.speed + ',\n';
       output += '  physics: {\n';
-      output += '    tension: ' + config.physics.tension + ',\n';
-      output += '    friction: ' + config.physics.friction + ',\n';
+      output += '    friction: ' + p.friction.toFixed(2) + ',\n';
+      output += '    attraction: ' + p.attraction.toFixed(3) + ',\n';
+      output += '    bounceRate: ' + p.bounceRate.toFixed(2) + ',\n';
       output += '  },\n';
-      output += '  edgeBounce: ' + config.edgeBounce + ',\n';
       output += '  grabCursor: true,\n';
       output += '});';
       document.getElementById('code-output').textContent = output;
     }
 
-    createSlider();
-
-    document.querySelectorAll('.controls input').forEach(function(input) {
-      input.addEventListener('input', function() {
-        document.getElementById('speed-value').textContent =
-          document.getElementById('ctrl-speed').value;
-        document.getElementById('tension-value').textContent =
-          document.getElementById('ctrl-tension').value;
-        document.getElementById('friction-value').textContent =
-          document.getElementById('ctrl-friction').value;
+    // Preset buttons
+    document.querySelectorAll('.presets-bar button').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.presets-bar button').forEach(function(b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        setControls(presets[btn.dataset.preset]);
         createSlider();
       });
     });
+
+    // Slider controls
+    document.querySelectorAll('.controls input').forEach(function(input) {
+      input.addEventListener('input', function() {
+        document.querySelectorAll('.presets-bar button').forEach(function(b) { b.classList.remove('active'); });
+        updateLabels();
+        createSlider();
+      });
+    });
+
+    createSlider();
   </script>
 </body>
 </html>
