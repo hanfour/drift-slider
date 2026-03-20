@@ -4,5 +4,6 @@ dist/
 *.log
 .env
 coverage/
+.worktrees/
 .lighthouseci/
 scripts/optimize-log.json
