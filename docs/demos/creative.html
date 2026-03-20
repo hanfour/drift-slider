@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DriftSlider — Creative Effect</title>
+  <meta name="description" content="DriftSlider creative effect demo with switchable presets and interactive controls.">
+  <meta name="keywords" content="DriftSlider, demo, creative, effect, presets, 3D, transform">
+  <link rel="canonical" href="https://hanfour.github.io/drift-slider/demos/creative.html">
+  <meta property="og:title" content="DriftSlider — Creative Effect">
+  <meta property="og:description" content="DriftSlider creative effect demo with switchable presets and interactive controls.">
+  <meta property="og:image" content="https://hanfour.github.io/drift-slider/assets/img/og-image.svg">
+  <meta property="og:url" content="https://hanfour.github.io/drift-slider/demos/creative.html">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="DriftSlider — Creative Effect">
+  <meta name="twitter:description" content="DriftSlider creative effect demo with switchable presets and interactive controls.">
+  <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/docs.css">
+  <link rel="stylesheet" href="../assets/css/prism-onedark.css">
+  <link rel="stylesheet" href="../assets/lib/drift-slider-bundle.css">
+  <style>
+    .demo-page { max-width: 960px; }
+    .drift-slider { overflow: visible; border-radius: 0; }
+    .drift-track { overflow: visible !important; }
+
+    .controls {
+      margin-top: 24px;
+      padding: 20px;
+      background: #fff;
+      border-radius: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px 24px;
+      align-items: center;
+    }
+    .controls label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+    }
+    .controls label span:first-child { min-width: 60px; }
+    .controls select {
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+      background: #f5f5f7;
+    }
+
+    .slide-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      border-radius: 12px;
+    }
+    .drift-slide { border-radius: 12px; overflow: hidden; }
+
+    pre#code-output {
+      margin-top: 24px;
+      padding: 16px 20px;
+      background: #1e1e1e;
+      color: #d4d4d4;
+      border-radius: 12px;
+      font-size: 13px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+  </style>
+</head>
+<body>
+  <div data-include="../_includes/header.html"></div>
+  <div class="page-body">
+    <div class="demo-page">
+      <a href="../demos.html" class="demo-back">&larr; Back to Demos</a>
+      <h1>Creative Effect</h1>
+      <p class="demo-desc">Fully customisable per-slide transforms — choose a preset or define your own.</p>
+
+      <!-- Controls -->
+      <div class="controls">
+        <label>
+          <span>Preset</span>
+          <select id="ctrl-preset">
+            <option value="slide-rotate" selected>Slide Rotate</option>
+            <option value="flip-horizontal">Flip Horizontal</option>
+            <option value="zoom-out">Zoom Out</option>
+            <option value="parallax-slide">Parallax Slide</option>
+            <option value="swing">Swing</option>
+          </select>
+        </label>
+        <label>
+          <span>Loop</span>
+          <select id="ctrl-loop">
+            <option value="true" selected>true</option>
+            <option value="false">false</option>
+          </select>
+        </label>
+        <label>
+          <span>Autoplay</span>
+          <select id="ctrl-autoplay">
+            <option value="true" selected>true</option>
+            <option value="false">false</option>
+          </select>
+        </label>
+      </div>
+
+      <!-- Live slider demo -->
+      <div class="drift-slider" style="margin-top:24px; height:400px;">
+        <div class="drift-track"><ul class="drift-list">
+          <li class="drift-slide"><img class="slide-img" src="https://picsum.photos/800/400?random=1" alt="Demo image 1"></li>
+          <li class="drift-slide"><img class="slide-img" src="https://picsum.photos/800/400?random=2" alt="Demo image 2"></li>
+          <li class="drift-slide"><img class="slide-img" src="https://picsum.photos/800/400?random=3" alt="Demo image 3"></li>
+          <li class="drift-slide"><img class="slide-img" src="https://picsum.photos/800/400?random=4" alt="Demo image 4"></li>
+          <li class="drift-slide"><img class="slide-img" src="https://picsum.photos/800/400?random=5" alt="Demo image 5"></li>
+        </ul></div>
+        <button class="drift-arrow drift-arrow--prev" aria-label="Previous" type="button"></button>
+        <button class="drift-arrow drift-arrow--next" aria-label="Next" type="button"></button>
+        <div class="drift-pagination"></div>
+      </div>
+
+      <!-- Live Code Output -->
+      <pre id="code-output"></pre>
+
+      <!-- Source Code section -->
+      <h2 class="demo-section-title">Source Code</h2>
+      <div class="code-block">
+        <span class="code-lang">js</span>
+        <pre><code class="language-javascript">var DS = DriftSlider;
+var slider = new DS.DriftSlider('.drift-slider', {
+  modules: [DS.Navigation, DS.Pagination, DS.Autoplay, DS.EffectCreative, DS.A11y],
+  effect: 'creative',
+  loop: true,
+  autoplay: { enabled: true, delay: 3000 },
+  speed: 600,
+  creativeEffect: {
+    perspective: true,
+    prev: { translate: ['-100%', 0, 0], rotate: [0, -30, 0] },
+    next: { translate: ['100%', 0, 0], rotate: [0, 30, 0] },
+  },
+});</code></pre>
+      </div>
+    </div>
+  </div>
+  <div data-include="../_includes/footer.html"></div>
+  <script src="../assets/lib/drift-slider.umd.js"></script>
+  <script src="../assets/js/prism.js"></script>
+  <script src="../assets/js/docs.js"></script>
+  <script>
+    var DS = DriftSlider;
+    var currentSlider = null;
+
+    var presets = {
+      'slide-rotate': {
+        perspective: true,
+        prev: { translate: ['-100%', 0, 0], rotate: [0, -30, 0] },
+        next: { translate: ['100%', 0, 0], rotate: [0, 30, 0] },
+      },
+      'flip-horizontal': {
+        perspective: true,
+        prev: { rotate: [0, -180, 0], opacity: 0 },
+        next: { rotate: [0, 180, 0], opacity: 0 },
+      },
+      'zoom-out': {
+        perspective: true,
+        prev: { scale: 0.4, opacity: 0, translate: [0, 0, -600] },
+        next: { scale: 0.4, opacity: 0, translate: [0, 0, -600] },
+      },
+      'parallax-slide': {
+        prev: { translate: ['-125%', 0, 0] },
+        next: { translate: ['125%', 0, 0] },
+      },
+      'swing': {
+        prev: { rotate: [0, 0, -10], translate: ['-100%', '20%', 0] },
+        next: { rotate: [0, 0, 10], translate: ['100%', '20%', 0] },
+      },
+    };
+
+    function val(id) { return document.getElementById(id).value; }
+    function bool(id) { return val(id) === 'true'; }
+
+    function formatObj(obj, indent) {
+      var parts = [];
+      for (var k in obj) {
+        var v = obj[k];
+        if (Array.isArray(v)) {
+          parts.push(indent + k + ': [' + v.map(function(x) { return typeof x === 'string' ? "'" + x + "'" : x; }).join(', ') + ']');
+        } else if (typeof v === 'boolean' || typeof v === 'number') {
+          parts.push(indent + k + ': ' + v);
+        }
+      }
+      return parts.join(',\n');
+    }
+
+    function updateCode(presetName, preset) {
+      var isLoop = bool('ctrl-loop');
+      var isAutoplay = bool('ctrl-autoplay');
+      var modules = 'DS.Navigation, DS.Pagination, DS.EffectCreative, DS.A11y';
+      if (isAutoplay) modules = 'DS.Navigation, DS.Pagination, DS.Autoplay, DS.EffectCreative, DS.A11y';
+      var lines = [
+        "var DS = DriftSlider;",
+        "var slider = new DS.DriftSlider('.drift-slider', {",
+        "  modules: [" + modules + "],",
+        "  effect: 'creative',",
+      ];
+      if (isLoop) lines.push("  loop: true,");
+      if (isAutoplay) lines.push("  autoplay: { enabled: true, delay: 3000 },");
+      lines.push("  speed: 600,");
+      lines.push("  creativeEffect: {");
+      if (preset.perspective) lines.push("    perspective: true,");
+      lines.push("    prev: { " + formatObj(preset.prev, '').trim() + " },");
+      lines.push("    next: { " + formatObj(preset.next, '').trim() + " },");
+      lines.push("  },");
+      lines.push("});");
+      document.getElementById('code-output').textContent = lines.join('\n');
+    }
+
+    function createSlider() {
+      if (currentSlider) { currentSlider.destroy(true); currentSlider = null; }
+      var presetName = val('ctrl-preset');
+      var preset = presets[presetName];
+      var isLoop = bool('ctrl-loop');
+      var isAutoplay = bool('ctrl-autoplay');
+      updateCode(presetName, preset);
+
+      var modules = [DS.Navigation, DS.Pagination, DS.EffectCreative, DS.A11y];
+      if (isAutoplay) modules.splice(2, 0, DS.Autoplay);
+
+      var opts = {
+        modules: modules,
+        effect: 'creative',
+        speed: 600,
+        grabCursor: true,
+        creativeEffect: preset,
+      };
+      if (isLoop) opts.loop = true;
+      if (isAutoplay) opts.autoplay = { enabled: true, delay: 3000 };
+
+      currentSlider = new DS.DriftSlider('.drift-slider', opts);
+    }
+
+    var controls = document.querySelectorAll('.controls select');
+    for (var i = 0; i < controls.length; i++) {
+      controls[i].addEventListener('change', createSlider);
+    }
+    createSlider();
+  </script>
+</body>
+</html>

@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DriftSlider — Creative Presets</title>
+  <meta name="description" content="Eight creative effect presets showcased side by side in a responsive grid.">
+  <meta name="keywords" content="DriftSlider, demo, creative, presets, effects, 3D, transform, gallery">
+  <link rel="canonical" href="https://hanfour.github.io/drift-slider/demos/creative-presets.html">
+  <meta property="og:title" content="DriftSlider — Creative Presets">
+  <meta property="og:description" content="Eight creative effect presets showcased side by side in a responsive grid.">
+  <meta property="og:image" content="https://hanfour.github.io/drift-slider/assets/img/og-image.svg">
+  <meta property="og:url" content="https://hanfour.github.io/drift-slider/demos/creative-presets.html">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="DriftSlider — Creative Presets">
+  <meta name="twitter:description" content="Eight creative effect presets showcased side by side in a responsive grid.">
+  <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/docs.css">
+  <link rel="stylesheet" href="../assets/lib/drift-slider-bundle.css">
+  <style>
+    .demo-page { max-width: 1100px; }
+
+    .preset-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 32px;
+    }
+    @media (max-width: 700px) {
+      .preset-grid { grid-template-columns: 1fr; }
+    }
+
+    .preset-cell {
+      background: #fff;
+      border-radius: 14px;
+      padding: 16px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    }
+    .preset-cell h3 {
+      margin: 0 0 10px;
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+    }
+    .preset-cell .drift-slider {
+      overflow: visible;
+      border-radius: 0;
+      height: 180px;
+    }
+    .preset-cell .drift-track { overflow: visible !important; }
+    .preset-cell .drift-slide {
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .preset-cell .slide-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .preset-cell code {
+      display: block;
+      margin-top: 10px;
+      padding: 10px 12px;
+      background: #1e1e1e;
+      color: #d4d4d4;
+      border-radius: 8px;
+      font-size: 11px;
+      line-height: 1.5;
+      white-space: pre;
+      overflow-x: auto;
+      font-family: 'JetBrains Mono', monospace;
+    }
+  </style>
+</head>
+<body>
+  <div data-include="../_includes/header.html"></div>
+  <div class="page-body">
+    <div class="demo-page">
+      <a href="../demos.html" class="demo-back">&larr; Back to Demos</a>
+      <h1>Creative Presets</h1>
+      <p class="demo-desc">Eight ready-to-use creative effect presets — each mini slider runs independently.</p>
+
+      <div class="preset-grid">
+
+        <!-- 1. flip-horizontal -->
+        <div class="preset-cell">
+          <h3>flip-horizontal</h3>
+          <div class="drift-slider" id="preset-flip-horizontal">
+            <div class="drift-track"><ul class="drift-list">
+              <li class="drift-slide"><img class="slide-img" src="https://picsum.photos/480/180?random=10" alt="Slide 1"></li>
+              <li class="drift-slide"><img class="slide-img" src="https://picsum.photos/480/180?random=11" alt="Slide 2"></li>
+              <li class="drift-slide"><img class="slide-img" src="https://picsum.photos/480/180?random=12" alt="Slide 3"></li>
+            </ul></div>
+            <div class="drift-pagination"></div>
+          </div>
+          <code>prev: { rotate: [0, -180, 0], opacity: 0 }
+next: { rotate: [0, 180, 0], opacity: 0 }
+perspective: true</code>
+        </div>
+
+        <!-- 2. zoom-out -->
+        <div class="preset-cell">
+          <h3>zoom-out</h3>
+          <div class="drift-slider" id="preset-zoom-out">
+            <div class="drift-track"><ul class="drift-list">
+              <li class="drift-slide"><img class="slide-img" src="https://picsum.photos/480/180?random=13" alt="Slide 1"></li>
+              <li class="drift-slide"><img class="slide-img" src="https://picsum.photos/480/180?random=14" alt="Slide 2"></li>
+              <li class="drift-slide"><img class="slide-img" src="https://picsum.photos/480/180?random=15" alt="Slide 3"></li>
+            </ul></div>
+            <div class="drift-pagination"></div>
+          </div>
+          <code>prev: { scale: 0.4, opacity: 0, translate: [0, 0, -600] }
+next: { scale: 0.4, opacity: 0, translate: [0, 0, -600] }
+perspective: true</code>
+        </div>
+
+        <!-- 3. rotate-in -->
+        <div class="preset-cell">
+          <h3>rotate-in</h3>
+          <div class="drift-slider" id="preset-rotate-in">
+            <div class="drift-track"><ul class="drift-list">
+              <li class="drift-slide"><img class="slide-img" src="https://picsum.photos/480/180?random=16" alt="Slide 1"></li>
+              <li class="drift-slide"><img class="slide-img" src="https://picsum.photos/480/180?random=17" alt="Slide 2"></li>
+              <li class="drift-slide"><img class="slide-img" src="https://picsum.photos/480/180?random=18" alt="Slide 3"></li>
+            </ul></div>
+            <div class="drift-pagination"></div>
+          </div>
+          <code>prev: { rotate: [0, 0, -15], translate: ['-120%', 0, 0] }
+next: { rotate: [0, 0, 15], translate: ['120%', 0, 0] }</code>
+        </div>
+
+        <!-- 4. slide-rotate -->
+        <div class="preset-cell">
+          <h3>slide-rotate</h3>
+          <div class="drift-slider" id="preset-slide-rotate">
+            <div class="drift-track"><ul class="drift-list">
+              <li class="drift-slide"><img class="slide-img" src="https://picsum.photos/480/180?random=19" alt="Slide 1"></li>
+              <li class="drift-slide"><img class="slide-img" src="https://picsum.photos/480/180?random=20" alt="Slide 2"></li>
+              <li class="drift-slide"><img class="slide-img" src="https://picsum.photos/480/180?random=21" alt="Slide 3"></li>
+            </ul></div>
+            <div class="drift-pagination"></div>
+          </div>
+          <code>prev: { translate: ['-100%', 0, 0], rotate: [0, -30, 0] }
+next: { translate: ['100%', 0, 0], rotate: [0, 30, 0] }
+perspective: true</code>
+        </div>
+
+        <!-- 5. parallax-slide -->
+        <div class="preset-cell">
+          <h3>parallax-slide</h3>
+          <div class="drift-slider" id="preset-parallax-slide">
+            <div class="drift-track"><ul class="drift-list">
+              <li class="drift-slide"><img class="slide-img" src="https://picsum.photos/480/180?random=22" alt="Slide 1"></li>
+              <li class="drift-slide"><img class="slide-img" src="https://picsum.photos/480/180?random=23" alt="Slide 2"></li>
+              <li class="drift-slide"><img class="slide-img" src="https://picsum.photos/480/180?random=24" alt="Slide 3"></li>
+            </ul></div>
+            <div class="drift-pagination"></div>
+          </div>
+          <code>prev: { translate: ['-125%', 0, 0] }
+next: { translate: ['125%', 0, 0] }</code>
+        </div>
+
+        <!-- 6. scale-up -->
+        <div class="preset-cell">
+          <h3>scale-up</h3>
+          <div class="drift-slider" id="preset-scale-up">
+            <div class="drift-track"><ul class="drift-list">
+              <li class="drift-slide"><img class="slide-img" src="https://picsum.photos/480/180?random=25" alt="Slide 1"></li>
+              <li class="drift-slide"><img class="slide-img" src="https://picsum.photos/480/180?random=26" alt="Slide 2"></li>
+              <li class="drift-slide"><img class="slide-img" src="https://picsum.photos/480/180?random=27" alt="Slide 3"></li>
+            </ul></div>
+            <div class="drift-pagination"></div>
+          </div>
+          <code>prev: { scale: 1.5, opacity: 0 }
+next: { scale: 1.5, opacity: 0 }</code>
+        </div>
+
+        <!-- 7. swing -->
+        <div class="preset-cell">
+          <h3>swing</h3>
+          <div class="drift-slider" id="preset-swing">
+            <div class="drift-track"><ul class="drift-list">
+              <li class="drift-slide"><img class="slide-img" src="https://picsum.photos/480/180?random=28" alt="Slide 1"></li>
+              <li class="drift-slide"><img class="slide-img" src="https://picsum.photos/480/180?random=29" alt="Slide 2"></li>
+              <li class="drift-slide"><img class="slide-img" src="https://picsum.photos/480/180?random=30" alt="Slide 3"></li>
+            </ul></div>
+            <div class="drift-pagination"></div>
+          </div>
+          <code>prev: { rotate: [0, 0, -10], translate: ['-100%', '20%', 0] }
+next: { rotate: [0, 0, 10], translate: ['100%', '20%', 0] }</code>
+        </div>
+
+        <!-- 8. fade-slide -->
+        <div class="preset-cell">
+          <h3>fade-slide</h3>
+          <div class="drift-slider" id="preset-fade-slide">
+            <div class="drift-track"><ul class="drift-list">
+              <li class="drift-slide"><img class="slide-img" src="https://picsum.photos/480/180?random=31" alt="Slide 1"></li>
+              <li class="drift-slide"><img class="slide-img" src="https://picsum.photos/480/180?random=32" alt="Slide 2"></li>
+              <li class="drift-slide"><img class="slide-img" src="https://picsum.photos/480/180?random=33" alt="Slide 3"></li>
+            </ul></div>
+            <div class="drift-pagination"></div>
+          </div>
+          <code>prev: { translate: ['-50%', 0, 0], opacity: 0 }
+next: { translate: ['50%', 0, 0], opacity: 0 }</code>
+        </div>
+
+      </div><!-- /preset-grid -->
+    </div>
+  </div>
+  <div data-include="../_includes/footer.html"></div>
+  <script src="../assets/lib/drift-slider.umd.js"></script>
+  <script src="../assets/js/docs.js"></script>
+  <script>
+    var DS = DriftSlider;
+
+    var presets = [
+      {
+        id: 'preset-flip-horizontal',
+        effect: {
+          perspective: true,
+          prev: { rotate: [0, -180, 0], opacity: 0 },
+          next: { rotate: [0, 180, 0], opacity: 0 },
+        },
+      },
+      {
+        id: 'preset-zoom-out',
+        effect: {
+          perspective: true,
+          prev: { scale: 0.4, opacity: 0, translate: [0, 0, -600] },
+          next: { scale: 0.4, opacity: 0, translate: [0, 0, -600] },
+        },
+      },
+      {
+        id: 'preset-rotate-in',
+        effect: {
+          prev: { rotate: [0, 0, -15], translate: ['-120%', 0, 0] },
+          next: { rotate: [0, 0, 15], translate: ['120%', 0, 0] },
+        },
+      },
+      {
+        id: 'preset-slide-rotate',
+        effect: {
+          perspective: true,
+          prev: { translate: ['-100%', 0, 0], rotate: [0, -30, 0] },
+          next: { translate: ['100%', 0, 0], rotate: [0, 30, 0] },
+        },
+      },
+      {
+        id: 'preset-parallax-slide',
+        effect: {
+          prev: { translate: ['-125%', 0, 0] },
+          next: { translate: ['125%', 0, 0] },
+        },
+      },
+      {
+        id: 'preset-scale-up',
+        effect: {
+          prev: { scale: 1.5, opacity: 0 },
+          next: { scale: 1.5, opacity: 0 },
+        },
+      },
+      {
+        id: 'preset-swing',
+        effect: {
+          prev: { rotate: [0, 0, -10], translate: ['-100%', '20%', 0] },
+          next: { rotate: [0, 0, 10], translate: ['100%', '20%', 0] },
+        },
+      },
+      {
+        id: 'preset-fade-slide',
+        effect: {
+          prev: { translate: ['-50%', 0, 0], opacity: 0 },
+          next: { translate: ['50%', 0, 0], opacity: 0 },
+        },
+      },
+    ];
+
+    presets.forEach(function(p, idx) {
+      new DS.DriftSlider('#' + p.id, {
+        modules: [DS.Pagination, DS.Autoplay, DS.EffectCreative, DS.A11y],
+        effect: 'creative',
+        loop: true,
+        speed: 600,
+        autoplay: { enabled: true, delay: 2500 + idx * 300 },
+        creativeEffect: p.effect,
+      });
+    });
+  </script>
+</body>
+</html>
