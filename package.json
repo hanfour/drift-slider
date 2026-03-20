@@ -6,7 +6,9 @@
   "main": "./dist/esm/index.mjs",
   "module": "./dist/esm/index.mjs",
   "types": "./dist/types/index.d.ts",
-  "sideEffects": ["*.css"],
+  "sideEffects": [
+    "*.css"
+  ],
   "exports": {
     ".": {
       "types": "./dist/types/index.d.ts",
@@ -47,7 +49,8 @@
     "test:coverage": "vitest run --coverage",
     "release": "release-it",
     "release:dry": "release-it --dry-run",
-    "prepublishOnly": "npm run build && npm run build:css",
+    "publint": "publint",
+    "prepublishOnly": "npm run build && npm run build:css && npm run publint",
     "optimize": "node scripts/agent-optimize.mjs"
   },
   "keywords": [
@@ -70,7 +73,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/hanfour/drift-slider.git"
+    "url": "git+https://github.com/hanfour/drift-slider.git"
   },
   "bugs": {
     "url": "https://github.com/hanfour/drift-slider/issues"
@@ -82,6 +85,7 @@
     "@rollup/plugin-terser": "^1.0.0",
     "@vitest/coverage-v8": "^4.1.0",
     "jsdom": "^29.0.0",
+    "publint": "^0.3.18",
     "release-it": "^19.2.4",
     "rollup": "^4.9.0",
     "sass": "^1.69.0",
