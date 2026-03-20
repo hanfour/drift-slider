@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DriftSlider — Vertical Thumbnails</title>
+  <meta name="description" content="Vertical thumbnail navigation layout using the DriftSlider Thumbs module.">
+  <meta name="keywords" content="DriftSlider, demo, thumbs, vertical, thumbnail, navigation">
+  <link rel="canonical" href="https://hanfour.github.io/drift-slider/demos/thumbs-vertical.html">
+  <meta property="og:title" content="DriftSlider — Vertical Thumbnails">
+  <meta property="og:description" content="Vertical thumbnail navigation layout using the DriftSlider Thumbs module.">
+  <meta property="og:image" content="https://hanfour.github.io/drift-slider/assets/img/og-image.svg">
+  <meta property="og:url" content="https://hanfour.github.io/drift-slider/demos/thumbs-vertical.html">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="DriftSlider — Vertical Thumbnails">
+  <meta name="twitter:description" content="Vertical thumbnail navigation layout using the DriftSlider Thumbs module.">
+  <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/docs.css">
+  <link rel="stylesheet" href="../assets/css/prism-onedark.css">
+  <link rel="stylesheet" href="../assets/lib/drift-slider-bundle.css">
+  <style>
+    .gallery-layout {
+      display: flex;
+      gap: 12px;
+      align-items: stretch;
+    }
+    .gallery-main {
+      flex: 0 0 75%;
+      max-width: 75%;
+    }
+    .gallery-thumbs {
+      flex: 0 0 calc(25% - 12px);
+      max-width: calc(25% - 12px);
+      height: 400px;
+    }
+
+    .main-slider { height: 400px; }
+    .main-slider .slide-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      border-radius: 12px;
+    }
+    .main-slider .drift-slide { border-radius: 12px; overflow: hidden; }
+
+    .thumb-slider { height: 100%; }
+    .thumb-slider .thumb-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      border-radius: 8px;
+      opacity: 0.5;
+      cursor: pointer;
+      transition: opacity 0.3s, border-color 0.3s;
+      border: 2px solid transparent;
+    }
+    .thumb-slider .drift-thumb--active .thumb-img {
+      opacity: 1;
+      border: 2px solid #007aff;
+    }
+
+    @media (max-width: 640px) {
+      .gallery-layout {
+        flex-direction: column;
+      }
+      .gallery-main,
+      .gallery-thumbs {
+        flex: none;
+        max-width: 100%;
+        width: 100%;
+      }
+      .gallery-thumbs { height: 80px; }
+      .thumb-slider .drift-slide { height: 70px !important; }
+    }
+  </style>
+</head>
+<body>
+  <div data-include="../_includes/header.html"></div>
+  <div class="page-body">
+    <div class="demo-page">
+      <a href="../demos.html" class="demo-back">&larr; Back to Demos</a>
+      <h1 data-i18n-en>Vertical Thumbnails</h1>
+      <h1 data-i18n-zh>垂直縮圖導航</h1>
+      <p class="demo-desc" data-i18n-en>Vertical thumbnail navigation on the right side, powered by the Thumbs module.</p>
+      <p class="demo-desc" data-i18n-zh>右側垂直縮圖導航，使用 Thumbs 模組驅動。</p>
+
+      <div class="gallery-layout">
+        <!-- Main slider -->
+        <div class="gallery-main">
+          <div id="main-slider" class="drift-slider main-slider">
+            <div class="drift-track"><ul class="drift-list">
+              <li class="drift-slide"><img class="slide-img" src="https://picsum.photos/800/500?random=11" alt="Gallery image 1"></li>
+              <li class="drift-slide"><img class="slide-img" src="https://picsum.photos/800/500?random=12" alt="Gallery image 2"></li>
+              <li class="drift-slide"><img class="slide-img" src="https://picsum.photos/800/500?random=13" alt="Gallery image 3"></li>
+              <li class="drift-slide"><img class="slide-img" src="https://picsum.photos/800/500?random=14" alt="Gallery image 4"></li>
+              <li class="drift-slide"><img class="slide-img" src="https://picsum.photos/800/500?random=15" alt="Gallery image 5"></li>
+              <li class="drift-slide"><img class="slide-img" src="https://picsum.photos/800/500?random=16" alt="Gallery image 6"></li>
+            </ul></div>
+            <button class="drift-arrow drift-arrow--prev" aria-label="Previous" type="button"></button>
+            <button class="drift-arrow drift-arrow--next" aria-label="Next" type="button"></button>
+            <div class="drift-pagination"></div>
+          </div>
+        </div>
+
+        <!-- Vertical thumb slider -->
+        <div class="gallery-thumbs">
+          <div id="thumb-slider" class="drift-slider thumb-slider">
+            <div class="drift-track"><ul class="drift-list">
+              <li class="drift-slide"><img class="thumb-img" src="https://picsum.photos/160/100?random=11" alt="Thumbnail 1"></li>
+              <li class="drift-slide"><img class="thumb-img" src="https://picsum.photos/160/100?random=12" alt="Thumbnail 2"></li>
+              <li class="drift-slide"><img class="thumb-img" src="https://picsum.photos/160/100?random=13" alt="Thumbnail 3"></li>
+              <li class="drift-slide"><img class="thumb-img" src="https://picsum.photos/160/100?random=14" alt="Thumbnail 4"></li>
+              <li class="drift-slide"><img class="thumb-img" src="https://picsum.photos/160/100?random=15" alt="Thumbnail 5"></li>
+              <li class="drift-slide"><img class="thumb-img" src="https://picsum.photos/160/100?random=16" alt="Thumbnail 6"></li>
+            </ul></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Source Code section -->
+      <h2 class="demo-section-title">Source Code</h2>
+      <div class="code-block">
+        <span class="code-lang">html</span>
+        <pre><code class="language-html">&lt;div class="gallery-layout"&gt;
+  &lt;!-- Main slider (75% width) --&gt;
+  &lt;div class="gallery-main"&gt;
+    &lt;div id="main-slider" class="drift-slider" style="height:400px;"&gt;
+      &lt;div class="drift-track"&gt;&lt;ul class="drift-list"&gt;
+        &lt;li class="drift-slide"&gt;&lt;img src="image-1.jpg" alt="Image 1"&gt;&lt;/li&gt;
+        &lt;!-- ... more slides --&gt;
+      &lt;/ul&gt;&lt;/div&gt;
+      &lt;button class="drift-arrow drift-arrow--prev" type="button"&gt;&lt;/button&gt;
+      &lt;button class="drift-arrow drift-arrow--next" type="button"&gt;&lt;/button&gt;
+      &lt;div class="drift-pagination"&gt;&lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+
+  &lt;!-- Vertical thumb slider (25% width) --&gt;
+  &lt;div class="gallery-thumbs" style="height:400px;"&gt;
+    &lt;div id="thumb-slider" class="drift-slider" style="height:100%;"&gt;
+      &lt;div class="drift-track"&gt;&lt;ul class="drift-list"&gt;
+        &lt;li class="drift-slide"&gt;&lt;img src="thumb-1.jpg" alt="Thumb 1"&gt;&lt;/li&gt;
+        &lt;!-- ... more thumbs --&gt;
+      &lt;/ul&gt;&lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+      </div>
+      <div class="code-block">
+        <span class="code-lang">js</span>
+        <pre><code class="language-javascript">var DS = DriftSlider;
+
+// Create vertical thumbnail slider first
+var thumbsSlider = new DS.DriftSlider('#thumb-slider', {
+  direction: 'vertical',
+  slidesPerView: 4,
+  spaceBetween: 8,
+  grabCursor: true,
+});
+
+// Create main slider with Thumbs module
+var mainSlider = new DS.DriftSlider('#main-slider', {
+  modules: [DS.Thumbs, DS.Navigation, DS.Pagination],
+  loop: false,
+  thumbs: {
+    slider: thumbsSlider,
+    slideThumbActiveClass: 'drift-thumb--active',
+    autoScrollThumbs: true,
+  },
+  pagination: {
+    el: document.querySelector('#main-slider .drift-pagination'),
+    type: 'fraction',
+  },
+  navigation: {
+    prevEl: document.querySelector('#main-slider .drift-arrow--prev'),
+    nextEl: document.querySelector('#main-slider .drift-arrow--next'),
+  },
+});</code></pre>
+      </div>
+      <div class="code-block">
+        <span class="code-lang">css</span>
+        <pre><code class="language-css">.gallery-layout {
+  display: flex;
+  gap: 12px;
+}
+.gallery-main { flex: 0 0 75%; }
+.gallery-thumbs {
+  flex: 0 0 calc(25% - 12px);
+  height: 400px; /* match main slider height */
+}
+
+/* Inactive thumbnails */
+.thumb-slider .thumb-img {
+  opacity: 0.5;
+  cursor: pointer;
+  border: 2px solid transparent;
+}
+
+/* Active thumbnail */
+.thumb-slider .drift-thumb--active .thumb-img {
+  opacity: 1;
+  border: 2px solid #007aff;
+}</code></pre>
+      </div>
+    </div>
+  </div>
+  <div data-include="../_includes/footer.html"></div>
+  <script src="../assets/lib/drift-slider.umd.js"></script>
+  <script src="../assets/js/prism.js"></script>
+  <script src="../assets/js/docs.js"></script>
+  <script>
+    var DS = DriftSlider;
+
+    // Create vertical thumbnail slider first
+    var thumbsSlider = new DS.DriftSlider('#thumb-slider', {
+      direction: 'vertical',
+      slidesPerView: 4,
+      spaceBetween: 8,
+      grabCursor: true,
+    });
+
+    // Create main slider with Thumbs module
+    var mainSlider = new DS.DriftSlider('#main-slider', {
+      modules: [DS.Thumbs, DS.Navigation, DS.Pagination],
+      loop: false,
+      thumbs: {
+        slider: thumbsSlider,
+        slideThumbActiveClass: 'drift-thumb--active',
+        autoScrollThumbs: true,
+      },
+      pagination: {
+        el: document.querySelector('#main-slider .drift-pagination'),
+        type: 'fraction',
+      },
+      navigation: {
+        prevEl: document.querySelector('#main-slider .drift-arrow--prev'),
+        nextEl: document.querySelector('#main-slider .drift-arrow--next'),
+      },
+    });
+  </script>
+</body>
+</html>
