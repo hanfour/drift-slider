@@ -4,17 +4,17 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DriftSlider — Multi-Row Grid</title>
-  <meta name="description" content="Multi-row grid layout with multiple slides per view.">
-  <meta name="keywords" content="DriftSlider, demo, multi-row, grid layout, slidesPerView, CSS grid">
+  <meta name="description" content="Multi-row grid layout using two synced DriftSlider instances.">
+  <meta name="keywords" content="DriftSlider, demo, multi-row, grid layout, slidesPerView, synced sliders">
   <link rel="canonical" href="https://hanfour.github.io/drift-slider/demos/multi-row.html">
   <meta property="og:title" content="DriftSlider — Multi-Row Grid">
-  <meta property="og:description" content="Multi-row grid layout with multiple slides per view.">
+  <meta property="og:description" content="Multi-row grid layout using two synced DriftSlider instances.">
   <meta property="og:image" content="https://hanfour.github.io/drift-slider/assets/img/og-image.svg">
   <meta property="og:url" content="https://hanfour.github.io/drift-slider/demos/multi-row.html">
   <meta property="og:type" content="website">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="DriftSlider — Multi-Row Grid">
-  <meta name="twitter:description" content="Multi-row grid layout with multiple slides per view.">
+  <meta name="twitter:description" content="Multi-row grid layout using two synced DriftSlider instances.">
   <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -22,6 +22,20 @@
   <link rel="stylesheet" href="../assets/css/docs.css">
   <link rel="stylesheet" href="../assets/css/prism-onedark.css">
   <link rel="stylesheet" href="../assets/lib/drift-slider-bundle.css">
+  <style>
+    .grid-wrap {
+      position: relative;
+    }
+    .grid-wrap .drift-slider {
+      overflow: hidden;
+      border-radius: 0;
+    }
+    #row1 { border-radius: var(--radius) var(--radius) 0 0; }
+    #row2 { border-radius: 0 0 var(--radius) var(--radius); }
+    #row1 .drift-arrow,
+    #row1 .drift-pagination { display: none; }
+    .grid-wrap .slide-content { height: 160px; font-size: 1.5em; }
+  </style>
 </head>
 <body>
   <div data-include="../_includes/header.html"></div>
@@ -29,24 +43,37 @@
     <div class="demo-page">
       <a href="../demos.html" class="demo-back">&larr; Back to Demos</a>
       <h1>Multi-Row Grid</h1>
-      <p class="demo-desc">Multi-row layout using <code>slidesPerView: 3</code> with CSS grid to simulate multiple rows.</p>
+      <p class="demo-desc">Two synced slider instances stacked to create a multi-row grid — navigation controls the pair together.</p>
 
       <!-- Live slider demo -->
-      <div class="drift-slider">
-        <div class="drift-track"><ul class="drift-list" style="flex-wrap: wrap; height: auto;">
-          <li class="drift-slide"><div class="slide-content slide-1">Slide 1</div></li>
-          <li class="drift-slide"><div class="slide-content slide-2">Slide 2</div></li>
-          <li class="drift-slide"><div class="slide-content slide-3">Slide 3</div></li>
-          <li class="drift-slide"><div class="slide-content slide-4">Slide 4</div></li>
-          <li class="drift-slide"><div class="slide-content slide-5">Slide 5</div></li>
-          <li class="drift-slide"><div class="slide-content slide-6">Slide 6</div></li>
-          <li class="drift-slide"><div class="slide-content slide-1">Slide 7</div></li>
-          <li class="drift-slide"><div class="slide-content slide-2">Slide 8</div></li>
-          <li class="drift-slide"><div class="slide-content slide-3">Slide 9</div></li>
-        </ul></div>
-        <button class="drift-arrow drift-arrow--prev" aria-label="Previous" type="button"></button>
-        <button class="drift-arrow drift-arrow--next" aria-label="Next" type="button"></button>
-        <div class="drift-pagination"></div>
+      <div class="grid-wrap">
+        <div class="drift-slider" id="row1">
+          <div class="drift-track"><ul class="drift-list">
+            <li class="drift-slide"><div class="slide-content slide-1">1</div></li>
+            <li class="drift-slide"><div class="slide-content slide-2">2</div></li>
+            <li class="drift-slide"><div class="slide-content slide-3">3</div></li>
+            <li class="drift-slide"><div class="slide-content slide-4">4</div></li>
+            <li class="drift-slide"><div class="slide-content slide-5">5</div></li>
+            <li class="drift-slide"><div class="slide-content slide-6">6</div></li>
+          </ul></div>
+          <button class="drift-arrow drift-arrow--prev" aria-label="Previous" type="button"></button>
+          <button class="drift-arrow drift-arrow--next" aria-label="Next" type="button"></button>
+          <div class="drift-pagination"></div>
+        </div>
+
+        <div class="drift-slider" id="row2">
+          <div class="drift-track"><ul class="drift-list">
+            <li class="drift-slide"><div class="slide-content slide-4">7</div></li>
+            <li class="drift-slide"><div class="slide-content slide-5">8</div></li>
+            <li class="drift-slide"><div class="slide-content slide-6">9</div></li>
+            <li class="drift-slide"><div class="slide-content slide-1">10</div></li>
+            <li class="drift-slide"><div class="slide-content slide-2">11</div></li>
+            <li class="drift-slide"><div class="slide-content slide-3">12</div></li>
+          </ul></div>
+          <button class="drift-arrow drift-arrow--prev" aria-label="Previous" type="button"></button>
+          <button class="drift-arrow drift-arrow--next" aria-label="Next" type="button"></button>
+          <div class="drift-pagination"></div>
+        </div>
       </div>
 
       <!-- Source Code section -->
@@ -54,12 +81,32 @@
       <div class="code-block">
         <span class="code-lang">js</span>
         <pre><code class="language-javascript">var DS = DriftSlider;
-var slider = new DS.DriftSlider('.drift-slider', {
+
+// Row 1 — no visible controls (driven by row 2)
+var row1 = new DS.DriftSlider('#row1', {
   modules: [DS.Navigation, DS.Pagination, DS.A11y],
   slidesPerView: 3,
+  slidesPerGroup: 3,
   spaceBetween: 16,
   speed: 400,
-  grabCursor: true,
+});
+
+// Row 2 — arrows + pagination visible
+var row2 = new DS.DriftSlider('#row2', {
+  modules: [DS.Navigation, DS.Pagination, DS.A11y],
+  slidesPerView: 3,
+  slidesPerGroup: 3,
+  spaceBetween: 16,
+  speed: 400,
+});
+
+// Sync: when either row changes, the other follows
+var syncing = false;
+row1.on('slideChange', function(s) {
+  if (!syncing) { syncing = true; row2.slideTo(s.activeIndex); syncing = false; }
+});
+row2.on('slideChange', function(s) {
+  if (!syncing) { syncing = true; row1.slideTo(s.activeIndex); syncing = false; }
 });</code></pre>
       </div>
     </div>
@@ -70,12 +117,29 @@ var slider = new DS.DriftSlider('.drift-slider', {
   <script src="../assets/js/docs.js"></script>
   <script>
     var DS = DriftSlider;
-    var slider = new DS.DriftSlider('.drift-slider', {
+
+    var row1 = new DS.DriftSlider('#row1', {
       modules: [DS.Navigation, DS.Pagination, DS.A11y],
       slidesPerView: 3,
+      slidesPerGroup: 3,
       spaceBetween: 16,
       speed: 400,
-      grabCursor: true,
+    });
+
+    var row2 = new DS.DriftSlider('#row2', {
+      modules: [DS.Navigation, DS.Pagination, DS.A11y],
+      slidesPerView: 3,
+      slidesPerGroup: 3,
+      spaceBetween: 16,
+      speed: 400,
+    });
+
+    var syncing = false;
+    row1.on('slideChange', function(s) {
+      if (!syncing) { syncing = true; row2.slideTo(s.activeIndex); syncing = false; }
+    });
+    row2.on('slideChange', function(s) {
+      if (!syncing) { syncing = true; row1.slideTo(s.activeIndex); syncing = false; }
     });
   </script>
 </body>
