@@ -177,6 +177,9 @@ export default function EffectShowcase({ slider, extendParams, on }) {
         const loopedSlides = slider._loopedSlides;
         const totalOriginal = slider.slides.length - loopedSlides * 2;
 
+        // Guard against infinite loop if totalOriginal <= 0
+        if (totalOriginal <= 0) return;
+
         let newIdx = slider.activeIndex;
         let needsJump = false;
 
@@ -192,6 +195,8 @@ export default function EffectShowcase({ slider, extendParams, on }) {
         if (needsJump) {
           slider.setTransition(0);
           slider.activeIndex = newIdx;
+          // Guard against snapGrid out-of-bounds
+          if (newIdx >= slider.snapGrid.length) return;
           const translate = -slider.snapGrid[newIdx];
           slider.setTranslate(translate);
         }
