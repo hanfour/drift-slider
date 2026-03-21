@@ -7,3 +7,4 @@ coverage/
 .worktrees/
 .lighthouseci/
 scripts/optimize-log.json
+logs/
