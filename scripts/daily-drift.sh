@@ -2,8 +2,8 @@
 set -euo pipefail
 
 # ── Config ──
-REPO_DIR="/Volumes/SATECHI DISK Media/UserFolders/Projects/library/jquery/drift-slider"
-LOG_DIR="$REPO_DIR/logs"
+REPO_DIR="/Users/hanfourmini/Projects/library/jquery/drift-slider"
+LOG_DIR="$HOME/logs/driftslider"
 DATE=$(date +%Y-%m-%d)
 DAY=$(date +%u)  # 1=Mon, 7=Sun
 LOG_FILE="$LOG_DIR/daily-$DATE.log"
