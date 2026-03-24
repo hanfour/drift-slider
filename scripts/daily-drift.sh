@@ -45,25 +45,78 @@ esac
 echo "Task type: $TYPE ($DESC)"
 
 # ── Build prompt ──
-PROMPT="You are running the DriftSlider daily automation task.
+read -r -d '' PROMPT << 'ENDPROMPT' || true
+You are running the DriftSlider daily automation task.
 
-Today is $DATE ($(date +%A)), task type: $TYPE ($DESC).
-
-Instructions:
+## Phase 1: Plan
 1. Read CLAUDE.md for project conventions and daily task rules.
 2. Read docs/plans/competitor-analysis.md for task ideas.
-3. Check git log and docs/demos/ to avoid duplicating recent work.
-4. Execute the type-$TYPE task as described in CLAUDE.md.
-5. Create a new branch: daily/$DATE
-6. Commit your changes with a descriptive message.
-7. Push and create a PR with gh pr create.
-8. Output the PR URL as the last line.
+3. Check git log --oneline -20 and ls docs/demos/ to avoid duplicating recent work.
+4. Decide what to build today based on the task type.
 
-Important:
+## Phase 2: Implement
+5. Create a new branch: daily/DATEPLACEHOLDER
+6. Execute the task as described in CLAUDE.md.
+7. For type C: run npm test and npm run build.
+8. Commit your changes with a descriptive message.
+
+## Phase 3: Verify (BEFORE creating PR)
+Run a strict self-review. You must pass ALL checks before proceeding.
+
+### 3a. Code Review
+- No security issues (XSS, injection, unsafe innerHTML)
+- No unused variables, dead code, or console.log left behind
+- i18n complete: both data-i18n-en and data-i18n-zh on h1 and p.demo-desc
+- No hardcoded English text in visible UI (except code blocks)
+- picsum.photos uses seed URLs (not ?random=)
+
+### 3b. Functional Testing
+- Open the page with Playwright browser_navigate
+- Take a screenshot to verify it renders correctly
+- Verify slider initializes (DOM has drift-slide elements)
+- Click the language toggle and verify Chinese text appears
+- For type C: npm test must pass with 0 failures
+
+### 3c. RWD Responsive Check
+- Screenshot at desktop width (1280px)
+- Resize to 768px (tablet) and screenshot — check no overflow or broken layout
+- Resize to 375px (mobile) and screenshot — check content is readable and usable
+
+### 3d. Lighthouse Quick Check (if available)
+- Run Lighthouse on the new/modified page
+- Performance ≥ 0.9, Accessibility ≥ 0.9
+
+### Verification Failure Handling
+If ANY check fails:
+- Fix the issue immediately
+- Re-run the failed check
+- Maximum 3 fix-verify cycles
+- After 3 failures: create a DRAFT PR with issues listed in the body
+
+## Phase 4: Create PR
+9. Push the branch.
+10. Create a PR with gh pr create. Include in the PR body:
+    - Summary of what was built/changed
+    - Verification results (screenshots, test results)
+    - Desktop/Tablet/Mobile screenshot links if applicable
+    - Any known issues (if creating a draft PR after verification failure)
+11. Mark the completed item in competitor-analysis.md with [x].
+12. Output ONLY the PR URL as the very last line of your response.
+
+## Rules
 - Do NOT push directly to main. Always create a PR.
 - Include i18n (EN + ZH) for any new or modified demo pages.
-- For type C: run npm test and npm run build before committing.
-- Mark completed items in competitor-analysis.md with [x]."
+- Use seed-based picsum URLs: https://picsum.photos/seed/{name}/W/H
+- Add the demo card to docs/demos.html gallery if creating a new demo.
+ENDPROMPT
+
+# Replace date placeholder
+PROMPT="${PROMPT//DATEPLACEHOLDER/$DATE}"
+
+# Prepend today's context
+PROMPT="Today is $DATE ($(date +%A)), task type: $TYPE ($DESC).
+
+$PROMPT"
 
 # ── Run Claude ──
 echo "Starting Claude CLI..."
