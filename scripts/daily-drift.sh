@@ -2,6 +2,16 @@
 set -euo pipefail
 export PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:$PATH"
 
+# ── GitHub auth (cron can't access macOS keyring) ──
+GH_TOKEN_FILE="$HOME/.config/driftslider/.gh-token"
+if [ -f "$GH_TOKEN_FILE" ]; then
+  export GH_TOKEN=$(cat "$GH_TOKEN_FILE")
+else
+  echo "ERROR: No token at $GH_TOKEN_FILE. Run: gh auth token > $GH_TOKEN_FILE" > /tmp/driftslider-daily.err
+  osascript -e 'display notification "No GitHub token file — check logs" with title "DriftSlider Daily ✗"'
+  exit 1
+fi
+
 # ── Config ──
 REPO_DIR="/Users/hanfourmini/Projects/library/jquery/drift-slider"
 LOG_DIR="$HOME/logs/driftslider"
