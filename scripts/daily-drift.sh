@@ -13,7 +13,7 @@ else
 fi
 
 # ── Config ──
-REPO_DIR="/Users/hanfourmini/Projects/library/jquery/drift-slider"
+REPO_DIR="/Users/hanfourmini/local-repos/drift-slider"
 LOG_DIR="$HOME/logs/driftslider"
 DATE=$(date +%Y-%m-%d)
 DAY=$(date +%u)  # 1=Mon, 7=Sun
