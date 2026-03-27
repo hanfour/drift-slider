@@ -9,6 +9,7 @@ export {
   EffectFade,
   EffectCoverflow,
   EffectCards,
+  EffectDeck,
   EffectShowcase,
   EffectCreative,
   Keyboard,

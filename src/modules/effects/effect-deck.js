@@ -1,21 +1,13 @@
 export default function EffectDeck({ slider, extendParams, on }) {
   const overlayEls = [];
 
-  const ORIGIN_MAP = {
-    'bottom-left': 'left bottom',
-    'bottom-right': 'right bottom',
-    'top-left': 'left top',
-    'top-right': 'right top',
-    'center': 'center center',
-  };
-
   extendParams({
     deckEffect: {
       stackOrigin: 'bottom-left',
-      activeScale: 1,
-      stackScale: 0.6,
-      stackOffsetX: 4,
-      stackOffsetY: 3,
+      activeScale: 0.85,
+      stackScale: 0.5,
+      stackOffsetX: 6,
+      stackOffsetY: 4,
       stackVisibleCount: 3,
       perspective: 1200,
       depthSpacing: 30,
@@ -30,20 +22,23 @@ export default function EffectDeck({ slider, extendParams, on }) {
     },
   });
 
-  function getOriginCSS() {
-    const origin = slider.params.deckEffect.stackOrigin;
-    return ORIGIN_MAP[origin] || ORIGIN_MAP['bottom-left'];
-  }
+  /**
+   * Returns {tx, ty, dx, dy} — base position and per-layer direction.
+   * All slides use transformOrigin: center center, so we translate from center.
+   */
+  function getStackTranslation(containerW, containerH, stackScale, origin) {
+    const sw = containerW * stackScale;
+    const sh = containerH * stackScale;
+    const edgeX = (containerW - sw) / 2;
+    const edgeY = (containerH - sh) / 2;
 
-  function getCornerMultipliers() {
-    const origin = slider.params.deckEffect.stackOrigin;
     switch (origin) {
-      case 'bottom-left':  return { mx: -1, my:  1 };
-      case 'bottom-right': return { mx:  1, my:  1 };
-      case 'top-left':     return { mx: -1, my: -1 };
-      case 'top-right':    return { mx:  1, my: -1 };
-      case 'center':       return { mx:  0, my:  0 };
-      default:             return { mx: -1, my:  1 };
+      case 'bottom-left':  return { tx: -edgeX * 0.7, ty: edgeY * 0.7, dx: -1, dy: 1 };
+      case 'bottom-right': return { tx: edgeX * 0.7,  ty: edgeY * 0.7, dx: 1, dy: 1 };
+      case 'top-left':     return { tx: -edgeX * 0.7, ty: -edgeY * 0.7, dx: -1, dy: -1 };
+      case 'top-right':    return { tx: edgeX * 0.7,  ty: -edgeY * 0.7, dx: 1, dy: -1 };
+      case 'center':       return { tx: 0, ty: 0, dx: 0, dy: 0 };
+      default:             return { tx: -edgeX * 0.7, ty: edgeY * 0.7, dx: -1, dy: 1 };
     }
   }
 
@@ -56,18 +51,21 @@ export default function EffectDeck({ slider, extendParams, on }) {
     const slideHeight = firstSlide ? firstSlide.offsetHeight : 0;
 
     slider.listEl.style.position = 'relative';
+    slider.listEl.style.width = '100%';
     slider.listEl.style.height = `${slideHeight}px`;
 
-    // Add container class
+    // Add container class and allow overflow for stack visibility
     slider.el.classList.add('drift-slider--deck');
+    slider.el.style.overflow = 'visible';
+    if (slider.trackEl) {
+      slider.trackEl.style.overflow = 'visible';
+    }
 
     // 3D perspective on track
     if (params.perspective > 0 && slider.trackEl) {
       slider.trackEl.style.perspective = `${params.perspective}px`;
       slider.trackEl.style.transformStyle = 'preserve-3d';
     }
-
-    const originCSS = getOriginCSS();
 
     for (let i = 0; i < slides.length; i++) {
       const slide = slides[i];
@@ -78,7 +76,7 @@ export default function EffectDeck({ slider, extendParams, on }) {
       slide.style.height = '100%';
       slide.style.transitionProperty = 'transform, opacity, visibility, box-shadow';
       slide.style.transitionDuration = `${slider.params.speed}ms`;
-      slide.style.transformOrigin = originCSS;
+      slide.style.transformOrigin = 'center center';
 
       // Create overlay div if needed
       if (params.overlay) {
@@ -87,6 +85,7 @@ export default function EffectDeck({ slider, extendParams, on }) {
         overlayDiv.style.position = 'absolute';
         overlayDiv.style.inset = '0';
         overlayDiv.style.pointerEvents = 'none';
+        overlayDiv.style.borderRadius = 'inherit';
         overlayDiv.style.transitionProperty = 'opacity';
         overlayDiv.style.transitionDuration = `${slider.params.speed}ms`;
         overlayDiv.style.background = params.overlayColor;
@@ -103,19 +102,15 @@ export default function EffectDeck({ slider, extendParams, on }) {
     const activeIdx = slider.activeIndex;
     const total = slides.length;
     const has3D = params.perspective > 0;
-    const cornerMul = getCornerMultipliers();
 
-    // Compute corner offset for stack cards
+    // Container dimensions for stack positioning
     const containerW = slider.el.clientWidth || 0;
     const containerH = slider.el.clientHeight || 0;
-    const scaledW = containerW * params.stackScale;
-    const scaledH = containerH * params.stackScale;
-    const gapX = (containerW - scaledW) / 2;
-    const gapY = (containerH - scaledH) / 2;
 
-    // Base corner translation
-    const baseX = gapX * cornerMul.mx;
-    const baseY = gapY * cornerMul.my;
+    // Base stack position (center of where stack cards go)
+    const stackBase = getStackTranslation(
+      containerW, containerH, params.stackScale, params.stackOrigin
+    );
 
     for (let i = 0; i < total; i++) {
       const slide = slides[i];
@@ -123,16 +118,15 @@ export default function EffectDeck({ slider, extendParams, on }) {
       // Calculate offset from active index
       let offset = i - activeIdx;
       if (slider.params.loop) {
-        // In loop mode, find shortest distance
         if (offset > total / 2) offset -= total;
         if (offset < -total / 2) offset += total;
       }
 
       if (offset === 0) {
-        // Active card
-        let transform = `scale(${params.activeScale})`;
+        // --- Active card: centered, scaled ---
+        let transform = `translate3d(0, 0, 0) scale(${params.activeScale})`;
         if (has3D) {
-          transform += ` translateZ(${params.activeDepth}px)`;
+          transform = `translate3d(0, 0, ${params.activeDepth}px) scale(${params.activeScale})`;
         }
         slide.style.transform = transform;
         slide.style.opacity = '1';
@@ -147,34 +141,35 @@ export default function EffectDeck({ slider, extendParams, on }) {
           slide.style.boxShadow = 'none';
         }
 
-        // Active overlay: hidden
         if (overlayEls[i]) {
           overlayEls[i].style.opacity = '0';
         }
       } else if (offset > 0 && offset <= params.stackVisibleCount) {
-        // Stack cards (next slides visible behind active)
+        // --- Stack cards: translated to corner, scaled down ---
         const layer = offset;
-        const tx = baseX + params.stackOffsetX * layer * cornerMul.mx;
-        const ty = baseY + params.stackOffsetY * layer * cornerMul.my;
+        // Each layer fans out further in the corner direction
+        const tx = stackBase.tx + params.stackOffsetX * layer * stackBase.dx;
+        const ty = stackBase.ty + params.stackOffsetY * layer * stackBase.dy;
 
         let transform = `translate3d(${tx}px, ${ty}px, 0) scale(${params.stackScale})`;
         if (has3D) {
-          transform = `translate3d(${tx}px, ${ty}px, ${-params.depthSpacing * layer}px) scale(${params.stackScale}) rotateX(${params.tiltX}deg) rotateY(${params.tiltY}deg)`;
+          const tz = -params.depthSpacing * layer;
+          transform = `translate3d(${tx}px, ${ty}px, ${tz}px) scale(${params.stackScale}) rotateX(${params.tiltX}deg) rotateY(${params.tiltY}deg)`;
         }
 
+        const layerOpacity = 1 - layer * (0.15);
         slide.style.transform = transform;
-        slide.style.opacity = String(1 - layer * (0.3 / params.stackVisibleCount));
+        slide.style.opacity = String(Math.max(layerOpacity, 0.4));
         slide.style.visibility = 'visible';
         slide.style.zIndex = String(params.stackVisibleCount + 1 - layer);
         slide.style.pointerEvents = 'none';
         slide.style.boxShadow = 'none';
 
-        // Stack overlay: increasing opacity per layer
         if (overlayEls[i]) {
-          overlayEls[i].style.opacity = String(layer * (0.6 / params.stackVisibleCount));
+          overlayEls[i].style.opacity = String(layer * (0.4 / params.stackVisibleCount));
         }
       } else {
-        // Hidden cards
+        // --- Hidden cards ---
         slide.style.transform = 'none';
         slide.style.opacity = '0';
         slide.style.visibility = 'hidden';
@@ -190,7 +185,6 @@ export default function EffectDeck({ slider, extendParams, on }) {
   }
 
   function overrideMethods() {
-    // Override setTranslate
     slider.setTranslate = function (translate) {
       slider.translate = translate;
 
@@ -208,7 +202,6 @@ export default function EffectDeck({ slider, extendParams, on }) {
       setSlideTransforms();
     };
 
-    // Override setTransition
     slider.setTransition = function (duration) {
       for (let i = 0; i < slider.slides.length; i++) {
         slider.slides[i].style.transitionDuration = `${duration}ms`;
@@ -223,13 +216,11 @@ export default function EffectDeck({ slider, extendParams, on }) {
   function init() {
     if (slider.params.effect !== 'deck') return;
 
-    // Force slidesPerView = 1
     slider.params.slidesPerView = 1;
 
     setupSlides();
     overrideMethods();
 
-    // Initial render
     slider.setTranslate(slider.translate);
   }
 
@@ -240,7 +231,6 @@ export default function EffectDeck({ slider, extendParams, on }) {
 
   function onUpdate() {
     if (slider.params.effect !== 'deck') return;
-    // Re-measure list height on resize/update
     const firstSlide = slider.slides[0];
     if (firstSlide) {
       slider.listEl.style.height = `${firstSlide.offsetHeight}px`;
@@ -249,16 +239,15 @@ export default function EffectDeck({ slider, extendParams, on }) {
   }
 
   function destroy() {
-    // Remove container class
     slider.el.classList.remove('drift-slider--deck');
+    slider.el.style.overflow = '';
 
-    // Clear perspective/transformStyle on trackEl
     if (slider.trackEl) {
+      slider.trackEl.style.overflow = '';
       slider.trackEl.style.perspective = '';
       slider.trackEl.style.transformStyle = '';
     }
 
-    // Clean slide styles and remove overlays
     for (let i = 0; i < slider.slides.length; i++) {
       const slide = slider.slides[i];
       slide.style.position = '';
@@ -276,14 +265,13 @@ export default function EffectDeck({ slider, extendParams, on }) {
       slide.style.transitionDuration = '';
       slide.style.transformOrigin = '';
 
-      // Remove overlay divs
       if (overlayEls[i] && overlayEls[i].parentNode) {
         overlayEls[i].parentNode.removeChild(overlayEls[i]);
       }
     }
     overlayEls.length = 0;
 
-    // Clean list styles
+    slider.listEl.style.width = '';
     slider.listEl.style.height = '';
     slider.listEl.style.position = '';
   }

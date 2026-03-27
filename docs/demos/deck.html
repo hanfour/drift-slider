@@ -136,6 +136,11 @@
 
         <h3>Stack</h3>
         <label>
+          <span>activeScale</span>
+          <input type="range" id="ctrl-activeScale" min="50" max="100" value="85">
+          <span class="val" id="val-activeScale">0.85</span>
+        </label>
+        <label>
           <span>stackOrigin</span>
           <select id="ctrl-stackOrigin">
             <option value="bottom-left" selected>bottom-left</option>
@@ -147,18 +152,18 @@
         </label>
         <label>
           <span>stackScale</span>
-          <input type="range" id="ctrl-stackScale" min="30" max="90" value="60">
-          <span class="val" id="val-stackScale">0.60</span>
+          <input type="range" id="ctrl-stackScale" min="30" max="90" value="50">
+          <span class="val" id="val-stackScale">0.50</span>
         </label>
         <label>
           <span>stackOffsetX</span>
-          <input type="range" id="ctrl-stackOffsetX" min="0" max="20" value="4">
-          <span class="val" id="val-stackOffsetX">4</span>
+          <input type="range" id="ctrl-stackOffsetX" min="0" max="20" value="6">
+          <span class="val" id="val-stackOffsetX">6</span>
         </label>
         <label>
           <span>stackOffsetY</span>
-          <input type="range" id="ctrl-stackOffsetY" min="0" max="20" value="3">
-          <span class="val" id="val-stackOffsetY">3</span>
+          <input type="range" id="ctrl-stackOffsetY" min="0" max="20" value="4">
+          <span class="val" id="val-stackOffsetY">4</span>
         </label>
         <label>
           <span>stackVisibleCount</span>
@@ -224,7 +229,8 @@ var slider = new DS.DriftSlider('.drift-slider', {
   speed: 500,
   deckEffect: {
     stackOrigin: 'bottom-left',
-    stackScale: 0.6,
+    activeScale: 0.85,
+    stackScale: 0.5,
     stackVisibleCount: 3,
     perspective: 1200,
     tiltX: 5,
@@ -249,7 +255,7 @@ var slider = new DS.DriftSlider('.drift-slider', {
     function getDeckParams() {
       return {
         stackOrigin: val('ctrl-stackOrigin'),
-        activeScale: 1,
+        activeScale: num('ctrl-activeScale') / 100,
         stackScale: num('ctrl-stackScale') / 100,
         stackOffsetX: num('ctrl-stackOffsetX'),
         stackOffsetY: num('ctrl-stackOffsetY'),
@@ -269,6 +275,7 @@ var slider = new DS.DriftSlider('.drift-slider', {
 
     function updateDisplay() {
       document.getElementById('val-speed').textContent = val('ctrl-speed');
+      document.getElementById('val-activeScale').textContent = (num('ctrl-activeScale') / 100).toFixed(2);
       document.getElementById('val-stackScale').textContent = (num('ctrl-stackScale') / 100).toFixed(2);
       document.getElementById('val-stackOffsetX').textContent = val('ctrl-stackOffsetX');
       document.getElementById('val-stackOffsetY').textContent = val('ctrl-stackOffsetY');
@@ -299,6 +306,7 @@ var slider = new DS.DriftSlider('.drift-slider', {
       lines.push(
         "  deckEffect: {",
         "    stackOrigin: '" + deckParams.stackOrigin + "',",
+        "    activeScale: " + deckParams.activeScale + ",",
         "    stackScale: " + deckParams.stackScale + ",",
         "    stackOffsetX: " + deckParams.stackOffsetX + ",",
         "    stackOffsetY: " + deckParams.stackOffsetY + ",",
