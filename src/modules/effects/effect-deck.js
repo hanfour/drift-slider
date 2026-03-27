@@ -175,7 +175,7 @@ export default function EffectDeck({ slider, extendParams, on }) {
         }
       } else {
         // Hidden cards
-        slide.style.transform = 'translate3d(0,0,0) scale(1)';
+        slide.style.transform = 'none';
         slide.style.opacity = '0';
         slide.style.visibility = 'hidden';
         slide.style.zIndex = '0';
@@ -240,6 +240,11 @@ export default function EffectDeck({ slider, extendParams, on }) {
 
   function onUpdate() {
     if (slider.params.effect !== 'deck') return;
+    // Re-measure list height on resize/update
+    const firstSlide = slider.slides[0];
+    if (firstSlide) {
+      slider.listEl.style.height = `${firstSlide.offsetHeight}px`;
+    }
     slider.setTranslate(slider.translate);
   }
 
