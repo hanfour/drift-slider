@@ -131,19 +131,33 @@ $PROMPT"
 
 # ── Run Claude ──
 echo "Starting Claude CLI..."
-PR_URL=$(claude -p "$PROMPT" \
+CLAUDE_OUTPUT_FILE="$LOG_DIR/claude-output-$DATE.txt"
+set +e  # allow claude to fail without exiting
+claude -p "$PROMPT" \
   --output-format text \
   --permission-mode auto \
   --model sonnet \
-  2>> "$LOG_FILE")
+  > "$CLAUDE_OUTPUT_FILE" 2>&1
+CLAUDE_EXIT=$?
+set -e
 
-echo "Claude finished. Output: $PR_URL"
+echo "Claude exit code: $CLAUDE_EXIT"
+echo "Claude output (last 50 lines):"
+tail -50 "$CLAUDE_OUTPUT_FILE"
+
+# ── Extract PR URL ──
+PR_URL=$(grep -oE 'https://github\.com/[^ ]+/pull/[0-9]+' "$CLAUDE_OUTPUT_FILE" | tail -1 || echo "")
 
 # ── Notify ──
 if [ -n "$PR_URL" ]; then
+  echo "PR created: $PR_URL"
   osascript -e "display notification \"$DESC completed. PR: $PR_URL\" with title \"DriftSlider Daily ✓\""
+elif [ "$CLAUDE_EXIT" -ne 0 ]; then
+  echo "ERROR: Claude exited with code $CLAUDE_EXIT"
+  osascript -e "display notification \"Claude failed (exit $CLAUDE_EXIT). Check logs.\" with title \"DriftSlider Daily ✗\""
 else
-  osascript -e "display notification \"Task may have failed. Check logs.\" with title \"DriftSlider Daily ✗\""
+  echo "WARNING: Claude finished but no PR URL found."
+  osascript -e "display notification \"No PR created. Check logs.\" with title \"DriftSlider Daily ⚠\""
 fi
 
 echo "=== Done ==="
