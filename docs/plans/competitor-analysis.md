@@ -110,7 +110,7 @@ Improvements to the **28 existing** demo pages.
 - [ ] **B16 -- ticker.html:** Add speed control slider and direction toggle (LTR/RTL)
 - [ ] **B17 -- ticker-dual.html:** Improve a11y -- add pause button and aria-live announcements
 - [ ] **B18 -- vertical.html:** Add touch-angle guidance -- vertical swipe conflicts with page scroll on mobile
-- [ ] **B19 -- autoplay-progress.html:** Add a play/pause toggle button for better UX
+- [x] **B19 -- autoplay-progress.html:** Add a play/pause toggle button for better UX
 - [ ] **B20 -- All demos:** Ensure consistent use of `<meta name="description">` and OG tags for SEO
 
 ---
