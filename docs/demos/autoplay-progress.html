@@ -130,21 +130,24 @@ var slider = new DS.DriftSlider('.drift-slider', {
 });
 
 // Play/Pause toggle
-var btn = document.getElementById('btn-play-pause');
 var playing = true;
-btn.addEventListener('click', function () {
-  if (playing) {
-    slider.autoplay.stop();
-  } else {
-    slider.autoplay.start();
-  }
-  playing = !playing;
-  updateButton();
-});
+var btn = document.getElementById('btn-play-pause');
 
 function updateButton() {
-  btn.setAttribute('aria-label', playing ? 'Pause autoplay' : 'Resume autoplay');
-}</code></pre>
+  btn.setAttribute('aria-label',
+    playing ? 'Pause autoplay' : 'Resume autoplay');
+  // Also update icon, label, and status text
+}
+
+btn.addEventListener('click', function () {
+  playing ? slider.autoplay.stop() : slider.autoplay.start();
+});
+
+// Sync state with actual autoplay events
+slider.on('autoplayStart', function () { playing = true; updateButton(); });
+slider.on('autoplayResume', function () { playing = true; updateButton(); });
+slider.on('autoplayStop', function () { playing = false; updateButton(); });
+slider.on('autoplayPause', function () { playing = false; updateButton(); });</code></pre>
       </div>
     </div>
   </div>
@@ -206,9 +209,13 @@ function updateButton() {
       } else {
         slider.autoplay.start();
       }
-      playing = !playing;
-      updateButton();
     });
+
+    // Sync button state with actual autoplay events
+    slider.on('autoplayStart', function () { playing = true; updateButton(); });
+    slider.on('autoplayResume', function () { playing = true; updateButton(); });
+    slider.on('autoplayStop', function () { playing = false; updateButton(); });
+    slider.on('autoplayPause', function () { playing = false; updateButton(); });
   </script>
 </body>
 </html>
