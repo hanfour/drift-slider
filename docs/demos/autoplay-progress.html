@@ -136,18 +136,21 @@ var btn = document.getElementById('btn-play-pause');
 function updateButton() {
   btn.setAttribute('aria-label',
     playing ? 'Pause autoplay' : 'Resume autoplay');
-  // Also update icon, label, and status text
+  btn.classList.toggle('is-paused', !playing);
+  // Toggle icon and label visibility
+  iconPause.style.display = playing ? '' : 'none';
+  iconPlay.style.display = playing ? 'none' : '';
+  btnLabel.textContent = playing ? 'Pause' : 'Resume';
+  statusEl.textContent = playing ? 'Playing' : 'Paused';
 }
 
 btn.addEventListener('click', function () {
   playing ? slider.autoplay.stop() : slider.autoplay.start();
 });
 
-// Sync state with actual autoplay events
+// Sync button state with intentional play/stop only
 slider.on('autoplayStart', function () { playing = true; updateButton(); });
-slider.on('autoplayResume', function () { playing = true; updateButton(); });
-slider.on('autoplayStop', function () { playing = false; updateButton(); });
-slider.on('autoplayPause', function () { playing = false; updateButton(); });</code></pre>
+slider.on('autoplayStop', function () { playing = false; updateButton(); });</code></pre>
       </div>
     </div>
   </div>
@@ -211,11 +214,10 @@ slider.on('autoplayPause', function () { playing = false; updateButton(); });</c
       }
     });
 
-    // Sync button state with actual autoplay events
+    // Sync button state with intentional play/stop actions only.
+    // Ignore autoplayPause/autoplayResume (transient hover-triggered pauses).
     slider.on('autoplayStart', function () { playing = true; updateButton(); });
-    slider.on('autoplayResume', function () { playing = true; updateButton(); });
     slider.on('autoplayStop', function () { playing = false; updateButton(); });
-    slider.on('autoplayPause', function () { playing = false; updateButton(); });
   </script>
 </body>
 </html>
