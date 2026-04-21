@@ -53,9 +53,13 @@ export default function EffectFade({ slider, extendParams, on }) {
 
     setupSlides();
 
+    // Core _init() calls slideTo BEFORE this init event fires, which applies
+    // a list transform that would drag stacked slides off-screen. Reset it so
+    // all slides overlay in the container.
+    slider.listEl.style.transform = '';
+
     // Override setTranslate to prevent CSS transform movement
     // but preserve progress/boundary calculations
-    const originalSetTranslate = slider.setTranslate.bind(slider);
     slider.setTranslate = function (translate) {
       // Update internal state (progress, isBeginning, isEnd) without moving the list
       slider.translate = translate;

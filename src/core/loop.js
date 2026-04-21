@@ -89,8 +89,15 @@ export default function loopModule({ slider }) {
     // Guard against snapGrid out-of-bounds
     if (newIdx >= slider.snapGrid.length) return;
     const translate = -slider.snapGrid[newIdx];
-    slider.listEl.style.transform = `translate3d(${translate}px, 0, 0)`;
+    // Stacked effects (fade) keep the list static — visual comes from opacity.
+    // Writing a transform here would drag the stacked slides off-screen.
+    if (slider.params.effect !== 'fade') {
+      slider.listEl.style.transform = `translate3d(${translate}px, 0, 0)`;
+    }
     slider.translate = translate;
+    // Notify effects of the activeIndex change so opacity stays in sync with
+    // the now-canonical (non-clone) slide.
+    slider.emit('slideChange', slider);
   }
 
   function _getRealIndex(index) {

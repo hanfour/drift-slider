@@ -32,6 +32,11 @@ export default function updateModule({ slider }) {
       offset = containerSize / 2 - slideSize / 2;
     }
 
+    // Stacked effects (fade) position all slides at the same spot via opacity
+    // rather than translating a track. Skip per-slide width/margin writes so
+    // the effect's own sizing (100% of container) is preserved across updates.
+    const isStackedEffect = params.effect === 'fade';
+
     for (let i = 0; i < slides.length; i++) {
       slidesSizesGrid.push(slideSize);
 
@@ -44,12 +49,14 @@ export default function updateModule({ slider }) {
       }
 
       // Set slide dimensions
-      if (isHorizontal) {
-        slides[i].style.width = `${slideSize}px`;
-        slides[i].style.marginRight = `${spaceBetween}px`;
-      } else {
-        slides[i].style.height = `${slideSize}px`;
-        slides[i].style.marginBottom = `${spaceBetween}px`;
+      if (!isStackedEffect) {
+        if (isHorizontal) {
+          slides[i].style.width = `${slideSize}px`;
+          slides[i].style.marginRight = `${spaceBetween}px`;
+        } else {
+          slides[i].style.height = `${slideSize}px`;
+          slides[i].style.marginBottom = `${spaceBetween}px`;
+        }
       }
     }
 
@@ -71,11 +78,14 @@ export default function updateModule({ slider }) {
     slider.isLocked =
       params.watchOverflow && snapGrid.length <= 1;
 
-    // Update list size
-    if (isHorizontal) {
-      slider.listEl.style.width = `${totalSize}px`;
-    } else {
-      slider.listEl.style.height = `${totalSize}px`;
+    // Update list size. For stacked effects the list must remain at
+    // container size — the effect module sets its own height on init.
+    if (!isStackedEffect) {
+      if (isHorizontal) {
+        slider.listEl.style.width = `${totalSize}px`;
+      } else {
+        slider.listEl.style.height = `${totalSize}px`;
+      }
     }
   }
 
