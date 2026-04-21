@@ -117,4 +117,55 @@ describe('module/effect-fade', () => {
     expect(slide.style.position).toBe('')
     expect(slide.style.visibility).toBe('')
   })
+
+  // Regression: fade + loop drove list.transform off-screen because core
+  // _init → slideTo set a translate before EffectFade's init could intercept.
+  it('resets list transform on init so stacked slides stay in the container', () => {
+    const s = createSlider({
+      sliderOptions: {
+        modules: [EffectFade],
+        effect: 'fade',
+        loop: true,
+      },
+    })
+    cleanup = s.cleanup
+    expect(s.slider.listEl.style.transform).toBe('')
+  })
+
+  // Regression: update() used to write list width = totalSize regardless of
+  // effect, which made slide children resolve to multi-viewport widths and
+  // pushed absolutely-positioned overlays off-screen.
+  it('does not inflate list width when effect is fade', () => {
+    const s = createSlider({
+      slideCount: 4,
+      containerWidth: 800,
+      sliderOptions: { modules: [EffectFade], effect: 'fade' },
+    })
+    cleanup = s.cleanup
+    expect(s.slider.listEl.style.width).toBe('')
+  })
+
+  // Regression: loopFix wrote list.transform directly (bypassing the fade
+  // override), yanking the visible stack off-screen at the loop boundary.
+  it('does not translate the list through a loop wrap', () => {
+    const s = createSlider({
+      slideCount: 4,
+      containerWidth: 800,
+      sliderOptions: {
+        modules: [EffectFade],
+        effect: 'fade',
+        loop: true,
+      },
+    })
+    cleanup = s.cleanup
+
+    // Jump into the clone range (end-of-loop) then invoke loopFix directly;
+    // loop + fade must never leave a translate on the list.
+    const looped = s.slider._loopedSlides || 0
+    const total = s.slider.slides.length - looped * 2
+    s.slider.activeIndex = looped + total // first clone after real slides
+    s.slider.loopFix()
+
+    expect(s.slider.listEl.style.transform).toBe('')
+  })
 })

@@ -5,6 +5,9 @@ export default function EffectFade({ slider, extendParams, on }) {
     },
   });
 
+  let _coreSetTranslate = null;
+  let _coreSetTransition = null;
+
   function setOpacity() {
     const slides = slider.slides;
     const activeIdx = slider.activeIndex;
@@ -53,9 +56,17 @@ export default function EffectFade({ slider, extendParams, on }) {
 
     setupSlides();
 
+    // Core _init() calls slideTo BEFORE this init event fires, which applies
+    // a list transform that would drag stacked slides off-screen. Reset it so
+    // all slides overlay in the container.
+    slider.listEl.style.transform = '';
+
+    // Save original methods for restore on destroy
+    _coreSetTranslate = slider.setTranslate;
+    _coreSetTransition = slider.setTransition;
+
     // Override setTranslate to prevent CSS transform movement
     // but preserve progress/boundary calculations
-    const originalSetTranslate = slider.setTranslate.bind(slider);
     slider.setTranslate = function (translate) {
       // Update internal state (progress, isBeginning, isEnd) without moving the list
       slider.translate = translate;
@@ -104,6 +115,10 @@ export default function EffectFade({ slider, extendParams, on }) {
       slide.style.transitionProperty = '';
       slide.style.transitionDuration = '';
     }
+    slider.listEl.style.height = '';
+    slider.listEl.style.position = '';
+    if (_coreSetTranslate) slider.setTranslate = _coreSetTranslate;
+    if (_coreSetTransition) slider.setTransition = _coreSetTransition;
   }
 
   on('init', init);
