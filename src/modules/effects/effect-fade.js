@@ -5,6 +5,9 @@ export default function EffectFade({ slider, extendParams, on }) {
     },
   });
 
+  let _coreSetTranslate = null;
+  let _coreSetTransition = null;
+
   function setOpacity() {
     const slides = slider.slides;
     const activeIdx = slider.activeIndex;
@@ -58,6 +61,10 @@ export default function EffectFade({ slider, extendParams, on }) {
     // all slides overlay in the container.
     slider.listEl.style.transform = '';
 
+    // Save original methods for restore on destroy
+    _coreSetTranslate = slider.setTranslate;
+    _coreSetTransition = slider.setTransition;
+
     // Override setTranslate to prevent CSS transform movement
     // but preserve progress/boundary calculations
     slider.setTranslate = function (translate) {
@@ -108,6 +115,10 @@ export default function EffectFade({ slider, extendParams, on }) {
       slide.style.transitionProperty = '';
       slide.style.transitionDuration = '';
     }
+    slider.listEl.style.height = '';
+    slider.listEl.style.position = '';
+    if (_coreSetTranslate) slider.setTranslate = _coreSetTranslate;
+    if (_coreSetTransition) slider.setTransition = _coreSetTransition;
   }
 
   on('init', init);
