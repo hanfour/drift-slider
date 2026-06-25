@@ -10,6 +10,9 @@ export default function EffectCards({ slider, extendParams, on }) {
   let _autoCycleIndex = 0;
   let _flipTimeout = null;
   const overlayEls = [];
+  let _coreSetTranslate = null;
+  let _coreSetTransition = null;
+  let _coreLoopFix = null;
 
   extendParams({
     cardsEffect: {
@@ -230,6 +233,11 @@ export default function EffectCards({ slider, extendParams, on }) {
 
     setupSlides();
 
+    // Save originals so they can be restored on destroy (effect switch / reuse)
+    _coreSetTranslate = slider.setTranslate;
+    _coreSetTransition = slider.setTransition;
+    _coreLoopFix = slider.loopFix;
+
     // Override setTranslate
     slider.setTranslate = function (translate) {
       slider.translate = translate;
@@ -373,6 +381,11 @@ export default function EffectCards({ slider, extendParams, on }) {
     // Clean list styles
     slider.listEl.style.height = '';
     slider.listEl.style.position = '';
+
+    // Restore overridden core methods
+    if (_coreSetTranslate) slider.setTranslate = _coreSetTranslate;
+    if (_coreSetTransition) slider.setTransition = _coreSetTransition;
+    if (_coreLoopFix) slider.loopFix = _coreLoopFix;
 
     // Reset auto-cycle
     _autoCycleIndex = 0;

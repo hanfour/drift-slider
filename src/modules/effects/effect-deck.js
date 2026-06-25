@@ -1,5 +1,7 @@
 export default function EffectDeck({ slider, extendParams, on }) {
   const overlayEls = [];
+  let _coreSetTranslate = null;
+  let _coreSetTransition = null;
 
   extendParams({
     deckEffect: {
@@ -185,6 +187,10 @@ export default function EffectDeck({ slider, extendParams, on }) {
   }
 
   function overrideMethods() {
+    // Save originals so they can be restored on destroy (effect switch / reuse)
+    _coreSetTranslate = slider.setTranslate;
+    _coreSetTransition = slider.setTransition;
+
     slider.setTranslate = function (translate) {
       slider.translate = translate;
 
@@ -274,6 +280,9 @@ export default function EffectDeck({ slider, extendParams, on }) {
     slider.listEl.style.width = '';
     slider.listEl.style.height = '';
     slider.listEl.style.position = '';
+
+    if (_coreSetTranslate) slider.setTranslate = _coreSetTranslate;
+    if (_coreSetTransition) slider.setTransition = _coreSetTransition;
   }
 
   on('init', init);

@@ -156,4 +156,31 @@ describe('EffectDeck', () => {
     const overlays = s.container.querySelectorAll('.drift-deck-overlay')
     expect(overlays.length).toBe(0)
   })
+
+  it('keeps the list at 100% width after update (no per-slide px inflation)', () => {
+    const s = createSlider({
+      slideCount: 5,
+      sliderOptions: { effect: 'deck', modules: [EffectDeck] },
+    })
+    cleanup = s.cleanup
+    s.slider.update()
+    // Deck stacks slides absolutely and manages its own 100% list width;
+    // calcSlides must not stretch the list to slideCount * slideSize.
+    expect(s.slider.listEl.style.width).toBe('100%')
+  })
+
+  it('restores the core setTranslate / setTransition on destroy', () => {
+    const s = createSlider({
+      slideCount: 5,
+      sliderOptions: { effect: 'deck', modules: [EffectDeck] },
+    })
+    cleanup = s.cleanup
+    const overriddenTranslate = s.slider.setTranslate
+    const overriddenTransition = s.slider.setTransition
+
+    s.slider.destroy()
+
+    expect(s.slider.setTranslate).not.toBe(overriddenTranslate)
+    expect(s.slider.setTransition).not.toBe(overriddenTransition)
+  })
 })
