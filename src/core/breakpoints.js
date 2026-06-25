@@ -52,9 +52,7 @@ export default function breakpointsModule({ slider }) {
     if (nextLoop === false && prevLoop === true) {
       slider.destroyLoop();
       slider._loopedSlides = 0;
-      slider.slides = Array.from(
-        slider.listEl.querySelectorAll(`:scope > .${slider.params.slideClass}`)
-      );
+      slider.refreshSlides();
     }
 
     for (const key of applyKeys) {
