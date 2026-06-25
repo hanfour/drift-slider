@@ -1,4 +1,4 @@
-import { useEffect, useImperativeHandle, useRef, forwardRef } from 'react';
+import { useEffect, useImperativeHandle, useRef, forwardRef, Children, isValidElement } from 'react';
 import type { CSSProperties, LiHTMLAttributes, ReactNode } from 'react';
 import CoreDriftSlider, { type DriftSliderOptions } from 'drift-slider';
 import type { DriftSliderModule, DriftSliderEvents } from 'drift-slider';
@@ -7,6 +7,12 @@ export const VERSION = '0.1.0';
 
 export function cx(...parts: Array<string | false | undefined>): string {
   return parts.filter(Boolean).join(' ');
+}
+
+function childrenKeys(children: ReactNode): string {
+  return Children.toArray(children)
+    .map((c, i) => (isValidElement(c) && c.key != null ? String(c.key) : `__i${i}`))
+    .join('|');
 }
 
 export interface SlideProps extends LiHTMLAttributes<HTMLLIElement> {
@@ -112,6 +118,16 @@ export const DriftSlider = forwardRef<DriftSliderHandle, DriftSliderProps>(
       // re-init only when options/modules identity changes
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [options, modules]);
+
+    const keySig = childrenKeys(children);
+    const didMount = useRef(false);
+    useEffect(() => {
+      if (!didMount.current) {
+        didMount.current = true;
+        return; // initial render already built the right DOM
+      }
+      sliderRef.current?.update();
+    }, [keySig]);
 
     useImperativeHandle(ref, () => ({
       slideTo: (...args) => sliderRef.current!.slideTo(...args),
