@@ -100,4 +100,36 @@ describe('EventsEmitter', () => {
       expect(() => emitter.emit('nonexistent')).not.toThrow()
     })
   })
+
+  describe('error isolation', () => {
+    it('a throwing handler does not abort remaining handlers', () => {
+      const emitter = createEmitter()
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+      const h2 = vi.fn()
+      emitter.on('test', () => { throw new Error('boom') })
+      emitter.on('test', h2)
+
+      expect(() => emitter.emit('test')).not.toThrow()
+      expect(h2).toHaveBeenCalled()
+      expect(errorSpy).toHaveBeenCalled()
+      errorSpy.mockRestore()
+    })
+  })
+
+  describe('robustness', () => {
+    it('once preserves priority ordering', () => {
+      const emitter = createEmitter()
+      const order = []
+      emitter.on('test', () => order.push('normal'))
+      emitter.once('test', () => order.push('priority'), true)
+      emitter.emit('test')
+      expect(order).toEqual(['priority', 'normal'])
+    })
+
+    it('off does not throw when a non-function handler was registered', () => {
+      const emitter = createEmitter()
+      emitter.on('test', null)
+      expect(() => emitter.off('test', () => {})).not.toThrow()
+    })
+  })
 })
