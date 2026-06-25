@@ -387,6 +387,8 @@ describe('core/touch', () => {
   it('advances one slide on a long slow drag past longSwipesRatio', () => {
     const s = createSlider({ sliderOptions: { touchEnabled: true, longSwipesRatio: 0.3 } })
     cleanup = s.cleanup
+    // Freeze the clock so synchronous dispatch never registers release velocity
+    vi.spyOn(Date, 'now').mockReturnValue(1000)
     expect(s.slider.activeIndex).toBe(0)
 
     const target = s.slider.trackEl || s.slider.el
@@ -408,6 +410,7 @@ describe('core/touch', () => {
   it('long swipe uses finger distance so it works with followFinger:false', () => {
     const s = createSlider({ sliderOptions: { touchEnabled: true, followFinger: false, longSwipesRatio: 0.3 } })
     cleanup = s.cleanup
+    vi.spyOn(Date, 'now').mockReturnValue(1000)
     expect(s.slider.activeIndex).toBe(0)
 
     const target = s.slider.trackEl || s.slider.el
@@ -427,6 +430,7 @@ describe('core/touch', () => {
   it('does not long-swipe when longSwipes is disabled', () => {
     const s = createSlider({ sliderOptions: { touchEnabled: true, longSwipes: false, longSwipesRatio: 0.3 } })
     cleanup = s.cleanup
+    vi.spyOn(Date, 'now').mockReturnValue(1000)
     expect(s.slider.activeIndex).toBe(0)
 
     const target = s.slider.trackEl || s.slider.el
