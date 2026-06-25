@@ -3,8 +3,6 @@ import type { CSSProperties, LiHTMLAttributes, ReactNode } from 'react';
 import CoreDriftSlider, { type DriftSliderOptions } from 'drift-slider';
 import type { DriftSliderModule, DriftSliderEvents } from 'drift-slider';
 
-export const VERSION = '0.1.0';
-
 export function cx(...parts: Array<string | false | undefined>): string {
   return parts.filter(Boolean).join(' ');
 }
