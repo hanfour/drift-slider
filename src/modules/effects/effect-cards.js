@@ -13,6 +13,7 @@ export default function EffectCards({ slider, extendParams, on }) {
   let _coreSetTranslate = null;
   let _coreSetTransition = null;
   let _coreLoopFix = null;
+  let _originalSlidesPerView = null;
 
   extendParams({
     cardsEffect: {
@@ -227,6 +228,7 @@ export default function EffectCards({ slider, extendParams, on }) {
     if (slider.params.effect !== 'cards') return;
 
     // Force slidesPerView = 1
+    _originalSlidesPerView = slider.params.slidesPerView;
     slider.params.slidesPerView = 1;
 
     _prevActiveIndex = slider.activeIndex;
@@ -283,25 +285,30 @@ export default function EffectCards({ slider, extendParams, on }) {
 
         const loopedSlides = slider._loopedSlides;
         const totalOriginal = slider.slides.length - loopedSlides * 2;
+        if (totalOriginal <= 0) return;
 
+        // Use while-loops (like the core loopFix) so that when loopedSlides
+        // exceeds totalOriginal a single jump that lands back in the clone
+        // range keeps being corrected until it reaches the real slides.
+        let newIdx = slider.activeIndex;
         let needsJump = false;
-        let newIdx;
-
-        if (slider.activeIndex >= totalOriginal + loopedSlides) {
-          newIdx = loopedSlides + (slider.activeIndex - totalOriginal - loopedSlides);
+        while (newIdx >= totalOriginal + loopedSlides) {
+          newIdx -= totalOriginal;
           needsJump = true;
-        } else if (slider.activeIndex < loopedSlides) {
-          newIdx = totalOriginal + slider.activeIndex;
+        }
+        while (newIdx < loopedSlides) {
+          newIdx += totalOriginal;
           needsJump = true;
         }
 
-        if (needsJump) {
-          slider.setTransition(0);
-          slider.activeIndex = newIdx;
-          _prevActiveIndex = newIdx;
-          const translate = -slider.snapGrid[newIdx];
-          slider.setTranslate(translate);
-        }
+        if (!needsJump) return;
+        if (newIdx >= slider.snapGrid.length) return;
+
+        slider.setTransition(0);
+        slider.activeIndex = newIdx;
+        _prevActiveIndex = newIdx;
+        const translate = -slider.snapGrid[newIdx];
+        slider.setTranslate(translate);
       };
     }
 
@@ -386,6 +393,7 @@ export default function EffectCards({ slider, extendParams, on }) {
     if (_coreSetTranslate) slider.setTranslate = _coreSetTranslate;
     if (_coreSetTransition) slider.setTransition = _coreSetTransition;
     if (_coreLoopFix) slider.loopFix = _coreLoopFix;
+    if (_originalSlidesPerView !== null) slider.params.slidesPerView = _originalSlidesPerView;
 
     // Reset auto-cycle
     _autoCycleIndex = 0;

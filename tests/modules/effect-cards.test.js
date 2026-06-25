@@ -416,4 +416,28 @@ describe('module/effect-cards', () => {
     expect(s.slider.setTranslate).not.toBe(overriddenTranslate)
     expect(s.slider.setTransition).not.toBe(overriddenTransition)
   })
+
+  it('loopFix keeps activeIndex in the real range when loopedSlides exceeds the original count', () => {
+    const s = createSlider({
+      slideCount: 2,
+      sliderOptions: { effect: 'cards', modules: [EffectCards], loop: true, loopAdditionalSlides: 2 },
+    })
+    cleanup = s.cleanup
+    const looped = s.slider._loopedSlides
+    const totalOriginal = s.slider.slides.length - looped * 2
+    // _loopedSlides (3) > totalOriginal (2): a single jump lands back in the
+    // clone range, so a while-loop is required to reach the real slides.
+    s.slider.activeIndex = s.slider.snapGrid.length - 1
+    s.slider.loopFix()
+    expect(s.slider.activeIndex).toBeGreaterThanOrEqual(looped)
+    expect(s.slider.activeIndex).toBeLessThan(looped + totalOriginal)
+  })
+
+  it('restores the original slidesPerView on destroy', () => {
+    const s = createSlider({ slideCount: 5, sliderOptions: { effect: 'cards', modules: [EffectCards], slidesPerView: 3 } })
+    cleanup = s.cleanup
+    expect(s.slider.params.slidesPerView).toBe(1)
+    s.slider.destroy()
+    expect(s.slider.params.slidesPerView).toBe(3)
+  })
 })
