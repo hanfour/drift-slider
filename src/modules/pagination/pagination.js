@@ -135,6 +135,20 @@ export default function Pagination({ slider, extendParams, on }) {
     }
   }
 
+  // Re-render bullets when the reachable slide count changes (e.g. a breakpoint
+  // alters slidesPerView/slidesPerGroup), then refresh active state.
+  function refresh() {
+    if (!paginationEl) return;
+    const params = slider.params.pagination;
+    if (params.type === 'bullets' && getTotalSlides() !== bullets.length) {
+      if (params.clickable) {
+        bullets.forEach((bullet) => bullet.removeEventListener('click', onBulletClick));
+      }
+      renderBullets();
+    }
+    update();
+  }
+
   function onBulletClick(e) {
     const index = parseInt(e.currentTarget.getAttribute('data-index'), 10);
     if (isNaN(index)) return;
@@ -197,6 +211,8 @@ export default function Pagination({ slider, extendParams, on }) {
 
   on('init', init);
   on('slideChange', update);
+  on('resize', refresh);
+  on('breakpoint', refresh);
   on('destroy', destroy);
 
   slider.pagination = { update, render: init, el: paginationEl };

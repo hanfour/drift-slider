@@ -110,6 +110,10 @@ export default function Navigation({ slider, extendParams, on }) {
 
   on('init', init);
   on('slideChange', update);
+  // Resize / breakpoint can change snapGrid length (and therefore isEnd) without
+  // emitting slideChange, so refresh the disabled state on those too.
+  on('resize', update);
+  on('breakpoint', update);
   on('destroy', destroy);
 
   slider.navigation = { update, enable: init, disable: destroy };
