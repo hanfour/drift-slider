@@ -18,6 +18,8 @@ export default function A11y({ slider, extendParams, on }) {
   });
 
   let liveRegionEl = null;
+  let _originalSpeed = null;
+  let _originalAutoplayDelay = null;
 
   function initSlides() {
     const params = slider.params.a11y;
@@ -82,8 +84,10 @@ export default function A11y({ slider, extendParams, on }) {
 
   function handleReducedMotion() {
     if (prefersReducedMotion()) {
+      _originalSpeed = slider.params.speed;
       slider.params.speed = 0;
       if (slider.params.autoplay && slider.params.autoplay.enabled) {
+        _originalAutoplayDelay = slider.params.autoplay.delay;
         slider.params.autoplay.delay = Math.max(slider.params.autoplay.delay, 5000);
       }
     }
@@ -134,6 +138,16 @@ export default function A11y({ slider, extendParams, on }) {
       slide.removeAttribute('aria-roledescription');
       slide.removeAttribute('aria-label');
       slide.removeAttribute('aria-hidden');
+    }
+
+    // Restore params mutated for reduced motion
+    if (_originalSpeed !== null) {
+      slider.params.speed = _originalSpeed;
+      _originalSpeed = null;
+    }
+    if (_originalAutoplayDelay !== null && slider.params.autoplay) {
+      slider.params.autoplay.delay = _originalAutoplayDelay;
+      _originalAutoplayDelay = null;
     }
   }
 

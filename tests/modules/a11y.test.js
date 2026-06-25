@@ -215,4 +215,13 @@ describe('module/a11y', () => {
     expect(slide0.hasAttribute('role')).toBe(false)
     expect(slide0.hasAttribute('aria-hidden')).toBe(false)
   })
+
+  it('restores params.speed on destroy when reduced motion was applied', () => {
+    window.matchMedia = vi.fn().mockReturnValue({ matches: true })
+    const s = createSlider({ sliderOptions: { modules: [A11y], speed: 600 } })
+    cleanup = s.cleanup
+    expect(s.slider.params.speed).toBe(0)
+    s.slider.destroy()
+    expect(s.slider.params.speed).toBe(600)
+  })
 })
