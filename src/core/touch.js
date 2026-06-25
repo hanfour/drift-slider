@@ -201,6 +201,24 @@ export default function touchModule({ slider }) {
       }
     }
 
+    // Long swipe detection: a long but slow drag past longSwipesRatio of the
+    // slide size advances even when release velocity is low. Uses the raw finger
+    // delta (touchData.diff) rather than the rendered translate so it still works
+    // with followFinger:false and is unaffected by boundary resistance damping.
+    if (params.longSwipes && closestIndex === slider.activeIndex) {
+      const dragDistance = touchData.diff;
+      const slideSize = slider.snapGrid.length > 1
+        ? Math.abs(slider.snapGrid[1] - slider.snapGrid[0])
+        : (slider.slideSize || 1);
+      if (Math.abs(dragDistance) > slideSize * params.longSwipesRatio) {
+        if (dragDistance > 0) {
+          closestIndex = Math.max(0, slider.activeIndex - 1);
+        } else if (dragDistance < 0) {
+          closestIndex = Math.min(slider.snapGrid.length - 1, slider.activeIndex + 1);
+        }
+      }
+    }
+
     // Calculate animation speed based on distance
     const snapTranslate = -slider.snapGrid[closestIndex];
     const distance = Math.abs(snapTranslate - currentTranslate);

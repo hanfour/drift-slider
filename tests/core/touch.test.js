@@ -379,4 +379,67 @@ describe('core/touch', () => {
 
     expect(handler).toHaveBeenCalled()
   })
+
+  // --- Long swipe detection (low-velocity long drag) ---
+  // Note: jsdom dispatches events synchronously so Date.now() does not advance;
+  // release velocity is always 0 here, which isolates the long-swipe path.
+
+  it('advances one slide on a long slow drag past longSwipesRatio', () => {
+    const s = createSlider({ sliderOptions: { touchEnabled: true, longSwipesRatio: 0.3 } })
+    cleanup = s.cleanup
+    expect(s.slider.activeIndex).toBe(0)
+
+    const target = s.slider.trackEl || s.slider.el
+    target.dispatchEvent(new PointerEvent('pointerdown', {
+      pointerId: 1, clientX: 600, clientY: 0, button: 0, bubbles: true,
+    }))
+    // Drag 300px left = 37.5% of an 800px slide: > 30% ratio but < 50%,
+    // so the nearest snap point is still index 0 — long-swipe must advance it.
+    document.dispatchEvent(new PointerEvent('pointermove', {
+      pointerId: 1, clientX: 300, clientY: 0, bubbles: true,
+    }))
+    document.dispatchEvent(new PointerEvent('pointerup', {
+      pointerId: 1, clientX: 300, clientY: 0, bubbles: true,
+    }))
+
+    expect(s.slider.activeIndex).toBe(1)
+  })
+
+  it('long swipe uses finger distance so it works with followFinger:false', () => {
+    const s = createSlider({ sliderOptions: { touchEnabled: true, followFinger: false, longSwipesRatio: 0.3 } })
+    cleanup = s.cleanup
+    expect(s.slider.activeIndex).toBe(0)
+
+    const target = s.slider.trackEl || s.slider.el
+    target.dispatchEvent(new PointerEvent('pointerdown', {
+      pointerId: 1, clientX: 600, clientY: 0, button: 0, bubbles: true,
+    }))
+    document.dispatchEvent(new PointerEvent('pointermove', {
+      pointerId: 1, clientX: 300, clientY: 0, bubbles: true,
+    }))
+    document.dispatchEvent(new PointerEvent('pointerup', {
+      pointerId: 1, clientX: 300, clientY: 0, bubbles: true,
+    }))
+
+    expect(s.slider.activeIndex).toBe(1)
+  })
+
+  it('does not long-swipe when longSwipes is disabled', () => {
+    const s = createSlider({ sliderOptions: { touchEnabled: true, longSwipes: false, longSwipesRatio: 0.3 } })
+    cleanup = s.cleanup
+    expect(s.slider.activeIndex).toBe(0)
+
+    const target = s.slider.trackEl || s.slider.el
+    target.dispatchEvent(new PointerEvent('pointerdown', {
+      pointerId: 1, clientX: 600, clientY: 0, button: 0, bubbles: true,
+    }))
+    document.dispatchEvent(new PointerEvent('pointermove', {
+      pointerId: 1, clientX: 300, clientY: 0, bubbles: true,
+    }))
+    document.dispatchEvent(new PointerEvent('pointerup', {
+      pointerId: 1, clientX: 300, clientY: 0, bubbles: true,
+    }))
+
+    expect(s.slider.activeIndex).toBe(0)
+  })
 })

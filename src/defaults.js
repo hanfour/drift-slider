@@ -24,6 +24,7 @@ export default {
   threshold: 5,
   touchAngle: 45,
   shortSwipes: true,
+  longSwipes: true,
   longSwipesRatio: 0.5,
   followFinger: true,
   resistance: true,
