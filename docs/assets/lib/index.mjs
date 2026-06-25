@@ -1213,10 +1213,37 @@ function breakpointsModule({ slider }) {
       'centeredSlides', 'loop', 'speed', 'grabCursor',
     ];
 
+    // Toggling loop at a breakpoint must rebuild/remove the clones, otherwise
+    // params.loop and the actual clone set fall out of sync.
+    const prevLoop = slider.params.loop;
+    const nextLoop = baseParams.loop;
+    const realIndex = slider.realIndex;
+
+    // Remove clones while params.loop is still true (destroyLoop guards on it)
+    if (nextLoop === false && prevLoop === true) {
+      slider.destroyLoop();
+      slider._loopedSlides = 0;
+      slider.slides = Array.from(
+        slider.listEl.querySelectorAll(`:scope > .${slider.params.slideClass}`)
+      );
+    }
+
     for (const key of applyKeys) {
       if (baseParams[key] !== undefined) {
         slider.params[key] = baseParams[key];
       }
+    }
+
+    // Build clones now that params.loop is true
+    if (nextLoop === true && prevLoop === false && !slider._loopedSlides) {
+      slider.createLoop();
+    }
+
+    // Keep the same real slide active across the toggle
+    if (nextLoop !== prevLoop) {
+      slider.activeIndex = nextLoop
+        ? realIndex + (slider._loopedSlides || 0)
+        : realIndex;
     }
 
     slider.update();
@@ -1553,6 +1580,10 @@ function Navigation({ slider, extendParams, on }) {
 
   on('init', init);
   on('slideChange', update);
+  // Resize / breakpoint can change snapGrid length (and therefore isEnd) without
+  // emitting slideChange, so refresh the disabled state on those too.
+  on('resize', update);
+  on('breakpoint', update);
   on('destroy', destroy);
 
   slider.navigation = { update, enable: init, disable: destroy };
@@ -1693,6 +1724,20 @@ function Pagination({ slider, extendParams, on }) {
     }
   }
 
+  // Re-render bullets when the reachable slide count changes (e.g. a breakpoint
+  // alters slidesPerView/slidesPerGroup), then refresh active state.
+  function refresh() {
+    if (!paginationEl) return;
+    const params = slider.params.pagination;
+    if (params.type === 'bullets' && getTotalSlides() !== bullets.length) {
+      if (params.clickable) {
+        bullets.forEach((bullet) => bullet.removeEventListener('click', onBulletClick));
+      }
+      renderBullets();
+    }
+    update();
+  }
+
   function onBulletClick(e) {
     const index = parseInt(e.currentTarget.getAttribute('data-index'), 10);
     if (isNaN(index)) return;
@@ -1755,6 +1800,8 @@ function Pagination({ slider, extendParams, on }) {
 
   on('init', init);
   on('slideChange', update);
+  on('resize', refresh);
+  on('breakpoint', refresh);
   on('destroy', destroy);
 
   slider.pagination = { update, render: init, el: paginationEl };
@@ -2156,14 +2203,25 @@ function Keyboard({ slider, extendParams, on }) {
           slider.slideNext();
         }
         break;
-      case 'Home':
+      case 'Home': {
         e.preventDefault();
-        slider.slideTo(0);
+        // In loop mode index 0 is a clone; target the first real slide.
+        const first = slider.params.loop && slider._loopedSlides
+          ? slider._loopedSlides
+          : 0;
+        slider.slideTo(first);
         break;
-      case 'End':
+      }
+      case 'End': {
         e.preventDefault();
-        slider.slideTo(slider.snapGrid.length - 1);
+        let last = slider.snapGrid.length - 1;
+        if (slider.params.loop && slider._loopedSlides) {
+          const realCount = slider.slides.length - slider._loopedSlides * 2;
+          last = slider._loopedSlides + realCount - 1;
+        }
+        slider.slideTo(last);
         break;
+      }
     }
   }
 
@@ -4149,6 +4207,13 @@ function Thumbs({ slider, extendParams, on }) {
   function init() {
     const params = slider.params.thumbs;
     if (!params || !params.slider) return;
+
+    // Detach handlers from a previous init to avoid duplicate bindings
+    for (const { el, handler } of clickHandlers) {
+      el.removeEventListener('click', handler);
+    }
+    clickHandlers.length = 0;
+
     thumbsSlider = params.slider;
 
     for (let i = 0; i < thumbsSlider.slides.length; i++) {
