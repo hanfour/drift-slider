@@ -302,7 +302,9 @@ export default function EffectDeck({ slider, extendParams, on }) {
 
   on('init', init);
   on('slideChange', onSlideChange);
+  // onUpdate forces a layout read (offsetHeight) to re-measure height, so avoid
+  // running it twice per resize: the resize handler always calls update() before
+  // emitting 'resize', so listening on 'update' alone already covers resizes.
   on('update', onUpdate);
-  on('resize', onUpdate);
   on('destroy', destroy);
 }
