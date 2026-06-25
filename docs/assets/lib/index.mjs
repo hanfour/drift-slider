@@ -1,4 +1,4 @@
-/*! DriftSlider v0.6.0 | MIT License */
+/*! DriftSlider v0.7.0 | MIT License */
 var defaults = {
   // Direction
   direction: 'horizontal', // 'horizontal' | 'vertical'
