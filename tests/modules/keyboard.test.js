@@ -157,4 +157,22 @@ describe('module/keyboard', () => {
     document.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight' }))
     expect(s.slider.activeIndex).toBe(0)
   })
+
+  it('Home / End target the real first and last slide in loop mode', () => {
+    const s = createSlider({
+      slideCount: 3,
+      sliderOptions: {
+        modules: [Keyboard],
+        keyboard: { enabled: true, onlyInViewport: false },
+        loop: true,
+      },
+    })
+    cleanup = s.cleanup
+
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'End' }))
+    expect(s.slider.realIndex).toBe(2)
+
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Home' }))
+    expect(s.slider.realIndex).toBe(0)
+  })
 })
