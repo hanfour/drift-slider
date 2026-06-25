@@ -23,6 +23,7 @@ export default function Pagination({ slider, extendParams, on }) {
 
   let paginationEl = null;
   let bullets = [];
+  let _created = false;
 
   function getTotalSlides() {
     if (slider.params.loop && slider._loopedSlides) {
@@ -174,6 +175,7 @@ export default function Pagination({ slider, extendParams, on }) {
     if (!paginationEl) {
       paginationEl = createElement('div', { className: 'drift-pagination' });
       slider.el.appendChild(paginationEl);
+      _created = true;
     }
 
     if (params.style) {
@@ -206,7 +208,21 @@ export default function Pagination({ slider, extendParams, on }) {
       });
     }
     bullets = [];
+
+    if (paginationEl) {
+      if (_created && paginationEl.parentNode) {
+        // We created the element — remove it entirely
+        paginationEl.parentNode.removeChild(paginationEl);
+      } else {
+        // User-provided element — just clear what we rendered into it
+        paginationEl.innerHTML = '';
+        removeClass(paginationEl, `drift-pagination--${slider.params.pagination.type}`);
+        paginationEl.removeAttribute('role');
+        paginationEl.removeAttribute('aria-label');
+      }
+    }
     paginationEl = null;
+    _created = false;
   }
 
   on('init', init);

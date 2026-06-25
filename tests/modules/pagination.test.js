@@ -346,4 +346,12 @@ describe('module/pagination', () => {
     s.slider.emit('resize', s.slider)
     expect(el.querySelectorAll('.drift-pagination__bullet').length).toBe(3)
   })
+
+  it('removes the auto-created pagination element on destroy', () => {
+    const s = createSlider({ slideCount: 3, sliderOptions: { modules: [Pagination] } })
+    cleanup = s.cleanup
+    expect(s.container.querySelector('.drift-pagination')).toBeTruthy()
+    s.slider.destroy()
+    expect(s.container.querySelector('.drift-pagination')).toBeNull()
+  })
 })
