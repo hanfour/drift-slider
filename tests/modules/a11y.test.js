@@ -199,4 +199,20 @@ describe('module/a11y', () => {
       expect(c.getAttribute('aria-hidden')).toBe('true')
     })
   })
+
+  it('removes ARIA attributes from container and slides on destroy', () => {
+    const s = createSlider({ sliderOptions: { modules: [A11y] } })
+    cleanup = s.cleanup
+    const container = s.container
+    const slide0 = s.slider.slides[0]
+    expect(container.getAttribute('role')).toBe('region')
+    expect(slide0.getAttribute('role')).toBe('group')
+
+    s.slider.destroy()
+
+    expect(container.hasAttribute('role')).toBe(false)
+    expect(container.hasAttribute('tabindex')).toBe(false)
+    expect(slide0.hasAttribute('role')).toBe(false)
+    expect(slide0.hasAttribute('aria-hidden')).toBe(false)
+  })
 })

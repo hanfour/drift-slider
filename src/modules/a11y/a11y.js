@@ -122,6 +122,19 @@ export default function A11y({ slider, extendParams, on }) {
       liveRegionEl.remove();
       liveRegionEl = null;
     }
+
+    // Restore the DOM by removing the ARIA attributes we added
+    slider.el.removeAttribute('role');
+    slider.el.removeAttribute('aria-roledescription');
+    slider.el.removeAttribute('aria-label');
+    slider.el.removeAttribute('tabindex');
+
+    for (const slide of slider.slides) {
+      slide.removeAttribute('role');
+      slide.removeAttribute('aria-roledescription');
+      slide.removeAttribute('aria-label');
+      slide.removeAttribute('aria-hidden');
+    }
   }
 
   on('init', init);
