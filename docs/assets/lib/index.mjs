@@ -153,10 +153,20 @@ function deepMerge(target, ...sources) {
   for (const source of sources) {
     if (!isObject(source)) continue;
     for (const key of Object.keys(source)) {
-      if (isObject(source[key]) && isObject(target[key])) {
-        target[key] = deepMerge({}, target[key], source[key]);
+      // Guard against prototype pollution from untrusted config (e.g. JSON)
+      if (key === '__proto__' || key === 'constructor' || key === 'prototype') {
+        continue;
+      }
+      const val = source[key];
+      if (Array.isArray(val)) {
+        // Clone arrays so the merged result does not alias the source
+        target[key] = val.slice();
+      } else if (isObject(val) && isObject(target[key])) {
+        target[key] = deepMerge({}, target[key], val);
       } else {
-        target[key] = source[key];
+        // Assign by reference for everything else, including class instances
+        // (e.g. a thumbs slider instance) which must not be cloned
+        target[key] = val;
       }
     }
   }
@@ -191,10 +201,15 @@ function deepMergeDefaults(target, ...sources) {
 
 function debounce(fn, delay) {
   let timer;
-  return function (...args) {
+  function debounced(...args) {
     clearTimeout(timer);
     timer = setTimeout(() => fn.apply(this, args), delay);
+  }
+  debounced.cancel = () => {
+    clearTimeout(timer);
+    timer = undefined;
   };
+  return debounced;
 }
 
 function clamp(val, min, max) {
@@ -717,6 +732,8 @@ function eventsModule({ slider }) {
   function detachEvents() {
     if (resizeHandler) {
       window.removeEventListener('resize', resizeHandler);
+      // Cancel any debounced resize still pending so it can't fire post-destroy
+      if (resizeHandler.cancel) resizeHandler.cancel();
     }
     slider.listEl.removeEventListener('transitionend', onListTransitionEnd);
   }
@@ -746,14 +763,19 @@ let passiveSupported = null;
 
 function supportsPassive() {
   if (passiveSupported !== null) return passiveSupported;
+  // Default to false so the result is always cached as a boolean, even on
+  // engines that never read the `passive` getter below.
+  passiveSupported = false;
   try {
+    const noop = () => {};
     const opts = Object.defineProperty({}, 'passive', {
       get() {
         passiveSupported = true;
+        return true;
       },
     });
-    window.addEventListener('testPassive', null, opts);
-    window.removeEventListener('testPassive', null, opts);
+    window.addEventListener('testPassive', noop, opts);
+    window.removeEventListener('testPassive', noop, opts);
   } catch {
     passiveSupported = false;
   }
@@ -1977,6 +1999,19 @@ function Autoplay({ slider, extendParams, on }) {
     }
   }
 
+  let _pausedByVisibility = false;
+  function onVisibilityChange() {
+    if (document.hidden) {
+      if (running && !paused) {
+        _pausedByVisibility = true;
+        pause();
+      }
+    } else if (_pausedByVisibility) {
+      _pausedByVisibility = false;
+      resume();
+    }
+  }
+
   function onTouchStart() {
     if (running) pause();
   }
@@ -1996,6 +2031,7 @@ function Autoplay({ slider, extendParams, on }) {
 
     slider.el.addEventListener('mouseenter', onMouseEnter);
     slider.el.addEventListener('mouseleave', onMouseLeave);
+    document.addEventListener('visibilitychange', onVisibilityChange);
 
     if (params.ticker) {
       slider.listEl.style.transitionProperty = 'none';
@@ -2013,6 +2049,7 @@ function Autoplay({ slider, extendParams, on }) {
     tickerStop();
     slider.el.removeEventListener('mouseenter', onMouseEnter);
     slider.el.removeEventListener('mouseleave', onMouseLeave);
+    document.removeEventListener('visibilitychange', onVisibilityChange);
   }
 
   on('init', init);
@@ -2363,6 +2400,19 @@ function A11y({ slider, extendParams, on }) {
     if (liveRegionEl) {
       liveRegionEl.remove();
       liveRegionEl = null;
+    }
+
+    // Restore the DOM by removing the ARIA attributes we added
+    slider.el.removeAttribute('role');
+    slider.el.removeAttribute('aria-roledescription');
+    slider.el.removeAttribute('aria-label');
+    slider.el.removeAttribute('tabindex');
+
+    for (const slide of slider.slides) {
+      slide.removeAttribute('role');
+      slide.removeAttribute('aria-roledescription');
+      slide.removeAttribute('aria-label');
+      slide.removeAttribute('aria-hidden');
     }
   }
 
