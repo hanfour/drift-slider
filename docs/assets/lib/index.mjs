@@ -1634,6 +1634,7 @@ function Pagination({ slider, extendParams, on }) {
 
   let paginationEl = null;
   let bullets = [];
+  let _created = false;
 
   function getTotalSlides() {
     if (slider.params.loop && slider._loopedSlides) {
@@ -1785,6 +1786,7 @@ function Pagination({ slider, extendParams, on }) {
     if (!paginationEl) {
       paginationEl = createElement('div', { className: 'drift-pagination' });
       slider.el.appendChild(paginationEl);
+      _created = true;
     }
 
     if (params.style) {
@@ -1817,7 +1819,21 @@ function Pagination({ slider, extendParams, on }) {
       });
     }
     bullets = [];
+
+    if (paginationEl) {
+      if (_created && paginationEl.parentNode) {
+        // We created the element — remove it entirely
+        paginationEl.parentNode.removeChild(paginationEl);
+      } else {
+        // User-provided element — just clear what we rendered into it
+        paginationEl.innerHTML = '';
+        removeClass(paginationEl, `drift-pagination--${slider.params.pagination.type}`);
+        paginationEl.removeAttribute('role');
+        paginationEl.removeAttribute('aria-label');
+      }
+    }
     paginationEl = null;
+    _created = false;
   }
 
   on('init', init);
@@ -2297,6 +2313,8 @@ function A11y({ slider, extendParams, on }) {
   });
 
   let liveRegionEl = null;
+  let _originalSpeed = null;
+  let _originalAutoplayDelay = null;
 
   function initSlides() {
     const params = slider.params.a11y;
@@ -2361,8 +2379,10 @@ function A11y({ slider, extendParams, on }) {
 
   function handleReducedMotion() {
     if (prefersReducedMotion()) {
+      _originalSpeed = slider.params.speed;
       slider.params.speed = 0;
       if (slider.params.autoplay && slider.params.autoplay.enabled) {
+        _originalAutoplayDelay = slider.params.autoplay.delay;
         slider.params.autoplay.delay = Math.max(slider.params.autoplay.delay, 5000);
       }
     }
@@ -2413,6 +2433,16 @@ function A11y({ slider, extendParams, on }) {
       slide.removeAttribute('aria-roledescription');
       slide.removeAttribute('aria-label');
       slide.removeAttribute('aria-hidden');
+    }
+
+    // Restore params mutated for reduced motion
+    if (_originalSpeed !== null) {
+      slider.params.speed = _originalSpeed;
+      _originalSpeed = null;
+    }
+    if (_originalAutoplayDelay !== null && slider.params.autoplay) {
+      slider.params.autoplay.delay = _originalAutoplayDelay;
+      _originalAutoplayDelay = null;
     }
   }
 
@@ -2758,6 +2788,7 @@ function EffectCoverflow({ slider, extendParams, on }) {
   let _coreSetTransition = null;
   let _coreGetComputedTranslate = null;
   let _coreLoopFix = null;
+  let _originalSlidesPerView = null;
   let _lastTransitionSpeed = 0;
   let _prevTranslate = 0;
 
@@ -2767,6 +2798,7 @@ function EffectCoverflow({ slider, extendParams, on }) {
     _use3D = computeUse3D();
 
     if (slider.params.slidesPerView < 1) {
+      _originalSlidesPerView = slider.params.slidesPerView;
       slider.params.slidesPerView = 1;
     }
 
@@ -2871,6 +2903,7 @@ function EffectCoverflow({ slider, extendParams, on }) {
     if (_coreSetTransition) slider.setTransition = _coreSetTransition;
     if (_coreGetComputedTranslate) slider.getComputedTranslate = _coreGetComputedTranslate;
     if (_coreLoopFix) slider.loopFix = _coreLoopFix;
+    if (_originalSlidesPerView !== null) slider.params.slidesPerView = _originalSlidesPerView;
 
     slider.el.classList.remove('drift-slider--coverflow');
     slider.el.style.overflow = '';
@@ -2930,6 +2963,7 @@ function EffectCards({ slider, extendParams, on }) {
   let _coreSetTranslate = null;
   let _coreSetTransition = null;
   let _coreLoopFix = null;
+  let _originalSlidesPerView = null;
 
   extendParams({
     cardsEffect: {
@@ -3144,6 +3178,7 @@ function EffectCards({ slider, extendParams, on }) {
     if (slider.params.effect !== 'cards') return;
 
     // Force slidesPerView = 1
+    _originalSlidesPerView = slider.params.slidesPerView;
     slider.params.slidesPerView = 1;
 
     _prevActiveIndex = slider.activeIndex;
@@ -3200,25 +3235,30 @@ function EffectCards({ slider, extendParams, on }) {
 
         const loopedSlides = slider._loopedSlides;
         const totalOriginal = slider.slides.length - loopedSlides * 2;
+        if (totalOriginal <= 0) return;
 
+        // Use while-loops (like the core loopFix) so that when loopedSlides
+        // exceeds totalOriginal a single jump that lands back in the clone
+        // range keeps being corrected until it reaches the real slides.
+        let newIdx = slider.activeIndex;
         let needsJump = false;
-        let newIdx;
-
-        if (slider.activeIndex >= totalOriginal + loopedSlides) {
-          newIdx = loopedSlides + (slider.activeIndex - totalOriginal - loopedSlides);
+        while (newIdx >= totalOriginal + loopedSlides) {
+          newIdx -= totalOriginal;
           needsJump = true;
-        } else if (slider.activeIndex < loopedSlides) {
-          newIdx = totalOriginal + slider.activeIndex;
+        }
+        while (newIdx < loopedSlides) {
+          newIdx += totalOriginal;
           needsJump = true;
         }
 
-        if (needsJump) {
-          slider.setTransition(0);
-          slider.activeIndex = newIdx;
-          _prevActiveIndex = newIdx;
-          const translate = -slider.snapGrid[newIdx];
-          slider.setTranslate(translate);
-        }
+        if (!needsJump) return;
+        if (newIdx >= slider.snapGrid.length) return;
+
+        slider.setTransition(0);
+        slider.activeIndex = newIdx;
+        _prevActiveIndex = newIdx;
+        const translate = -slider.snapGrid[newIdx];
+        slider.setTranslate(translate);
       };
     }
 
@@ -3303,6 +3343,7 @@ function EffectCards({ slider, extendParams, on }) {
     if (_coreSetTranslate) slider.setTranslate = _coreSetTranslate;
     if (_coreSetTransition) slider.setTransition = _coreSetTransition;
     if (_coreLoopFix) slider.loopFix = _coreLoopFix;
+    if (_originalSlidesPerView !== null) slider.params.slidesPerView = _originalSlidesPerView;
 
     // Reset auto-cycle
     _autoCycleIndex = 0;
@@ -3319,6 +3360,7 @@ function EffectDeck({ slider, extendParams, on }) {
   const overlayEls = [];
   let _coreSetTranslate = null;
   let _coreSetTransition = null;
+  let _originalSlidesPerView = null;
 
   extendParams({
     deckEffect: {
@@ -3539,6 +3581,7 @@ function EffectDeck({ slider, extendParams, on }) {
   function init() {
     if (slider.params.effect !== 'deck') return;
 
+    _originalSlidesPerView = slider.params.slidesPerView;
     slider.params.slidesPerView = 1;
 
     setupSlides();
@@ -3556,7 +3599,19 @@ function EffectDeck({ slider, extendParams, on }) {
     if (slider.params.effect !== 'deck') return;
     const firstSlide = slider.slides[0];
     if (firstSlide) {
-      slider.listEl.style.height = `${firstSlide.offsetHeight}px`;
+      // Measure the natural height with the absolute/100% positioning removed.
+      // Reading offsetHeight while the slide is position:absolute;height:100%
+      // resolves against the list's own (stale) height — a circular read that
+      // never picks up content-driven height changes on resize. Mirror the
+      // pre-absolute measurement that setupSlides does.
+      const prevPosition = firstSlide.style.position;
+      const prevHeight = firstSlide.style.height;
+      firstSlide.style.position = '';
+      firstSlide.style.height = '';
+      const naturalHeight = firstSlide.offsetHeight;
+      firstSlide.style.position = prevPosition;
+      firstSlide.style.height = prevHeight;
+      slider.listEl.style.height = `${naturalHeight}px`;
     }
     slider.setTranslate(slider.translate);
   }
@@ -3600,6 +3655,7 @@ function EffectDeck({ slider, extendParams, on }) {
 
     if (_coreSetTranslate) slider.setTranslate = _coreSetTranslate;
     if (_coreSetTransition) slider.setTransition = _coreSetTransition;
+    if (_originalSlidesPerView !== null) slider.params.slidesPerView = _originalSlidesPerView;
   }
 
   on('init', init);
@@ -3826,11 +3882,13 @@ function EffectShowcase({ slider, extendParams, on }) {
   let _coreSetTransition = null;
   let _coreGetComputedTranslate = null;
   let _coreLoopFix = null;
+  let _originalSlidesPerView = null;
 
   function init() {
     if (slider.params.effect !== 'showcase') return;
 
     if (slider.params.slidesPerView < 1) {
+      _originalSlidesPerView = slider.params.slidesPerView;
       slider.params.slidesPerView = 1;
     }
 
@@ -3928,6 +3986,7 @@ function EffectShowcase({ slider, extendParams, on }) {
     if (_coreSetTransition) slider.setTransition = _coreSetTransition;
     if (_coreGetComputedTranslate) slider.getComputedTranslate = _coreGetComputedTranslate;
     if (_coreLoopFix) slider.loopFix = _coreLoopFix;
+    if (_originalSlidesPerView !== null) slider.params.slidesPerView = _originalSlidesPerView;
 
     slider.el.classList.remove('drift-slider--showcase');
 
@@ -4085,11 +4144,13 @@ function EffectCreative({ slider, extendParams, on }) {
   let _coreSetTransition = null;
   let _coreGetComputedTranslate = null;
   let _coreLoopFix = null;
+  let _originalSlidesPerView = null;
 
   function init() {
     if (slider.params.effect !== 'creative') return;
 
     if (slider.params.slidesPerView < 1) {
+      _originalSlidesPerView = slider.params.slidesPerView;
       slider.params.slidesPerView = 1;
     }
 
@@ -4182,6 +4243,7 @@ function EffectCreative({ slider, extendParams, on }) {
     if (_coreSetTransition) slider.setTransition = _coreSetTransition;
     if (_coreGetComputedTranslate) slider.getComputedTranslate = _coreGetComputedTranslate;
     if (_coreLoopFix) slider.loopFix = _coreLoopFix;
+    if (_originalSlidesPerView !== null) slider.params.slidesPerView = _originalSlidesPerView;
 
     slider.el.classList.remove('drift-slider--creative');
 
