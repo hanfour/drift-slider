@@ -21,13 +21,24 @@ export default function A11y({ slider, extendParams, on }) {
 
   function initSlides() {
     const params = slider.params.a11y;
+    const cloneClass = slider.params.slideCloneClass;
     const slides = slider.slides;
+
+    // Label and count only real slides; clones are visual duplicates and must
+    // not be announced (they would inflate the count and read out twice).
+    const total = slides.filter((s) => !s.classList.contains(cloneClass)).length;
+    let realIndex = 0;
 
     for (let i = 0; i < slides.length; i++) {
       const slide = slides[i];
+      if (slide.classList.contains(cloneClass)) {
+        slide.setAttribute('aria-hidden', 'true');
+        continue;
+      }
+      realIndex += 1;
       slide.setAttribute('role', params.slideRole);
       slide.setAttribute('aria-roledescription', params.slideRoleDescription);
-      slide.setAttribute('aria-label', `${i + 1} / ${slides.length}`);
+      slide.setAttribute('aria-label', `${realIndex} / ${total}`);
     }
   }
 
@@ -80,10 +91,16 @@ export default function A11y({ slider, extendParams, on }) {
 
   function updateAria() {
     const slides = slider.slides;
-    const activeIdx = slider.activeIndex;
+    const cloneClass = slider.params.slideCloneClass;
+    // The visible window is the active page's slides (activeIndex is a snap/page
+    // index; the first real slide of the page is activeIndex * slidesPerGroup).
+    const base = slider.activeIndex * slider.params.slidesPerGroup;
+    const perView = slider.params.slidesPerView;
 
     for (let i = 0; i < slides.length; i++) {
-      slides[i].setAttribute('aria-hidden', i !== activeIdx ? 'true' : 'false');
+      const isClone = slides[i].classList.contains(cloneClass);
+      const visible = !isClone && i >= base && i < base + perView;
+      slides[i].setAttribute('aria-hidden', visible ? 'false' : 'true');
     }
 
     updateLiveRegion();

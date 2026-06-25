@@ -171,4 +171,32 @@ describe('module/a11y', () => {
     cleanup = s.cleanup
     expect(s.slider.params.autoplay.delay).toBeGreaterThanOrEqual(5000)
   })
+
+  it('keeps every slide within slidesPerView visible to assistive tech', () => {
+    const s = createSlider({ slideCount: 5, sliderOptions: { modules: [A11y], slidesPerView: 2 } })
+    cleanup = s.cleanup
+    expect(s.slider.slides[0].getAttribute('aria-hidden')).toBe('false')
+    expect(s.slider.slides[1].getAttribute('aria-hidden')).toBe('false')
+    expect(s.slider.slides[2].getAttribute('aria-hidden')).toBe('true')
+  })
+
+  it('labels only real slides with the real slide count in loop mode', () => {
+    const s = createSlider({ slideCount: 3, sliderOptions: { modules: [A11y], loop: true } })
+    cleanup = s.cleanup
+    const real = s.slider.slides.filter((sl) => !sl.classList.contains('drift-slide--clone'))
+    expect(real).toHaveLength(3)
+    expect(real[0].getAttribute('aria-label')).toBe('1 / 3')
+    expect(real[2].getAttribute('aria-label')).toBe('3 / 3')
+  })
+
+  it('does not expose clone slides as slides to assistive tech', () => {
+    const s = createSlider({ slideCount: 3, sliderOptions: { modules: [A11y], loop: true } })
+    cleanup = s.cleanup
+    const clones = s.slider.slides.filter((sl) => sl.classList.contains('drift-slide--clone'))
+    expect(clones.length).toBeGreaterThan(0)
+    clones.forEach((c) => {
+      expect(c.getAttribute('role')).toBeNull()
+      expect(c.getAttribute('aria-hidden')).toBe('true')
+    })
+  })
 })
