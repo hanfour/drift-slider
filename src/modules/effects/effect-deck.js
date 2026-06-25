@@ -1,4 +1,7 @@
 export default function EffectDeck({ slider, extendParams, on }) {
+  // Stacked effect: core calcSlides must not write per-slide/list sizing.
+  if (slider.params.effect === 'deck') slider._managesOwnLayout = true;
+
   const overlayEls = [];
   let _coreSetTranslate = null;
   let _coreSetTransition = null;

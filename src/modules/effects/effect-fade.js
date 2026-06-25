@@ -1,4 +1,8 @@
 export default function EffectFade({ slider, extendParams, on }) {
+  // Declare that this effect manages its own slide/list sizing so core
+  // calcSlides skips width/margin writes (set before the first calcSlides).
+  if (slider.params.effect === 'fade') slider._managesOwnLayout = true;
+
   extendParams({
     fadeEffect: {
       crossFade: true,

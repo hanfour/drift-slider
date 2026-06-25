@@ -1,4 +1,7 @@
 export default function EffectCards({ slider, extendParams, on }) {
+  // Stacked effect: core calcSlides must not write per-slide/list sizing.
+  if (slider.params.effect === 'cards') slider._managesOwnLayout = true;
+
   const ALL_DIRS = ['tl-br', 'bl-tr', 'tr-bl', 'br-tl'];
   const DIR_MAP = {
     'tl-br': { x: 1, y: 1 },

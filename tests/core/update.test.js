@@ -59,6 +59,25 @@ describe('core/update', () => {
     expect(called).toBe(true)
   })
 
+  it('refreshSlides re-queries the slide elements from the list', () => {
+    const s = createSlider({ slideCount: 3 })
+    cleanup = s.cleanup
+    const extra = document.createElement('li')
+    extra.className = 'drift-slide'
+    s.slider.listEl.appendChild(extra)
+    s.slider.refreshSlides()
+    expect(s.slider.slides.length).toBe(4)
+  })
+
+  it('skips list/slide sizing for any module that sets _managesOwnLayout', () => {
+    // Declarative contract: core asks the flag, not a hardcoded effect-name list.
+    const CustomLayout = ({ slider }) => { slider._managesOwnLayout = true }
+    const s = createSlider({ slideCount: 5, sliderOptions: { modules: [CustomLayout] } })
+    cleanup = s.cleanup
+    s.slider.update()
+    expect(s.slider.listEl.style.width).toBe('')
+  })
+
   describe('snapGrid end clamping (slidesPerView > 1)', () => {
     it('no snap point overscrolls past minTranslate', () => {
       const s = createSlider({ slideCount: 5, containerWidth: 800, sliderOptions: { slidesPerView: 2, spaceBetween: 0 } })

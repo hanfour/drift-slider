@@ -32,14 +32,11 @@ export default function updateModule({ slider }) {
       offset = containerSize / 2 - slideSize / 2;
     }
 
-    // Stacked effects (fade, deck, cards) position all slides at the same spot
-    // (absolute, 100% of container) and manage their own list sizing. Skip the
-    // per-slide width/margin and list width/height writes so they are not
-    // overwritten with a slideCount * slideSize total on every update/resize.
-    const isStackedEffect =
-      params.effect === 'fade' ||
-      params.effect === 'deck' ||
-      params.effect === 'cards';
+    // Effects that stack slides (absolute, 100% of container) declare
+    // slider._managesOwnLayout so core skips the per-slide width/margin and
+    // list width/height writes — otherwise they'd be overwritten with a
+    // slideCount * slideSize total on every update/resize.
+    const isStackedEffect = slider._managesOwnLayout === true;
 
     for (let i = 0; i < slides.length; i++) {
       slidesSizesGrid.push(slideSize);
@@ -129,6 +126,14 @@ export default function updateModule({ slider }) {
     slider.emit('update', slider);
   }
 
+  // Re-read the slide elements from the DOM (e.g. after clones are added/removed).
+  function refreshSlides() {
+    slider.slides = Array.from(
+      slider.listEl.querySelectorAll(`:scope > .${slider.params.slideClass}`)
+    );
+  }
+
   slider.calcSlides = calcSlides;
   slider.update = update;
+  slider.refreshSlides = refreshSlides;
 }
