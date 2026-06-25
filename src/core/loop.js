@@ -4,6 +4,11 @@ export default function loopModule({ slider }) {
   function createLoop() {
     if (!slider.params.loop) return;
 
+    // Loop clones are sized by slidesPerView, not slidesPerGroup, so they are
+    // not group-aligned. slidesPerGroup > 1 + loop would desync the snapGrid
+    // from the real slides (wrong active/aria mapping), so fall back to 1.
+    if (slider.params.slidesPerGroup > 1) slider.params.slidesPerGroup = 1;
+
     const slides = slider.slides;
     const perView = Math.ceil(slider.params.slidesPerView);
     const additional = slider.params.loopAdditionalSlides;
@@ -43,10 +48,8 @@ export default function loopModule({ slider }) {
       slider.listEl.appendChild(clone);
     }
 
-    // Re-query slides (now includes clones) — use :scope > for consistency
-    slider.slides = Array.from(
-      slider.listEl.querySelectorAll(`:scope > .${slider.params.slideClass}`)
-    );
+    // Re-query slides (now includes clones)
+    slider.refreshSlides();
   }
 
   function destroyLoop() {
