@@ -58,14 +58,15 @@ export default function loopModule({ slider }) {
     clones.forEach((clone) => clone.remove());
   }
 
-  function loopFix() {
-    if (!slider.params.loop || !slider._loopedSlides) return;
-
+  // Resolve the canonical (non-clone) snap index for the current activeIndex.
+  // Shared by the core loopFix and effect overrides (e.g. cards) so the
+  // clone-wrap math lives in exactly one place.
+  function _resolveLoopIndex() {
     const loopedSlides = slider._loopedSlides;
     const totalOriginal = slider.slides.length - loopedSlides * 2;
 
     // Guard against infinite loop if totalOriginal <= 0
-    if (totalOriginal <= 0) return;
+    if (totalOriginal <= 0) return { newIdx: slider.activeIndex, needsJump: false };
 
     let newIdx = slider.activeIndex;
 
@@ -82,6 +83,13 @@ export default function loopModule({ slider }) {
       needsJump = true;
     }
 
+    return { newIdx, needsJump };
+  }
+
+  function loopFix() {
+    if (!slider.params.loop || !slider._loopedSlides) return;
+
+    const { newIdx, needsJump } = _resolveLoopIndex();
     if (!needsJump) return;
 
     slider.setTransition(0);
@@ -112,5 +120,6 @@ export default function loopModule({ slider }) {
   slider.createLoop = createLoop;
   slider.destroyLoop = destroyLoop;
   slider.loopFix = loopFix;
+  slider._resolveLoopIndex = _resolveLoopIndex;
   slider._getRealIndex = _getRealIndex;
 }

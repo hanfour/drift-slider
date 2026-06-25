@@ -283,26 +283,10 @@ export default function EffectCards({ slider, extendParams, on }) {
       slider.loopFix = function () {
         if (!slider.params.loop || !slider._loopedSlides) return;
 
-        const loopedSlides = slider._loopedSlides;
-        const totalOriginal = slider.slides.length - loopedSlides * 2;
-        if (totalOriginal <= 0) return;
-
-        // Use while-loops (like the core loopFix) so that when loopedSlides
-        // exceeds totalOriginal a single jump that lands back in the clone
-        // range keeps being corrected until it reaches the real slides.
-        let newIdx = slider.activeIndex;
-        let needsJump = false;
-        while (newIdx >= totalOriginal + loopedSlides) {
-          newIdx -= totalOriginal;
-          needsJump = true;
-        }
-        while (newIdx < loopedSlides) {
-          newIdx += totalOriginal;
-          needsJump = true;
-        }
-
-        if (!needsJump) return;
-        if (newIdx >= slider.snapGrid.length) return;
+        // Reuse the core clone-wrap math; only the apply step differs (cards
+        // routes through its overridden setTranslate and tracks _prevActiveIndex).
+        const { newIdx, needsJump } = slider._resolveLoopIndex();
+        if (!needsJump || newIdx >= slider.snapGrid.length) return;
 
         slider.setTransition(0);
         slider.activeIndex = newIdx;
