@@ -4,7 +4,10 @@ export default function classesModule({ slider }) {
   function updateSlidesClasses() {
     const params = slider.params;
     const slides = slider.slides;
-    const activeIdx = slider.activeIndex;
+    // activeIndex is a snap-grid (page) index; the first real slide of that
+    // page is page * slidesPerGroup. With the default slidesPerGroup of 1 this
+    // is identical to activeIndex.
+    const activeIdx = slider.activeIndex * params.slidesPerGroup;
 
     for (let i = 0; i < slides.length; i++) {
       const slide = slides[i];

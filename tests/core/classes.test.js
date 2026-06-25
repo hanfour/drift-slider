@@ -44,4 +44,20 @@ describe('core/classes', () => {
     expect(s.slider.slides[1].classList.contains('drift-slide--prev')).toBe(true)
     expect(s.slider.slides[3].classList.contains('drift-slide--next')).toBe(true)
   })
+
+  it('marks the correct active slide with slidesPerGroup > 1', () => {
+    const s = createSlider({ slideCount: 9, sliderOptions: { slidesPerView: 3, slidesPerGroup: 3 } })
+    cleanup = s.cleanup
+    s.slider.slideTo(1, 0) // page 1 → first slide of group is slide index 3
+    expect(s.slider.slides[3].classList.contains('drift-slide--active')).toBe(true)
+  })
+
+  it('marks the active group as visible with slidesPerGroup > 1', () => {
+    const s = createSlider({ slideCount: 9, sliderOptions: { slidesPerView: 3, slidesPerGroup: 3 } })
+    cleanup = s.cleanup
+    s.slider.slideTo(1, 0)
+    expect(s.slider.slides[3].classList.contains('drift-slide--visible')).toBe(true)
+    expect(s.slider.slides[4].classList.contains('drift-slide--visible')).toBe(true)
+    expect(s.slider.slides[5].classList.contains('drift-slide--visible')).toBe(true)
+  })
 })
