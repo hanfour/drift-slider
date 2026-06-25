@@ -80,6 +80,16 @@ $('.drift-slider').driftSlider({
 });
 ```
 
+## React
+
+An official React wrapper is available as `drift-slider-react`:
+
+```bash
+npm i drift-slider drift-slider-react
+```
+
+See [`packages/react/README.md`](packages/react/README.md) for usage.
+
 ## HTML Structure
 
 ```html
