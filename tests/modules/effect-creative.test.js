@@ -196,4 +196,12 @@ describe('module/effect-creative', () => {
     const nextSlideTransform = s.slider.slides[1].style.transform
     expect(nextSlideTransform).toContain('rotateY(')
   })
+
+  it('restores the original slidesPerView on destroy', () => {
+    const s = createSlider({ slideCount: 5, sliderOptions: { effect: 'creative', modules: [EffectCreative], slidesPerView: 0.5 } })
+    cleanup = s.cleanup
+    expect(s.slider.params.slidesPerView).toBe(1)
+    s.slider.destroy()
+    expect(s.slider.params.slidesPerView).toBe(0.5)
+  })
 })

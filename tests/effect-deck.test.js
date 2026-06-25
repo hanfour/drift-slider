@@ -183,4 +183,15 @@ describe('EffectDeck', () => {
     expect(s.slider.setTranslate).not.toBe(overriddenTranslate)
     expect(s.slider.setTransition).not.toBe(overriddenTransition)
   })
+
+  it('restores the original slidesPerView on destroy', () => {
+    const s = createSlider({
+      slideCount: 5,
+      sliderOptions: { effect: 'deck', modules: [EffectDeck], slidesPerView: 3 },
+    })
+    cleanup = s.cleanup
+    expect(s.slider.params.slidesPerView).toBe(1)
+    s.slider.destroy()
+    expect(s.slider.params.slidesPerView).toBe(3)
+  })
 })
