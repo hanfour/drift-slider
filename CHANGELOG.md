@@ -1,5 +1,36 @@
 # Changelog
 
+# 0.7.0 (2026-06-25)
+
+Project-wide health audit & hardening (PR #9). Detailed EN/ZH notes in `docs/changelog.html`.
+
+### Features
+
+* **slides:** implement `centeredSlides` (was a no-op)
+* **autoplay:** pause while the page/tab is hidden
+* **jquery:** proxy method calls and clear `$.data` on destroy
+* **touch:** add `longSwipes` option for low-velocity long drags
+
+### Bug Fixes
+
+* **core:** correct `slidesPerGroup` navigation and active-class mapping
+* **core:** clamp `snapGrid` end so multi-view sliders don't overscroll
+* **events-emitter:** isolate handler errors
+* **a11y:** exclude clones, reveal full `slidesPerView` window, restore ARIA/reduced-motion on destroy
+* **keyboard:** target real first/last slide for Home/End in loop mode
+* **navigation,pagination:** refresh on resize/breakpoint; clean up DOM on destroy
+* **breakpoints:** rebuild loop clones when `loop` toggles
+* **effects:** restore overridden methods + `slidesPerView` on destroy; stop deck/cards list inflation; fix cards `loopFix`
+* **thumbs:** detach previous click handlers before re-init
+* **utils:** harden `deepMerge`, add `debounce.cancel`
+* **dom:** parse `matrix3d` in `getTranslate`
+* **support:** always cache `supportsPassive` as a boolean
+
+### Notes
+
+* `loop` + `slidesPerGroup > 1` falls back to `slidesPerGroup: 1` (clones are not group-aligned)
+
+
 # 0.2.0 (2026-03-17)
 
 

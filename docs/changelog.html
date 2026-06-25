@@ -40,6 +40,57 @@
       <p class="lead" data-i18n-en>All notable changes to DriftSlider will be documented here.</p>
       <p class="lead" data-i18n-zh>DriftSlider 所有重要變更都記錄在此。</p>
 
+      <!-- v0.7.0 -->
+      <div class="changelog-entry">
+        <h2 class="changelog-version">v0.7.0</h2>
+        <p class="changelog-date">2026-06-25 &mdash; Health Audit &amp; Hardening</p>
+
+        <h3 data-i18n-en>New Features</h3>
+        <h3 data-i18n-zh>新功能</h3>
+        <ul>
+          <li data-i18n-en><strong>Centered slides</strong> &mdash; <code>centeredSlides: true</code> now actually centers the active slide with partial peeks of the neighbours (previously a no-op).</li>
+          <li data-i18n-zh><strong>置中滑塊</strong> &mdash; <code>centeredSlides: true</code> 現在會真正讓活動滑塊置中並露出相鄰滑塊（先前完全無作用）。</li>
+          <li data-i18n-en><strong>Autoplay pauses on hidden tab</strong> &mdash; autoplay now pauses on <code>visibilitychange</code> when the tab is hidden and resumes when visible (skips resume if the pointer is over the slider).</li>
+          <li data-i18n-zh><strong>分頁隱藏時暫停自動播放</strong> &mdash; 分頁隱藏時依 <code>visibilitychange</code> 暫停，回到可見時恢復（指標懸停在 slider 上時不恢復）。</li>
+          <li data-i18n-en><strong>jQuery method calls</strong> &mdash; <code>$el.driftSlider('slideNext')</code> and other methods now proxy to the instance instead of re-initialising; <code>destroy</code> clears <code>$.data</code>.</li>
+          <li data-i18n-zh><strong>jQuery 方法呼叫</strong> &mdash; <code>$el.driftSlider('slideNext')</code> 等方法現在會代理到實例而非重新初始化；<code>destroy</code> 會清除 <code>$.data</code>。</li>
+          <li data-i18n-en><strong>Long swipes</strong> &mdash; new <code>longSwipes</code> option (default <code>true</code>): a slow drag past <code>longSwipesRatio</code> advances even at low velocity.</li>
+          <li data-i18n-zh><strong>長距離滑動</strong> &mdash; 新增 <code>longSwipes</code> 選項（預設 <code>true</code>）：即使低速，只要拖曳超過 <code>longSwipesRatio</code> 即換頁。</li>
+        </ul>
+
+        <h3 data-i18n-en>Bug Fixes</h3>
+        <h3 data-i18n-zh>問題修復</h3>
+        <ul>
+          <li data-i18n-en><strong>Grouped navigation</strong> &mdash; <code>slidesPerGroup ≥ 2</code> no longer skips groups, and active/visible classes now land on the correct slide.</li>
+          <li data-i18n-zh><strong>分組導航</strong> &mdash; <code>slidesPerGroup ≥ 2</code> 不再跳過分組，active/visible class 也標在正確的滑塊上。</li>
+          <li data-i18n-en><strong>Multi-view end</strong> &mdash; with <code>slidesPerView &gt; 1</code>, navigating to the end no longer overscrolls past the content into blank space.</li>
+          <li data-i18n-zh><strong>多視圖尾端</strong> &mdash; <code>slidesPerView &gt; 1</code> 時，導航到底不再過捲露出空白。</li>
+          <li data-i18n-en><strong>Event isolation</strong> &mdash; a throwing event handler no longer aborts the remaining handlers (a buggy callback can't break navigation/pagination/a11y).</li>
+          <li data-i18n-zh><strong>事件隔離</strong> &mdash; 單一事件處理器拋錯不再中斷其餘處理器（壞掉的 callback 不會連帶弄壞導航/分頁/無障礙）。</li>
+          <li data-i18n-en><strong>Accessibility</strong> &mdash; loop clones are hidden from screen readers with the correct slide count, the full <code>slidesPerView</code> window is exposed, and ARIA / reduced-motion params are restored on destroy.</li>
+          <li data-i18n-zh><strong>無障礙</strong> &mdash; loop clone 對螢幕報讀隱藏並使用正確張數，完整 <code>slidesPerView</code> 範圍可見，destroy 時還原 ARIA 與 reduced-motion 參數。</li>
+          <li data-i18n-en><strong>Keyboard</strong> &mdash; <code>Home</code>/<code>End</code> target the real first/last slide in loop mode.</li>
+          <li data-i18n-zh><strong>鍵盤</strong> &mdash; loop 模式下 <code>Home</code>/<code>End</code> 對應真正的首/末張。</li>
+          <li data-i18n-en><strong>Navigation &amp; pagination</strong> refresh on resize/breakpoint (bullets re-render when the count changes); pagination cleans up its DOM on destroy.</li>
+          <li data-i18n-zh><strong>導航與分頁</strong> 在 resize/breakpoint 時刷新（總數變動時重繪 bullet）；destroy 時清除 pagination DOM。</li>
+          <li data-i18n-en><strong>Breakpoints</strong> &mdash; toggling <code>loop</code> at a breakpoint now rebuilds/removes the loop clones.</li>
+          <li data-i18n-zh><strong>斷點</strong> &mdash; 在斷點切換 <code>loop</code> 現在會重建/移除 loop clone。</li>
+          <li data-i18n-en><strong>Effects</strong> &mdash; deck/cards no longer inflate the list width on resize; all effects restore overridden core methods and <code>slidesPerView</code> on destroy; cards loop-jump corrected.</li>
+          <li data-i18n-zh><strong>效果</strong> &mdash; deck/cards 在 resize 時不再撐爆 list 寬度；所有效果於 destroy 還原被覆寫的核心方法與 <code>slidesPerView</code>；修正 cards 的 loop 跳轉。</li>
+          <li data-i18n-en><strong>Thumbs</strong> &mdash; no duplicate click handlers when re-initialised.</li>
+          <li data-i18n-zh><strong>縮圖</strong> &mdash; 重新初始化時不再重複綁定 click。</li>
+          <li data-i18n-en><strong>Internals</strong> &mdash; <code>deepMerge</code> hardened against prototype pollution and array aliasing, <code>debounce</code> gains <code>cancel()</code>, and <code>getTranslate</code> parses <code>matrix3d</code>.</li>
+          <li data-i18n-zh><strong>內部</strong> &mdash; <code>deepMerge</code> 強化防止原型污染與陣列共參，<code>debounce</code> 新增 <code>cancel()</code>，<code>getTranslate</code> 支援 <code>matrix3d</code>。</li>
+        </ul>
+
+        <h3 data-i18n-en>Notes</h3>
+        <h3 data-i18n-zh>注意事項</h3>
+        <ul>
+          <li data-i18n-en><code>slidesPerGroup &gt; 1</code> combined with <code>loop</code> falls back to <code>slidesPerGroup: 1</code> (loop clones are sized per <code>slidesPerView</code> and are not group-aligned).</li>
+          <li data-i18n-zh><code>slidesPerGroup &gt; 1</code> 與 <code>loop</code> 併用時會退回 <code>slidesPerGroup: 1</code>（loop clone 依 <code>slidesPerView</code> 配置，無法對齊分組）。</li>
+        </ul>
+      </div>
+
       <!-- v0.6.0 -->
       <div class="changelog-entry">
         <h2 class="changelog-version">v0.6.0</h2>
