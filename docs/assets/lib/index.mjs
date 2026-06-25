@@ -1136,14 +1136,15 @@ function loopModule({ slider }) {
     clones.forEach((clone) => clone.remove());
   }
 
-  function loopFix() {
-    if (!slider.params.loop || !slider._loopedSlides) return;
-
+  // Resolve the canonical (non-clone) snap index for the current activeIndex.
+  // Shared by the core loopFix and effect overrides (e.g. cards) so the
+  // clone-wrap math lives in exactly one place.
+  function _resolveLoopIndex() {
     const loopedSlides = slider._loopedSlides;
     const totalOriginal = slider.slides.length - loopedSlides * 2;
 
     // Guard against infinite loop if totalOriginal <= 0
-    if (totalOriginal <= 0) return;
+    if (totalOriginal <= 0) return { newIdx: slider.activeIndex, needsJump: false };
 
     let newIdx = slider.activeIndex;
 
@@ -1160,6 +1161,13 @@ function loopModule({ slider }) {
       needsJump = true;
     }
 
+    return { newIdx, needsJump };
+  }
+
+  function loopFix() {
+    if (!slider.params.loop || !slider._loopedSlides) return;
+
+    const { newIdx, needsJump } = _resolveLoopIndex();
     if (!needsJump) return;
 
     slider.setTransition(0);
@@ -1190,6 +1198,7 @@ function loopModule({ slider }) {
   slider.createLoop = createLoop;
   slider.destroyLoop = destroyLoop;
   slider.loopFix = loopFix;
+  slider._resolveLoopIndex = _resolveLoopIndex;
   slider._getRealIndex = _getRealIndex;
 }
 
@@ -3233,26 +3242,10 @@ function EffectCards({ slider, extendParams, on }) {
       slider.loopFix = function () {
         if (!slider.params.loop || !slider._loopedSlides) return;
 
-        const loopedSlides = slider._loopedSlides;
-        const totalOriginal = slider.slides.length - loopedSlides * 2;
-        if (totalOriginal <= 0) return;
-
-        // Use while-loops (like the core loopFix) so that when loopedSlides
-        // exceeds totalOriginal a single jump that lands back in the clone
-        // range keeps being corrected until it reaches the real slides.
-        let newIdx = slider.activeIndex;
-        let needsJump = false;
-        while (newIdx >= totalOriginal + loopedSlides) {
-          newIdx -= totalOriginal;
-          needsJump = true;
-        }
-        while (newIdx < loopedSlides) {
-          newIdx += totalOriginal;
-          needsJump = true;
-        }
-
-        if (!needsJump) return;
-        if (newIdx >= slider.snapGrid.length) return;
+        // Reuse the core clone-wrap math; only the apply step differs (cards
+        // routes through its overridden setTranslate and tracks _prevActiveIndex).
+        const { newIdx, needsJump } = slider._resolveLoopIndex();
+        if (!needsJump || newIdx >= slider.snapGrid.length) return;
 
         slider.setTransition(0);
         slider.activeIndex = newIdx;
@@ -3660,8 +3653,10 @@ function EffectDeck({ slider, extendParams, on }) {
 
   on('init', init);
   on('slideChange', onSlideChange);
+  // onUpdate forces a layout read (offsetHeight) to re-measure height, so avoid
+  // running it twice per resize: the resize handler always calls update() before
+  // emitting 'resize', so listening on 'update' alone already covers resizes.
   on('update', onUpdate);
-  on('resize', onUpdate);
   on('destroy', destroy);
 }
 
