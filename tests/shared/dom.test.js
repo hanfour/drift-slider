@@ -149,6 +149,26 @@ describe('getTranslate', () => {
     expect(getTranslate(el, 'x')).toBe(0)
     el.remove()
   })
+
+  it('parses translate from a matrix3d transform', () => {
+    const el = document.createElement('div')
+    vi.spyOn(window, 'getComputedStyle').mockReturnValue({
+      transform: 'matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 42, 7, 0, 1)',
+    })
+    expect(getTranslate(el, 'x')).toBe(42)
+    expect(getTranslate(el, 'y')).toBe(7)
+    vi.restoreAllMocks()
+  })
+
+  it('parses translate from a 2D matrix transform', () => {
+    const el = document.createElement('div')
+    vi.spyOn(window, 'getComputedStyle').mockReturnValue({
+      transform: 'matrix(1, 0, 0, 1, 25, 9)',
+    })
+    expect(getTranslate(el, 'x')).toBe(25)
+    expect(getTranslate(el, 'y')).toBe(9)
+    vi.restoreAllMocks()
+  })
 })
 
 describe('outerWidth / outerHeight', () => {

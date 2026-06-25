@@ -42,10 +42,35 @@ export default function breakpointsModule({ slider }) {
       'centeredSlides', 'loop', 'speed', 'grabCursor',
     ];
 
+    // Toggling loop at a breakpoint must rebuild/remove the clones, otherwise
+    // params.loop and the actual clone set fall out of sync.
+    const prevLoop = slider.params.loop;
+    const nextLoop = baseParams.loop;
+    const realIndex = slider.realIndex;
+
+    // Remove clones while params.loop is still true (destroyLoop guards on it)
+    if (nextLoop === false && prevLoop === true) {
+      slider.destroyLoop();
+      slider._loopedSlides = 0;
+      slider.refreshSlides();
+    }
+
     for (const key of applyKeys) {
       if (baseParams[key] !== undefined) {
         slider.params[key] = baseParams[key];
       }
+    }
+
+    // Build clones now that params.loop is true
+    if (nextLoop === true && prevLoop === false && !slider._loopedSlides) {
+      slider.createLoop();
+    }
+
+    // Keep the same real slide active across the toggle
+    if (nextLoop !== prevLoop) {
+      slider.activeIndex = nextLoop
+        ? realIndex + (slider._loopedSlides || 0)
+        : realIndex;
     }
 
     slider.update();

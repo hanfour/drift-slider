@@ -76,6 +76,19 @@ describe('deepMerge', () => {
     expect(result).toBe(target)
     expect(target.b).toBe(2)
   })
+
+  it('does not pollute via __proto__ keys', () => {
+    const result = deepMerge({}, JSON.parse('{"__proto__":{"polluted":true}}'))
+    expect(result.polluted).toBeUndefined()
+    expect({}.polluted).toBeUndefined()
+  })
+
+  it('clones arrays instead of sharing the source reference', () => {
+    const source = { items: [1, 2, 3] }
+    const result = deepMerge({}, source)
+    result.items.push(4)
+    expect(source.items).toEqual([1, 2, 3])
+  })
 })
 
 describe('deepMergeDefaults', () => {
@@ -132,6 +145,18 @@ describe('debounce', () => {
 
     vi.advanceTimersByTime(1)
     expect(fn).toHaveBeenCalledOnce()
+    vi.useRealTimers()
+  })
+
+  it('cancel() prevents a pending call', () => {
+    vi.useFakeTimers()
+    const fn = vi.fn()
+    const debounced = debounce(fn, 100)
+
+    debounced()
+    debounced.cancel()
+    vi.advanceTimersByTime(200)
+    expect(fn).not.toHaveBeenCalled()
     vi.useRealTimers()
   })
 })

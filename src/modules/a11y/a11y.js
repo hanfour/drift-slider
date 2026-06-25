@@ -18,16 +18,29 @@ export default function A11y({ slider, extendParams, on }) {
   });
 
   let liveRegionEl = null;
+  let _originalSpeed = null;
+  let _originalAutoplayDelay = null;
 
   function initSlides() {
     const params = slider.params.a11y;
+    const cloneClass = slider.params.slideCloneClass;
     const slides = slider.slides;
+
+    // Label and count only real slides; clones are visual duplicates and must
+    // not be announced (they would inflate the count and read out twice).
+    const total = slides.filter((s) => !s.classList.contains(cloneClass)).length;
+    let realIndex = 0;
 
     for (let i = 0; i < slides.length; i++) {
       const slide = slides[i];
+      if (slide.classList.contains(cloneClass)) {
+        slide.setAttribute('aria-hidden', 'true');
+        continue;
+      }
+      realIndex += 1;
       slide.setAttribute('role', params.slideRole);
       slide.setAttribute('aria-roledescription', params.slideRoleDescription);
-      slide.setAttribute('aria-label', `${i + 1} / ${slides.length}`);
+      slide.setAttribute('aria-label', `${realIndex} / ${total}`);
     }
   }
 
@@ -71,8 +84,10 @@ export default function A11y({ slider, extendParams, on }) {
 
   function handleReducedMotion() {
     if (prefersReducedMotion()) {
+      _originalSpeed = slider.params.speed;
       slider.params.speed = 0;
       if (slider.params.autoplay && slider.params.autoplay.enabled) {
+        _originalAutoplayDelay = slider.params.autoplay.delay;
         slider.params.autoplay.delay = Math.max(slider.params.autoplay.delay, 5000);
       }
     }
@@ -80,10 +95,16 @@ export default function A11y({ slider, extendParams, on }) {
 
   function updateAria() {
     const slides = slider.slides;
-    const activeIdx = slider.activeIndex;
+    const cloneClass = slider.params.slideCloneClass;
+    // The visible window is the active page's slides (activeIndex is a snap/page
+    // index; the first real slide of the page is activeIndex * slidesPerGroup).
+    const base = slider.activeIndex * slider.params.slidesPerGroup;
+    const perView = slider.params.slidesPerView;
 
     for (let i = 0; i < slides.length; i++) {
-      slides[i].setAttribute('aria-hidden', i !== activeIdx ? 'true' : 'false');
+      const isClone = slides[i].classList.contains(cloneClass);
+      const visible = !isClone && i >= base && i < base + perView;
+      slides[i].setAttribute('aria-hidden', visible ? 'false' : 'true');
     }
 
     updateLiveRegion();
@@ -104,6 +125,29 @@ export default function A11y({ slider, extendParams, on }) {
     if (liveRegionEl) {
       liveRegionEl.remove();
       liveRegionEl = null;
+    }
+
+    // Restore the DOM by removing the ARIA attributes we added
+    slider.el.removeAttribute('role');
+    slider.el.removeAttribute('aria-roledescription');
+    slider.el.removeAttribute('aria-label');
+    slider.el.removeAttribute('tabindex');
+
+    for (const slide of slider.slides) {
+      slide.removeAttribute('role');
+      slide.removeAttribute('aria-roledescription');
+      slide.removeAttribute('aria-label');
+      slide.removeAttribute('aria-hidden');
+    }
+
+    // Restore params mutated for reduced motion
+    if (_originalSpeed !== null) {
+      slider.params.speed = _originalSpeed;
+      _originalSpeed = null;
+    }
+    if (_originalAutoplayDelay !== null && slider.params.autoplay) {
+      slider.params.autoplay.delay = _originalAutoplayDelay;
+      _originalAutoplayDelay = null;
     }
   }
 

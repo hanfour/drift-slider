@@ -410,4 +410,12 @@ describe('module/effect-coverflow', () => {
     expect(s.container.style.overflowX).toBe('')
     expect(s.container.style.overflowY).toBe('')
   })
+
+  it('restores the original slidesPerView on destroy', () => {
+    const s = createSlider({ slideCount: 5, sliderOptions: { effect: 'coverflow', modules: [EffectCoverflow], slidesPerView: 0.5 } })
+    cleanup = s.cleanup
+    expect(s.slider.params.slidesPerView).toBe(1)
+    s.slider.destroy()
+    expect(s.slider.params.slidesPerView).toBe(0.5)
+  })
 })

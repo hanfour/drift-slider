@@ -7,11 +7,37 @@ const allModules = [Navigation, Pagination, Autoplay, EffectFade, Keyboard, A11y
 (function ($) {
   if (!$ || !$.fn) return;
 
-  $.fn.driftSlider = function (options) {
+  function getInstance(el) {
+    return el.driftSlider || $.data(el, 'driftSlider');
+  }
+
+  $.fn.driftSlider = function (options, ...args) {
+    // Method invocation: $el.driftSlider('slideNext', ...args)
+    if (typeof options === 'string') {
+      const method = options;
+      let result;
+      this.each(function () {
+        const instance = getInstance(this);
+        if (!instance || typeof instance[method] !== 'function') return;
+
+        const ret = instance[method](...args);
+        // Capture the first non-instance return value (getters); method calls
+        // that return the instance itself stay chainable.
+        if (result === undefined && ret !== instance) {
+          result = ret;
+        }
+        if (method === 'destroy') {
+          $.removeData(this, 'driftSlider');
+        }
+      });
+      return result !== undefined ? result : this;
+    }
+
     return this.each(function () {
       // Destroy existing instance
-      if (this.driftSlider) {
-        this.driftSlider.destroy();
+      if (getInstance(this)) {
+        getInstance(this).destroy();
+        $.removeData(this, 'driftSlider');
       }
 
       // Normalize shorthand options

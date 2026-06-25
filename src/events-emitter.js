@@ -1,5 +1,6 @@
 export default {
   on(event, handler, priority) {
+    if (typeof handler !== 'function') return this;
     if (!this._events) this._events = {};
     if (!this._events[event]) this._events[event] = [];
 
@@ -7,7 +8,8 @@ export default {
     return this;
   },
 
-  once(event, handler) {
+  once(event, handler, priority) {
+    if (typeof handler !== 'function') return this;
     if (!this._events) this._events = {};
 
     const onceHandler = (...args) => {
@@ -15,7 +17,7 @@ export default {
       handler.apply(this, args);
     };
     onceHandler._original = handler;
-    return this.on(event, onceHandler);
+    return this.on(event, onceHandler, priority);
   },
 
   off(event, handler) {
@@ -39,7 +41,13 @@ export default {
     handlers.sort((a, b) => (b.priority ? 1 : 0) - (a.priority ? 1 : 0));
 
     for (const { handler } of handlers) {
-      handler.apply(this, args);
+      // Isolate handlers: one throwing listener must not abort the rest
+      // (internal modules and user callbacks share the same event bus).
+      try {
+        handler.apply(this, args);
+      } catch (err) {
+        console.error(`DriftSlider: error in "${event}" handler`, err);
+      }
     }
     return this;
   },

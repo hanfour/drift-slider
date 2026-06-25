@@ -50,14 +50,25 @@ export default function Keyboard({ slider, extendParams, on }) {
           slider.slideNext();
         }
         break;
-      case 'Home':
+      case 'Home': {
         e.preventDefault();
-        slider.slideTo(0);
+        // In loop mode index 0 is a clone; target the first real slide.
+        const first = slider.params.loop && slider._loopedSlides
+          ? slider._loopedSlides
+          : 0;
+        slider.slideTo(first);
         break;
-      case 'End':
+      }
+      case 'End': {
         e.preventDefault();
-        slider.slideTo(slider.snapGrid.length - 1);
+        let last = slider.snapGrid.length - 1;
+        if (slider.params.loop && slider._loopedSlides) {
+          const realCount = slider.slides.length - slider._loopedSlides * 2;
+          last = slider._loopedSlides + realCount - 1;
+        }
+        slider.slideTo(last);
         break;
+      }
     }
   }
 

@@ -118,4 +118,10 @@ describe('core/loop', () => {
     expect(result).toBeGreaterThanOrEqual(0)
     expect(result).toBeLessThan(3)
   })
+
+  it('falls back to slidesPerGroup 1 in loop mode (clones are not group-aligned)', () => {
+    const s = createSlider({ slideCount: 6, sliderOptions: { loop: true, slidesPerGroup: 2 } })
+    cleanup = s.cleanup
+    expect(s.slider.params.slidesPerGroup).toBe(1)
+  })
 })

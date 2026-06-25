@@ -2,14 +2,19 @@ let passiveSupported = null;
 
 export function supportsPassive() {
   if (passiveSupported !== null) return passiveSupported;
+  // Default to false so the result is always cached as a boolean, even on
+  // engines that never read the `passive` getter below.
+  passiveSupported = false;
   try {
+    const noop = () => {};
     const opts = Object.defineProperty({}, 'passive', {
       get() {
         passiveSupported = true;
+        return true;
       },
     });
-    window.addEventListener('testPassive', null, opts);
-    window.removeEventListener('testPassive', null, opts);
+    window.addEventListener('testPassive', noop, opts);
+    window.removeEventListener('testPassive', noop, opts);
   } catch {
     passiveSupported = false;
   }

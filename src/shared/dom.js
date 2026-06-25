@@ -55,11 +55,18 @@ export function getTranslate(el, axis = 'x') {
   const transform = style.transform || style.webkitTransform;
   if (!transform || transform === 'none') return 0;
 
+  // matrix3d(...) — translate components are at indices 12 (tx) and 13 (ty)
+  const match3d = transform.match(/matrix3d\((.+)\)/);
+  if (match3d) {
+    const values = match3d[1].split(',').map(Number);
+    return axis === 'x' ? values[12] : values[13];
+  }
+
+  // matrix(a, b, c, d, tx, ty)
   const match = transform.match(/matrix\((.+)\)/);
   if (!match) return 0;
 
   const values = match[1].split(',').map(Number);
-  // matrix(a, b, c, d, tx, ty)
   return axis === 'x' ? values[4] : values[5];
 }
 

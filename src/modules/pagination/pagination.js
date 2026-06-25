@@ -23,6 +23,7 @@ export default function Pagination({ slider, extendParams, on }) {
 
   let paginationEl = null;
   let bullets = [];
+  let _created = false;
 
   function getTotalSlides() {
     if (slider.params.loop && slider._loopedSlides) {
@@ -135,6 +136,20 @@ export default function Pagination({ slider, extendParams, on }) {
     }
   }
 
+  // Re-render bullets when the reachable slide count changes (e.g. a breakpoint
+  // alters slidesPerView/slidesPerGroup), then refresh active state.
+  function refresh() {
+    if (!paginationEl) return;
+    const params = slider.params.pagination;
+    if (params.type === 'bullets' && getTotalSlides() !== bullets.length) {
+      if (params.clickable) {
+        bullets.forEach((bullet) => bullet.removeEventListener('click', onBulletClick));
+      }
+      renderBullets();
+    }
+    update();
+  }
+
   function onBulletClick(e) {
     const index = parseInt(e.currentTarget.getAttribute('data-index'), 10);
     if (isNaN(index)) return;
@@ -160,6 +175,7 @@ export default function Pagination({ slider, extendParams, on }) {
     if (!paginationEl) {
       paginationEl = createElement('div', { className: 'drift-pagination' });
       slider.el.appendChild(paginationEl);
+      _created = true;
     }
 
     if (params.style) {
@@ -192,11 +208,27 @@ export default function Pagination({ slider, extendParams, on }) {
       });
     }
     bullets = [];
+
+    if (paginationEl) {
+      if (_created && paginationEl.parentNode) {
+        // We created the element — remove it entirely
+        paginationEl.parentNode.removeChild(paginationEl);
+      } else {
+        // User-provided element — just clear what we rendered into it
+        paginationEl.innerHTML = '';
+        removeClass(paginationEl, `drift-pagination--${slider.params.pagination.type}`);
+        paginationEl.removeAttribute('role');
+        paginationEl.removeAttribute('aria-label');
+      }
+    }
     paginationEl = null;
+    _created = false;
   }
 
   on('init', init);
   on('slideChange', update);
+  on('resize', refresh);
+  on('breakpoint', refresh);
   on('destroy', destroy);
 
   slider.pagination = { update, render: init, el: paginationEl };

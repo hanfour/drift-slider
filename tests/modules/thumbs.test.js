@@ -72,4 +72,21 @@ describe('module/thumbs', () => {
     cleanup2 = main.cleanup
     expect(thumbs.slider.slides[0].classList.contains('drift-thumb--active')).toBe(true)
   })
+
+  it('does not duplicate thumb click handlers when init runs again', () => {
+    const thumbs = createSlider({ slideCount: 5 })
+    cleanup1 = thumbs.cleanup
+    const main = createSlider({
+      slideCount: 5,
+      sliderOptions: { modules: [Thumbs], thumbs: { slider: thumbs.slider } },
+    })
+    cleanup2 = main.cleanup
+
+    // Re-initialise (the 'init' event re-runs the module's init)
+    main.slider.emit('init', main.slider)
+
+    const spy = vi.spyOn(main.slider, 'slideTo')
+    thumbs.slider.slides[2].click()
+    expect(spy).toHaveBeenCalledTimes(1)
+  })
 })

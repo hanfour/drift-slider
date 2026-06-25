@@ -389,4 +389,55 @@ describe('module/effect-cards', () => {
     // No rotation should have been applied (flip not triggered)
     expect(s.slider.slides[0].style.transform).not.toContain('rotateY(-90deg)')
   })
+
+  it('does not inflate the list width with a per-slide pixel total', () => {
+    const s = createSlider({
+      slideCount: 5,
+      sliderOptions: { effect: 'cards', modules: [EffectCards] },
+    })
+    cleanup = s.cleanup
+    s.slider.update()
+    // Cards positions slides absolutely; calcSlides must not stretch the list
+    // to slideCount * slideSize.
+    expect(s.slider.listEl.style.width).toBe('')
+  })
+
+  it('restores the core setTranslate / setTransition on destroy', () => {
+    const s = createSlider({
+      slideCount: 5,
+      sliderOptions: { effect: 'cards', modules: [EffectCards] },
+    })
+    cleanup = s.cleanup
+    const overriddenTranslate = s.slider.setTranslate
+    const overriddenTransition = s.slider.setTransition
+
+    s.slider.destroy()
+
+    expect(s.slider.setTranslate).not.toBe(overriddenTranslate)
+    expect(s.slider.setTransition).not.toBe(overriddenTransition)
+  })
+
+  it('loopFix keeps activeIndex in the real range when loopedSlides exceeds the original count', () => {
+    const s = createSlider({
+      slideCount: 2,
+      sliderOptions: { effect: 'cards', modules: [EffectCards], loop: true, loopAdditionalSlides: 2 },
+    })
+    cleanup = s.cleanup
+    const looped = s.slider._loopedSlides
+    const totalOriginal = s.slider.slides.length - looped * 2
+    // _loopedSlides (3) > totalOriginal (2): a single jump lands back in the
+    // clone range, so a while-loop is required to reach the real slides.
+    s.slider.activeIndex = s.slider.snapGrid.length - 1
+    s.slider.loopFix()
+    expect(s.slider.activeIndex).toBeGreaterThanOrEqual(looped)
+    expect(s.slider.activeIndex).toBeLessThan(looped + totalOriginal)
+  })
+
+  it('restores the original slidesPerView on destroy', () => {
+    const s = createSlider({ slideCount: 5, sliderOptions: { effect: 'cards', modules: [EffectCards], slidesPerView: 3 } })
+    cleanup = s.cleanup
+    expect(s.slider.params.slidesPerView).toBe(1)
+    s.slider.destroy()
+    expect(s.slider.params.slidesPerView).toBe(3)
+  })
 })

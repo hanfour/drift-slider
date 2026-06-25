@@ -291,4 +291,26 @@ describe('module/autoplay', () => {
     s.slider.autoplay.resume()
     expect(handler).toHaveBeenCalled()
   })
+
+  it('pauses when the page becomes hidden and resumes when visible', () => {
+    const s = createSlider({
+      sliderOptions: {
+        modules: [Autoplay],
+        autoplay: { enabled: true, delay: 1000 },
+      },
+    })
+    cleanup = s.cleanup
+    const pauseSpy = vi.fn()
+    const resumeSpy = vi.fn()
+    s.slider.on('autoplayPause', pauseSpy)
+    s.slider.on('autoplayResume', resumeSpy)
+
+    Object.defineProperty(document, 'hidden', { value: true, configurable: true })
+    document.dispatchEvent(new Event('visibilitychange'))
+    expect(pauseSpy).toHaveBeenCalled()
+
+    Object.defineProperty(document, 'hidden', { value: false, configurable: true })
+    document.dispatchEvent(new Event('visibilitychange'))
+    expect(resumeSpy).toHaveBeenCalled()
+  })
 })

@@ -333,6 +333,7 @@ export default function EffectCoverflow({ slider, extendParams, on }) {
   let _coreSetTransition = null;
   let _coreGetComputedTranslate = null;
   let _coreLoopFix = null;
+  let _originalSlidesPerView = null;
   let _lastTransitionSpeed = 0;
   let _prevTranslate = 0;
 
@@ -342,6 +343,7 @@ export default function EffectCoverflow({ slider, extendParams, on }) {
     _use3D = computeUse3D();
 
     if (slider.params.slidesPerView < 1) {
+      _originalSlidesPerView = slider.params.slidesPerView;
       slider.params.slidesPerView = 1;
     }
 
@@ -446,6 +448,7 @@ export default function EffectCoverflow({ slider, extendParams, on }) {
     if (_coreSetTransition) slider.setTransition = _coreSetTransition;
     if (_coreGetComputedTranslate) slider.getComputedTranslate = _coreGetComputedTranslate;
     if (_coreLoopFix) slider.loopFix = _coreLoopFix;
+    if (_originalSlidesPerView !== null) slider.params.slidesPerView = _originalSlidesPerView;
 
     slider.el.classList.remove('drift-slider--coverflow');
     slider.el.style.overflow = '';

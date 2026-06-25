@@ -1,4 +1,4 @@
-/*! DriftSlider v0.5.0 | MIT License */
+/*! DriftSlider v0.6.0 | MIT License */
 var defaults = {
   // Direction
   direction: 'horizontal', // 'horizontal' | 'vertical'
@@ -25,6 +25,7 @@ var defaults = {
   threshold: 5,
   touchAngle: 45,
   shortSwipes: true,
+  longSwipes: true,
   longSwipesRatio: 0.5,
   followFinger: true,
   resistance: true,
@@ -84,6 +85,7 @@ var defaults = {
 
 var eventsEmitter = {
   on(event, handler, priority) {
+    if (typeof handler !== 'function') return this;
     if (!this._events) this._events = {};
     if (!this._events[event]) this._events[event] = [];
 
@@ -91,7 +93,8 @@ var eventsEmitter = {
     return this;
   },
 
-  once(event, handler) {
+  once(event, handler, priority) {
+    if (typeof handler !== 'function') return this;
     if (!this._events) this._events = {};
 
     const onceHandler = (...args) => {
@@ -99,7 +102,7 @@ var eventsEmitter = {
       handler.apply(this, args);
     };
     onceHandler._original = handler;
-    return this.on(event, onceHandler);
+    return this.on(event, onceHandler, priority);
   },
 
   off(event, handler) {
@@ -123,7 +126,13 @@ var eventsEmitter = {
     handlers.sort((a, b) => (b.priority ? 1 : 0) - (a.priority ? 1 : 0));
 
     for (const { handler } of handlers) {
-      handler.apply(this, args);
+      // Isolate handlers: one throwing listener must not abort the rest
+      // (internal modules and user callbacks share the same event bus).
+      try {
+        handler.apply(this, args);
+      } catch (err) {
+        console.error(`DriftSlider: error in "${event}" handler`, err);
+      }
     }
     return this;
   },
@@ -144,10 +153,20 @@ function deepMerge(target, ...sources) {
   for (const source of sources) {
     if (!isObject(source)) continue;
     for (const key of Object.keys(source)) {
-      if (isObject(source[key]) && isObject(target[key])) {
-        target[key] = deepMerge({}, target[key], source[key]);
+      // Guard against prototype pollution from untrusted config (e.g. JSON)
+      if (key === '__proto__' || key === 'constructor' || key === 'prototype') {
+        continue;
+      }
+      const val = source[key];
+      if (Array.isArray(val)) {
+        // Clone arrays so the merged result does not alias the source
+        target[key] = val.slice();
+      } else if (isObject(val) && isObject(target[key])) {
+        target[key] = deepMerge({}, target[key], val);
       } else {
-        target[key] = source[key];
+        // Assign by reference for everything else, including class instances
+        // (e.g. a thumbs slider instance) which must not be cloned
+        target[key] = val;
       }
     }
   }
@@ -182,10 +201,15 @@ function deepMergeDefaults(target, ...sources) {
 
 function debounce(fn, delay) {
   let timer;
-  return function (...args) {
+  function debounced(...args) {
     clearTimeout(timer);
     timer = setTimeout(() => fn.apply(this, args), delay);
+  }
+  debounced.cancel = () => {
+    clearTimeout(timer);
+    timer = undefined;
   };
+  return debounced;
 }
 
 function clamp(val, min, max) {
@@ -268,7 +292,17 @@ function updateModule({ slider }) {
     const slidesGrid = [];
     const slidesSizesGrid = [];
 
-    if (params.centeredSlides) ;
+    let offset = 0;
+
+    if (params.centeredSlides) {
+      offset = containerSize / 2 - slideSize / 2;
+    }
+
+    // Effects that stack slides (absolute, 100% of container) declare
+    // slider._managesOwnLayout so core skips the per-slide width/margin and
+    // list width/height writes — otherwise they'd be overwritten with a
+    // slideCount * slideSize total on every update/resize.
+    const isStackedEffect = slider._managesOwnLayout === true;
 
     for (let i = 0; i < slides.length; i++) {
       slidesSizesGrid.push(slideSize);
@@ -276,18 +310,60 @@ function updateModule({ slider }) {
       const slidePosition = i * (slideSize + spaceBetween);
       slidesGrid.push(slidePosition);
 
-      // Snap grid (per group)
+      // Snap grid (per group). In centered mode each snap is shifted by the
+      // centering offset so the slide lands in the middle of the viewport
+      // (offset is 0 when centeredSlides is off, leaving this a no-op).
       if (i % params.slidesPerGroup === 0) {
-        snapGrid.push(slidePosition);
+        snapGrid.push(slidePosition - offset);
       }
 
       // Set slide dimensions
-      if (isHorizontal) {
-        slides[i].style.width = `${slideSize}px`;
-        slides[i].style.marginRight = `${spaceBetween}px`;
-      } else {
-        slides[i].style.height = `${slideSize}px`;
-        slides[i].style.marginBottom = `${spaceBetween}px`;
+      if (!isStackedEffect) {
+        if (isHorizontal) {
+          slides[i].style.width = `${slideSize}px`;
+          slides[i].style.marginRight = `${spaceBetween}px`;
+        } else {
+          slides[i].style.height = `${slideSize}px`;
+          slides[i].style.marginBottom = `${spaceBetween}px`;
+        }
+      }
+    }
+
+    // Total list size
+    const totalSize =
+      slides.length * slideSize + (slides.length - 1) * spaceBetween;
+
+    // Translate bounds. Centered mode lets the first and last slides reach the
+    // viewport centre, so the bounds are shifted by the centering offset.
+    if (params.centeredSlides) {
+      const lastPosition = (slides.length - 1) * (slideSize + spaceBetween);
+      slider.maxTranslate = offset;
+      slider.minTranslate = offset - lastPosition;
+      if (slider.minTranslate > slider.maxTranslate) {
+        slider.minTranslate = slider.maxTranslate;
+      }
+    } else {
+      slider.maxTranslate = 0;
+      slider.minTranslate = -(totalSize - containerSize);
+      if (slider.minTranslate > 0) slider.minTranslate = 0;
+    }
+
+    // Clamp trailing snap points so the final view sits flush against the end
+    // instead of overscrolling into empty space. Only relevant when slides do
+    // not divide evenly into the viewport (e.g. slidesPerView > 1) and when not
+    // centering (centered mode intentionally lets the last slide reach center).
+    if (!params.centeredSlides) {
+      const maxSnap = totalSize - containerSize;
+      if (maxSnap > 0) {
+        for (let k = 0; k < snapGrid.length; k++) {
+          if (snapGrid[k] > maxSnap) snapGrid[k] = maxSnap;
+        }
+        // Drop duplicate trailing snaps created by the clamp
+        let w = 1;
+        for (let k = 1; k < snapGrid.length; k++) {
+          if (snapGrid[k] !== snapGrid[w - 1]) snapGrid[w++] = snapGrid[k];
+        }
+        snapGrid.length = w;
       }
     }
 
@@ -295,25 +371,18 @@ function updateModule({ slider }) {
     slider.slidesGrid = slidesGrid;
     slider.slidesSizesGrid = slidesSizesGrid;
 
-    // Total list size
-    const totalSize =
-      slides.length * slideSize + (slides.length - 1) * spaceBetween;
-
-    // Max translate
-    slider.maxTranslate = 0;
-    slider.minTranslate = -(totalSize - containerSize);
-
-    if (slider.minTranslate > 0) slider.minTranslate = 0;
-
     // Check overflow (not enough slides)
     slider.isLocked =
       params.watchOverflow && snapGrid.length <= 1;
 
-    // Update list size
-    if (isHorizontal) {
-      slider.listEl.style.width = `${totalSize}px`;
-    } else {
-      slider.listEl.style.height = `${totalSize}px`;
+    // Update list size. For stacked effects the list must remain at
+    // container size — the effect module sets its own height on init.
+    if (!isStackedEffect) {
+      if (isHorizontal) {
+        slider.listEl.style.width = `${totalSize}px`;
+      } else {
+        slider.listEl.style.height = `${totalSize}px`;
+      }
     }
   }
 
@@ -323,8 +392,16 @@ function updateModule({ slider }) {
     slider.emit('update', slider);
   }
 
+  // Re-read the slide elements from the DOM (e.g. after clones are added/removed).
+  function refreshSlides() {
+    slider.slides = Array.from(
+      slider.listEl.querySelectorAll(`:scope > .${slider.params.slideClass}`)
+    );
+  }
+
   slider.calcSlides = calcSlides;
   slider.update = update;
+  slider.refreshSlides = refreshSlides;
 }
 
 function translateModule({ slider }) {
@@ -509,20 +586,21 @@ function slideModule({ slider }) {
 
   function slideNext(speed, runCallbacks = true) {
     const params = slider.params;
-
+    // snapGrid already has one entry per group (see calcSlides), so advancing
+    // one group means stepping one snap index — not slidesPerGroup.
     if (params.loop && slider._loopedSlides) {
       // In loop mode: let it go past current, loopFix will correct
-      const nextIndex = slider.activeIndex + params.slidesPerGroup;
+      const nextIndex = slider.activeIndex + 1;
       if (nextIndex >= slider.snapGrid.length) {
         // Jump back via loopFix first, then move forward
         slider.loopFix();
-        return slideTo(slider.activeIndex + params.slidesPerGroup, speed, runCallbacks);
+        return slideTo(slider.activeIndex + 1, speed, runCallbacks);
       }
       return slideTo(nextIndex, speed, runCallbacks);
     }
 
     const nextIndex = Math.min(
-      slider.activeIndex + params.slidesPerGroup,
+      slider.activeIndex + 1,
       slider.snapGrid.length - 1
     );
     return slideTo(nextIndex, speed, runCallbacks);
@@ -532,15 +610,15 @@ function slideModule({ slider }) {
     const params = slider.params;
 
     if (params.loop && slider._loopedSlides) {
-      const prevIndex = slider.activeIndex - params.slidesPerGroup;
+      const prevIndex = slider.activeIndex - 1;
       if (prevIndex < 0) {
         slider.loopFix();
-        return slideTo(slider.activeIndex - params.slidesPerGroup, speed, runCallbacks);
+        return slideTo(slider.activeIndex - 1, speed, runCallbacks);
       }
       return slideTo(prevIndex, speed, runCallbacks);
     }
 
-    const prevIndex = Math.max(slider.activeIndex - params.slidesPerGroup, 0);
+    const prevIndex = Math.max(slider.activeIndex - 1, 0);
     return slideTo(prevIndex, speed, runCallbacks);
   }
 
@@ -570,7 +648,10 @@ function classesModule({ slider }) {
   function updateSlidesClasses() {
     const params = slider.params;
     const slides = slider.slides;
-    const activeIdx = slider.activeIndex;
+    // activeIndex is a snap-grid (page) index; the first real slide of that
+    // page is page * slidesPerGroup. With the default slidesPerGroup of 1 this
+    // is identical to activeIndex.
+    const activeIdx = slider.activeIndex * params.slidesPerGroup;
 
     for (let i = 0; i < slides.length; i++) {
       const slide = slides[i];
@@ -656,6 +737,8 @@ function eventsModule({ slider }) {
   function detachEvents() {
     if (resizeHandler) {
       window.removeEventListener('resize', resizeHandler);
+      // Cancel any debounced resize still pending so it can't fire post-destroy
+      if (resizeHandler.cancel) resizeHandler.cancel();
     }
     slider.listEl.removeEventListener('transitionend', onListTransitionEnd);
   }
@@ -685,14 +768,19 @@ let passiveSupported = null;
 
 function supportsPassive() {
   if (passiveSupported !== null) return passiveSupported;
+  // Default to false so the result is always cached as a boolean, even on
+  // engines that never read the `passive` getter below.
+  passiveSupported = false;
   try {
+    const noop = () => {};
     const opts = Object.defineProperty({}, 'passive', {
       get() {
         passiveSupported = true;
+        return true;
       },
     });
-    window.addEventListener('testPassive', null, opts);
-    window.removeEventListener('testPassive', null, opts);
+    window.addEventListener('testPassive', noop, opts);
+    window.removeEventListener('testPassive', noop, opts);
   } catch {
     passiveSupported = false;
   }
@@ -919,6 +1007,24 @@ function touchModule({ slider }) {
       }
     }
 
+    // Long swipe detection: a long but slow drag past longSwipesRatio of the
+    // slide size advances even when release velocity is low. Uses the raw finger
+    // delta (touchData.diff) rather than the rendered translate so it still works
+    // with followFinger:false and is unaffected by boundary resistance damping.
+    if (params.longSwipes && closestIndex === slider.activeIndex) {
+      const dragDistance = touchData.diff;
+      const slideSize = slider.snapGrid.length > 1
+        ? Math.abs(slider.snapGrid[1] - slider.snapGrid[0])
+        : (slider.slideSize || 1);
+      if (Math.abs(dragDistance) > slideSize * params.longSwipesRatio) {
+        if (dragDistance > 0) {
+          closestIndex = Math.max(0, slider.activeIndex - 1);
+        } else if (dragDistance < 0) {
+          closestIndex = Math.min(slider.snapGrid.length - 1, slider.activeIndex + 1);
+        }
+      }
+    }
+
     // Calculate animation speed based on distance
     const snapTranslate = -slider.snapGrid[closestIndex];
     const distance = Math.abs(snapTranslate - currentTranslate);
@@ -981,6 +1087,11 @@ function loopModule({ slider }) {
   function createLoop() {
     if (!slider.params.loop) return;
 
+    // Loop clones are sized by slidesPerView, not slidesPerGroup, so they are
+    // not group-aligned. slidesPerGroup > 1 + loop would desync the snapGrid
+    // from the real slides (wrong active/aria mapping), so fall back to 1.
+    if (slider.params.slidesPerGroup > 1) slider.params.slidesPerGroup = 1;
+
     const slides = slider.slides;
     const perView = Math.ceil(slider.params.slidesPerView);
     const additional = slider.params.loopAdditionalSlides;
@@ -1020,10 +1131,8 @@ function loopModule({ slider }) {
       slider.listEl.appendChild(clone);
     }
 
-    // Re-query slides (now includes clones) — use :scope > for consistency
-    slider.slides = Array.from(
-      slider.listEl.querySelectorAll(`:scope > .${slider.params.slideClass}`)
-    );
+    // Re-query slides (now includes clones)
+    slider.refreshSlides();
   }
 
   function destroyLoop() {
@@ -1035,14 +1144,15 @@ function loopModule({ slider }) {
     clones.forEach((clone) => clone.remove());
   }
 
-  function loopFix() {
-    if (!slider.params.loop || !slider._loopedSlides) return;
-
+  // Resolve the canonical (non-clone) snap index for the current activeIndex.
+  // Shared by the core loopFix and effect overrides (e.g. cards) so the
+  // clone-wrap math lives in exactly one place.
+  function _resolveLoopIndex() {
     const loopedSlides = slider._loopedSlides;
     const totalOriginal = slider.slides.length - loopedSlides * 2;
 
     // Guard against infinite loop if totalOriginal <= 0
-    if (totalOriginal <= 0) return;
+    if (totalOriginal <= 0) return { newIdx: slider.activeIndex, needsJump: false };
 
     let newIdx = slider.activeIndex;
 
@@ -1059,6 +1169,13 @@ function loopModule({ slider }) {
       needsJump = true;
     }
 
+    return { newIdx, needsJump };
+  }
+
+  function loopFix() {
+    if (!slider.params.loop || !slider._loopedSlides) return;
+
+    const { newIdx, needsJump } = _resolveLoopIndex();
     if (!needsJump) return;
 
     slider.setTransition(0);
@@ -1066,8 +1183,15 @@ function loopModule({ slider }) {
     // Guard against snapGrid out-of-bounds
     if (newIdx >= slider.snapGrid.length) return;
     const translate = -slider.snapGrid[newIdx];
-    slider.listEl.style.transform = `translate3d(${translate}px, 0, 0)`;
+    // Stacked effects (fade) keep the list static — visual comes from opacity.
+    // Writing a transform here would drag the stacked slides off-screen.
+    if (slider.params.effect !== 'fade') {
+      slider.listEl.style.transform = `translate3d(${translate}px, 0, 0)`;
+    }
     slider.translate = translate;
+    // Notify effects of the activeIndex change so opacity stays in sync with
+    // the now-canonical (non-clone) slide.
+    slider.emit('slideChange', slider);
   }
 
   function _getRealIndex(index) {
@@ -1082,6 +1206,7 @@ function loopModule({ slider }) {
   slider.createLoop = createLoop;
   slider.destroyLoop = destroyLoop;
   slider.loopFix = loopFix;
+  slider._resolveLoopIndex = _resolveLoopIndex;
   slider._getRealIndex = _getRealIndex;
 }
 
@@ -1127,10 +1252,35 @@ function breakpointsModule({ slider }) {
       'centeredSlides', 'loop', 'speed', 'grabCursor',
     ];
 
+    // Toggling loop at a breakpoint must rebuild/remove the clones, otherwise
+    // params.loop and the actual clone set fall out of sync.
+    const prevLoop = slider.params.loop;
+    const nextLoop = baseParams.loop;
+    const realIndex = slider.realIndex;
+
+    // Remove clones while params.loop is still true (destroyLoop guards on it)
+    if (nextLoop === false && prevLoop === true) {
+      slider.destroyLoop();
+      slider._loopedSlides = 0;
+      slider.refreshSlides();
+    }
+
     for (const key of applyKeys) {
       if (baseParams[key] !== undefined) {
         slider.params[key] = baseParams[key];
       }
+    }
+
+    // Build clones now that params.loop is true
+    if (nextLoop === true && prevLoop === false && !slider._loopedSlides) {
+      slider.createLoop();
+    }
+
+    // Keep the same real slide active across the toggle
+    if (nextLoop !== prevLoop) {
+      slider.activeIndex = nextLoop
+        ? realIndex + (slider._loopedSlides || 0)
+        : realIndex;
     }
 
     slider.update();
@@ -1467,6 +1617,10 @@ function Navigation({ slider, extendParams, on }) {
 
   on('init', init);
   on('slideChange', update);
+  // Resize / breakpoint can change snapGrid length (and therefore isEnd) without
+  // emitting slideChange, so refresh the disabled state on those too.
+  on('resize', update);
+  on('breakpoint', update);
   on('destroy', destroy);
 
   slider.navigation = { update, enable: init, disable: destroy };
@@ -1495,6 +1649,7 @@ function Pagination({ slider, extendParams, on }) {
 
   let paginationEl = null;
   let bullets = [];
+  let _created = false;
 
   function getTotalSlides() {
     if (slider.params.loop && slider._loopedSlides) {
@@ -1607,6 +1762,20 @@ function Pagination({ slider, extendParams, on }) {
     }
   }
 
+  // Re-render bullets when the reachable slide count changes (e.g. a breakpoint
+  // alters slidesPerView/slidesPerGroup), then refresh active state.
+  function refresh() {
+    if (!paginationEl) return;
+    const params = slider.params.pagination;
+    if (params.type === 'bullets' && getTotalSlides() !== bullets.length) {
+      if (params.clickable) {
+        bullets.forEach((bullet) => bullet.removeEventListener('click', onBulletClick));
+      }
+      renderBullets();
+    }
+    update();
+  }
+
   function onBulletClick(e) {
     const index = parseInt(e.currentTarget.getAttribute('data-index'), 10);
     if (isNaN(index)) return;
@@ -1632,6 +1801,7 @@ function Pagination({ slider, extendParams, on }) {
     if (!paginationEl) {
       paginationEl = createElement('div', { className: 'drift-pagination' });
       slider.el.appendChild(paginationEl);
+      _created = true;
     }
 
     if (params.style) {
@@ -1664,11 +1834,27 @@ function Pagination({ slider, extendParams, on }) {
       });
     }
     bullets = [];
+
+    if (paginationEl) {
+      if (_created && paginationEl.parentNode) {
+        // We created the element — remove it entirely
+        paginationEl.parentNode.removeChild(paginationEl);
+      } else {
+        // User-provided element — just clear what we rendered into it
+        paginationEl.innerHTML = '';
+        removeClass(paginationEl, `drift-pagination--${slider.params.pagination.type}`);
+        paginationEl.removeAttribute('role');
+        paginationEl.removeAttribute('aria-label');
+      }
+    }
     paginationEl = null;
+    _created = false;
   }
 
   on('init', init);
   on('slideChange', update);
+  on('resize', refresh);
+  on('breakpoint', refresh);
   on('destroy', destroy);
 
   slider.pagination = { update, render: init, el: paginationEl };
@@ -1844,6 +2030,31 @@ function Autoplay({ slider, extendParams, on }) {
     }
   }
 
+  let _pausedByVisibility = false;
+  function isPointerOver() {
+    // :hover reflects the live pointer position even when no mouseenter fired
+    // (e.g. the pointer moved over the slider while the tab was hidden).
+    try {
+      return slider.el.matches(':hover');
+    } catch {
+      return false;
+    }
+  }
+  function onVisibilityChange() {
+    if (document.hidden) {
+      if (running && !paused) {
+        _pausedByVisibility = true;
+        pause();
+      }
+    } else if (_pausedByVisibility) {
+      _pausedByVisibility = false;
+      // Don't resume under a hovering pointer when pauseOnMouseEnter is set.
+      if (!(slider.params.autoplay.pauseOnMouseEnter && isPointerOver())) {
+        resume();
+      }
+    }
+  }
+
   function onTouchStart() {
     if (running) pause();
   }
@@ -1863,6 +2074,7 @@ function Autoplay({ slider, extendParams, on }) {
 
     slider.el.addEventListener('mouseenter', onMouseEnter);
     slider.el.addEventListener('mouseleave', onMouseLeave);
+    document.addEventListener('visibilitychange', onVisibilityChange);
 
     if (params.ticker) {
       slider.listEl.style.transitionProperty = 'none';
@@ -1880,6 +2092,7 @@ function Autoplay({ slider, extendParams, on }) {
     tickerStop();
     slider.el.removeEventListener('mouseenter', onMouseEnter);
     slider.el.removeEventListener('mouseleave', onMouseLeave);
+    document.removeEventListener('visibilitychange', onVisibilityChange);
   }
 
   on('init', init);
@@ -1891,11 +2104,18 @@ function Autoplay({ slider, extendParams, on }) {
 }
 
 function EffectFade({ slider, extendParams, on }) {
+  // Declare that this effect manages its own slide/list sizing so core
+  // calcSlides skips width/margin writes (set before the first calcSlides).
+  if (slider.params.effect === 'fade') slider._managesOwnLayout = true;
+
   extendParams({
     fadeEffect: {
       crossFade: true,
     },
   });
+
+  let _coreSetTranslate = null;
+  let _coreSetTransition = null;
 
   function setOpacity() {
     const slides = slider.slides;
@@ -1945,9 +2165,17 @@ function EffectFade({ slider, extendParams, on }) {
 
     setupSlides();
 
+    // Core _init() calls slideTo BEFORE this init event fires, which applies
+    // a list transform that would drag stacked slides off-screen. Reset it so
+    // all slides overlay in the container.
+    slider.listEl.style.transform = '';
+
+    // Save original methods for restore on destroy
+    _coreSetTranslate = slider.setTranslate;
+    _coreSetTransition = slider.setTransition;
+
     // Override setTranslate to prevent CSS transform movement
     // but preserve progress/boundary calculations
-    slider.setTranslate.bind(slider);
     slider.setTranslate = function (translate) {
       // Update internal state (progress, isBeginning, isEnd) without moving the list
       slider.translate = translate;
@@ -1996,6 +2224,10 @@ function EffectFade({ slider, extendParams, on }) {
       slide.style.transitionProperty = '';
       slide.style.transitionDuration = '';
     }
+    slider.listEl.style.height = '';
+    slider.listEl.style.position = '';
+    if (_coreSetTranslate) slider.setTranslate = _coreSetTranslate;
+    if (_coreSetTransition) slider.setTransition = _coreSetTransition;
   }
 
   on('init', init);
@@ -2055,14 +2287,25 @@ function Keyboard({ slider, extendParams, on }) {
           slider.slideNext();
         }
         break;
-      case 'Home':
+      case 'Home': {
         e.preventDefault();
-        slider.slideTo(0);
+        // In loop mode index 0 is a clone; target the first real slide.
+        const first = slider.params.loop && slider._loopedSlides
+          ? slider._loopedSlides
+          : 0;
+        slider.slideTo(first);
         break;
-      case 'End':
+      }
+      case 'End': {
         e.preventDefault();
-        slider.slideTo(slider.snapGrid.length - 1);
+        let last = slider.snapGrid.length - 1;
+        if (slider.params.loop && slider._loopedSlides) {
+          const realCount = slider.slides.length - slider._loopedSlides * 2;
+          last = slider._loopedSlides + realCount - 1;
+        }
+        slider.slideTo(last);
         break;
+      }
     }
   }
 
@@ -2101,16 +2344,29 @@ function A11y({ slider, extendParams, on }) {
   });
 
   let liveRegionEl = null;
+  let _originalSpeed = null;
+  let _originalAutoplayDelay = null;
 
   function initSlides() {
     const params = slider.params.a11y;
+    const cloneClass = slider.params.slideCloneClass;
     const slides = slider.slides;
+
+    // Label and count only real slides; clones are visual duplicates and must
+    // not be announced (they would inflate the count and read out twice).
+    const total = slides.filter((s) => !s.classList.contains(cloneClass)).length;
+    let realIndex = 0;
 
     for (let i = 0; i < slides.length; i++) {
       const slide = slides[i];
+      if (slide.classList.contains(cloneClass)) {
+        slide.setAttribute('aria-hidden', 'true');
+        continue;
+      }
+      realIndex += 1;
       slide.setAttribute('role', params.slideRole);
       slide.setAttribute('aria-roledescription', params.slideRoleDescription);
-      slide.setAttribute('aria-label', `${i + 1} / ${slides.length}`);
+      slide.setAttribute('aria-label', `${realIndex} / ${total}`);
     }
   }
 
@@ -2154,8 +2410,10 @@ function A11y({ slider, extendParams, on }) {
 
   function handleReducedMotion() {
     if (prefersReducedMotion()) {
+      _originalSpeed = slider.params.speed;
       slider.params.speed = 0;
       if (slider.params.autoplay && slider.params.autoplay.enabled) {
+        _originalAutoplayDelay = slider.params.autoplay.delay;
         slider.params.autoplay.delay = Math.max(slider.params.autoplay.delay, 5000);
       }
     }
@@ -2163,10 +2421,16 @@ function A11y({ slider, extendParams, on }) {
 
   function updateAria() {
     const slides = slider.slides;
-    const activeIdx = slider.activeIndex;
+    const cloneClass = slider.params.slideCloneClass;
+    // The visible window is the active page's slides (activeIndex is a snap/page
+    // index; the first real slide of the page is activeIndex * slidesPerGroup).
+    const base = slider.activeIndex * slider.params.slidesPerGroup;
+    const perView = slider.params.slidesPerView;
 
     for (let i = 0; i < slides.length; i++) {
-      slides[i].setAttribute('aria-hidden', i !== activeIdx ? 'true' : 'false');
+      const isClone = slides[i].classList.contains(cloneClass);
+      const visible = !isClone && i >= base && i < base + perView;
+      slides[i].setAttribute('aria-hidden', visible ? 'false' : 'true');
     }
 
     updateLiveRegion();
@@ -2187,6 +2451,29 @@ function A11y({ slider, extendParams, on }) {
     if (liveRegionEl) {
       liveRegionEl.remove();
       liveRegionEl = null;
+    }
+
+    // Restore the DOM by removing the ARIA attributes we added
+    slider.el.removeAttribute('role');
+    slider.el.removeAttribute('aria-roledescription');
+    slider.el.removeAttribute('aria-label');
+    slider.el.removeAttribute('tabindex');
+
+    for (const slide of slider.slides) {
+      slide.removeAttribute('role');
+      slide.removeAttribute('aria-roledescription');
+      slide.removeAttribute('aria-label');
+      slide.removeAttribute('aria-hidden');
+    }
+
+    // Restore params mutated for reduced motion
+    if (_originalSpeed !== null) {
+      slider.params.speed = _originalSpeed;
+      _originalSpeed = null;
+    }
+    if (_originalAutoplayDelay !== null && slider.params.autoplay) {
+      slider.params.autoplay.delay = _originalAutoplayDelay;
+      _originalAutoplayDelay = null;
     }
   }
 
@@ -2532,6 +2819,7 @@ function EffectCoverflow({ slider, extendParams, on }) {
   let _coreSetTransition = null;
   let _coreGetComputedTranslate = null;
   let _coreLoopFix = null;
+  let _originalSlidesPerView = null;
   let _lastTransitionSpeed = 0;
   let _prevTranslate = 0;
 
@@ -2541,6 +2829,7 @@ function EffectCoverflow({ slider, extendParams, on }) {
     _use3D = computeUse3D();
 
     if (slider.params.slidesPerView < 1) {
+      _originalSlidesPerView = slider.params.slidesPerView;
       slider.params.slidesPerView = 1;
     }
 
@@ -2645,6 +2934,7 @@ function EffectCoverflow({ slider, extendParams, on }) {
     if (_coreSetTransition) slider.setTransition = _coreSetTransition;
     if (_coreGetComputedTranslate) slider.getComputedTranslate = _coreGetComputedTranslate;
     if (_coreLoopFix) slider.loopFix = _coreLoopFix;
+    if (_originalSlidesPerView !== null) slider.params.slidesPerView = _originalSlidesPerView;
 
     slider.el.classList.remove('drift-slider--coverflow');
     slider.el.style.overflow = '';
@@ -2690,6 +2980,9 @@ function EffectCoverflow({ slider, extendParams, on }) {
 }
 
 function EffectCards({ slider, extendParams, on }) {
+  // Stacked effect: core calcSlides must not write per-slide/list sizing.
+  if (slider.params.effect === 'cards') slider._managesOwnLayout = true;
+
   const ALL_DIRS = ['tl-br', 'bl-tr', 'tr-bl', 'br-tl'];
   const DIR_MAP = {
     'tl-br': { x: 1, y: 1 },
@@ -2701,6 +2994,10 @@ function EffectCards({ slider, extendParams, on }) {
   let _autoCycleIndex = 0;
   let _flipTimeout = null;
   const overlayEls = [];
+  let _coreSetTranslate = null;
+  let _coreSetTransition = null;
+  let _coreLoopFix = null;
+  let _originalSlidesPerView = null;
 
   extendParams({
     cardsEffect: {
@@ -2915,11 +3212,17 @@ function EffectCards({ slider, extendParams, on }) {
     if (slider.params.effect !== 'cards') return;
 
     // Force slidesPerView = 1
+    _originalSlidesPerView = slider.params.slidesPerView;
     slider.params.slidesPerView = 1;
 
     _prevActiveIndex = slider.activeIndex;
 
     setupSlides();
+
+    // Save originals so they can be restored on destroy (effect switch / reuse)
+    _coreSetTranslate = slider.setTranslate;
+    _coreSetTransition = slider.setTransition;
+    _coreLoopFix = slider.loopFix;
 
     // Override setTranslate
     slider.setTranslate = function (translate) {
@@ -2964,27 +3267,16 @@ function EffectCards({ slider, extendParams, on }) {
       slider.loopFix = function () {
         if (!slider.params.loop || !slider._loopedSlides) return;
 
-        const loopedSlides = slider._loopedSlides;
-        const totalOriginal = slider.slides.length - loopedSlides * 2;
+        // Reuse the core clone-wrap math; only the apply step differs (cards
+        // routes through its overridden setTranslate and tracks _prevActiveIndex).
+        const { newIdx, needsJump } = slider._resolveLoopIndex();
+        if (!needsJump || newIdx >= slider.snapGrid.length) return;
 
-        let needsJump = false;
-        let newIdx;
-
-        if (slider.activeIndex >= totalOriginal + loopedSlides) {
-          newIdx = loopedSlides + (slider.activeIndex - totalOriginal - loopedSlides);
-          needsJump = true;
-        } else if (slider.activeIndex < loopedSlides) {
-          newIdx = totalOriginal + slider.activeIndex;
-          needsJump = true;
-        }
-
-        if (needsJump) {
-          slider.setTransition(0);
-          slider.activeIndex = newIdx;
-          _prevActiveIndex = newIdx;
-          const translate = -slider.snapGrid[newIdx];
-          slider.setTranslate(translate);
-        }
+        slider.setTransition(0);
+        slider.activeIndex = newIdx;
+        _prevActiveIndex = newIdx;
+        const translate = -slider.snapGrid[newIdx];
+        slider.setTranslate(translate);
       };
     }
 
@@ -3065,6 +3357,12 @@ function EffectCards({ slider, extendParams, on }) {
     slider.listEl.style.height = '';
     slider.listEl.style.position = '';
 
+    // Restore overridden core methods
+    if (_coreSetTranslate) slider.setTranslate = _coreSetTranslate;
+    if (_coreSetTransition) slider.setTransition = _coreSetTransition;
+    if (_coreLoopFix) slider.loopFix = _coreLoopFix;
+    if (_originalSlidesPerView !== null) slider.params.slidesPerView = _originalSlidesPerView;
+
     // Reset auto-cycle
     _autoCycleIndex = 0;
   }
@@ -3073,6 +3371,320 @@ function EffectCards({ slider, extendParams, on }) {
   on('slideChange', onSlideChange);
   on('update', onUpdate);
   on('resize', onUpdate);
+  on('destroy', destroy);
+}
+
+function EffectDeck({ slider, extendParams, on }) {
+  // Stacked effect: core calcSlides must not write per-slide/list sizing.
+  if (slider.params.effect === 'deck') slider._managesOwnLayout = true;
+
+  const overlayEls = [];
+  let _coreSetTranslate = null;
+  let _coreSetTransition = null;
+  let _originalSlidesPerView = null;
+
+  extendParams({
+    deckEffect: {
+      stackOrigin: 'bottom-left',
+      activeScale: 0.85,
+      stackScale: 0.5,
+      stackOffsetX: 6,
+      stackOffsetY: 4,
+      stackVisibleCount: 3,
+      perspective: 1200,
+      depthSpacing: 30,
+      tiltX: 5,
+      tiltY: -3,
+      activeDepth: 50,
+      overlay: true,
+      overlayColor: 'rgba(0,0,0,0.15)',
+      shadow: true,
+      shadowColor: 'rgba(0,0,0,0.25)',
+      shadowBlur: 20,
+    },
+  });
+
+  /**
+   * Returns {tx, ty, dx, dy} — base position and per-layer direction.
+   * All slides use transformOrigin: center center, so we translate from center.
+   */
+  function getStackTranslation(containerW, containerH, stackScale, origin) {
+    const sw = containerW * stackScale;
+    const sh = containerH * stackScale;
+    const edgeX = (containerW - sw) / 2;
+    const edgeY = (containerH - sh) / 2;
+
+    switch (origin) {
+      case 'bottom-left':  return { tx: -edgeX * 0.7, ty: edgeY * 0.7, dx: -1, dy: 1 };
+      case 'bottom-right': return { tx: edgeX * 0.7,  ty: edgeY * 0.7, dx: 1, dy: 1 };
+      case 'top-left':     return { tx: -edgeX * 0.7, ty: -edgeY * 0.7, dx: -1, dy: -1 };
+      case 'top-right':    return { tx: edgeX * 0.7,  ty: -edgeY * 0.7, dx: 1, dy: -1 };
+      case 'center':       return { tx: 0, ty: 0, dx: 0, dy: 0 };
+      default:             return { tx: -edgeX * 0.7, ty: edgeY * 0.7, dx: -1, dy: 1 };
+    }
+  }
+
+  function setupSlides() {
+    const slides = slider.slides;
+    const params = slider.params.deckEffect;
+
+    // Measure height before absolute positioning
+    const firstSlide = slides[0];
+    const slideHeight = firstSlide ? firstSlide.offsetHeight : 0;
+
+    slider.listEl.style.position = 'relative';
+    slider.listEl.style.width = '100%';
+    slider.listEl.style.height = `${slideHeight}px`;
+
+    // Add container class and allow overflow for stack visibility
+    slider.el.classList.add('drift-slider--deck');
+    slider.el.style.overflow = 'visible';
+    if (slider.trackEl) {
+      slider.trackEl.style.overflow = 'visible';
+    }
+
+    // 3D perspective on track
+    if (params.perspective > 0 && slider.trackEl) {
+      slider.trackEl.style.perspective = `${params.perspective}px`;
+      slider.trackEl.style.transformStyle = 'preserve-3d';
+    }
+
+    for (let i = 0; i < slides.length; i++) {
+      const slide = slides[i];
+      slide.style.position = 'absolute';
+      slide.style.top = '0';
+      slide.style.left = '0';
+      slide.style.width = '100%';
+      slide.style.height = '100%';
+      slide.style.transitionProperty = 'transform, opacity, visibility, box-shadow';
+      slide.style.transitionDuration = `${slider.params.speed}ms`;
+      slide.style.transformOrigin = 'center center';
+
+      // Create overlay div if needed
+      if (params.overlay) {
+        const overlayDiv = document.createElement('div');
+        overlayDiv.className = 'drift-deck-overlay';
+        overlayDiv.style.position = 'absolute';
+        overlayDiv.style.inset = '0';
+        overlayDiv.style.pointerEvents = 'none';
+        overlayDiv.style.borderRadius = 'inherit';
+        overlayDiv.style.transitionProperty = 'opacity';
+        overlayDiv.style.transitionDuration = `${slider.params.speed}ms`;
+        overlayDiv.style.background = params.overlayColor;
+        overlayDiv.style.opacity = '0';
+        slide.appendChild(overlayDiv);
+        overlayEls[i] = overlayDiv;
+      }
+    }
+  }
+
+  function setSlideTransforms() {
+    const slides = slider.slides;
+    const params = slider.params.deckEffect;
+    const activeIdx = slider.activeIndex;
+    const total = slides.length;
+    const has3D = params.perspective > 0;
+
+    // Container dimensions for stack positioning
+    const containerW = slider.el.clientWidth || 0;
+    const containerH = slider.el.clientHeight || 0;
+
+    // Base stack position (center of where stack cards go)
+    const stackBase = getStackTranslation(
+      containerW, containerH, params.stackScale, params.stackOrigin
+    );
+
+    for (let i = 0; i < total; i++) {
+      const slide = slides[i];
+
+      // Calculate offset from active index
+      let offset = i - activeIdx;
+      if (slider.params.loop) {
+        if (offset > total / 2) offset -= total;
+        if (offset < -total / 2) offset += total;
+      }
+
+      if (offset === 0) {
+        // --- Active card: centered, scaled ---
+        let transform = `translate3d(0, 0, 0) scale(${params.activeScale})`;
+        if (has3D) {
+          transform = `translate3d(0, 0, ${params.activeDepth}px) scale(${params.activeScale})`;
+        }
+        slide.style.transform = transform;
+        slide.style.opacity = '1';
+        slide.style.visibility = 'visible';
+        slide.style.zIndex = String(params.stackVisibleCount + 1);
+        slide.style.pointerEvents = 'auto';
+
+        if (params.shadow) {
+          slide.style.boxShadow =
+            `0 ${params.shadowBlur / 2}px ${params.shadowBlur}px ${params.shadowColor}`;
+        } else {
+          slide.style.boxShadow = 'none';
+        }
+
+        if (overlayEls[i]) {
+          overlayEls[i].style.opacity = '0';
+        }
+      } else if (offset > 0 && offset <= params.stackVisibleCount) {
+        // --- Stack cards: translated to corner, scaled down ---
+        const layer = offset;
+        // Each layer fans out further in the corner direction
+        const tx = stackBase.tx + params.stackOffsetX * layer * stackBase.dx;
+        const ty = stackBase.ty + params.stackOffsetY * layer * stackBase.dy;
+
+        let transform = `translate3d(${tx}px, ${ty}px, 0) scale(${params.stackScale})`;
+        if (has3D) {
+          const tz = -params.depthSpacing * layer;
+          transform = `translate3d(${tx}px, ${ty}px, ${tz}px) scale(${params.stackScale}) rotateX(${params.tiltX}deg) rotateY(${params.tiltY}deg)`;
+        }
+
+        const layerOpacity = 1 - layer * (0.15);
+        slide.style.transform = transform;
+        slide.style.opacity = String(Math.max(layerOpacity, 0.4));
+        slide.style.visibility = 'visible';
+        slide.style.zIndex = String(params.stackVisibleCount + 1 - layer);
+        slide.style.pointerEvents = 'none';
+        slide.style.boxShadow = 'none';
+
+        if (overlayEls[i]) {
+          overlayEls[i].style.opacity = String(layer * (0.4 / params.stackVisibleCount));
+        }
+      } else {
+        // --- Hidden cards ---
+        slide.style.transform = 'none';
+        slide.style.opacity = '0';
+        slide.style.visibility = 'hidden';
+        slide.style.zIndex = '0';
+        slide.style.pointerEvents = 'none';
+        slide.style.boxShadow = 'none';
+
+        if (overlayEls[i]) {
+          overlayEls[i].style.opacity = '0';
+        }
+      }
+    }
+  }
+
+  function overrideMethods() {
+    // Save originals so they can be restored on destroy (effect switch / reuse)
+    _coreSetTranslate = slider.setTranslate;
+    _coreSetTransition = slider.setTransition;
+
+    slider.setTranslate = function (translate) {
+      slider.translate = translate;
+
+      slider.progress = slider.maxTranslate === slider.minTranslate
+        ? 0
+        : (translate - slider.maxTranslate) /
+          (slider.minTranslate - slider.maxTranslate);
+
+      slider.isBeginning = translate >= slider.maxTranslate;
+      slider.isEnd = translate <= slider.minTranslate;
+
+      slider.emit('setTranslate', slider, translate);
+      slider.emit('progress', slider, slider.progress);
+
+      setSlideTransforms();
+    };
+
+    slider.setTransition = function (duration) {
+      for (let i = 0; i < slider.slides.length; i++) {
+        slider.slides[i].style.transitionDuration = `${duration}ms`;
+        if (overlayEls[i]) {
+          overlayEls[i].style.transitionDuration = `${duration}ms`;
+        }
+      }
+      slider.emit('setTransition', slider, duration);
+    };
+  }
+
+  function init() {
+    if (slider.params.effect !== 'deck') return;
+
+    _originalSlidesPerView = slider.params.slidesPerView;
+    slider.params.slidesPerView = 1;
+
+    setupSlides();
+    overrideMethods();
+
+    slider.setTranslate(slider.translate);
+  }
+
+  function onSlideChange() {
+    if (slider.params.effect !== 'deck') return;
+    setSlideTransforms();
+  }
+
+  function onUpdate() {
+    if (slider.params.effect !== 'deck') return;
+    const firstSlide = slider.slides[0];
+    if (firstSlide) {
+      // Measure the natural height with the absolute/100% positioning removed.
+      // Reading offsetHeight while the slide is position:absolute;height:100%
+      // resolves against the list's own (stale) height — a circular read that
+      // never picks up content-driven height changes on resize. Mirror the
+      // pre-absolute measurement that setupSlides does.
+      const prevPosition = firstSlide.style.position;
+      const prevHeight = firstSlide.style.height;
+      firstSlide.style.position = '';
+      firstSlide.style.height = '';
+      const naturalHeight = firstSlide.offsetHeight;
+      firstSlide.style.position = prevPosition;
+      firstSlide.style.height = prevHeight;
+      slider.listEl.style.height = `${naturalHeight}px`;
+    }
+    slider.setTranslate(slider.translate);
+  }
+
+  function destroy() {
+    slider.el.classList.remove('drift-slider--deck');
+    slider.el.style.overflow = '';
+
+    if (slider.trackEl) {
+      slider.trackEl.style.overflow = '';
+      slider.trackEl.style.perspective = '';
+      slider.trackEl.style.transformStyle = '';
+    }
+
+    for (let i = 0; i < slider.slides.length; i++) {
+      const slide = slider.slides[i];
+      slide.style.position = '';
+      slide.style.top = '';
+      slide.style.left = '';
+      slide.style.width = '';
+      slide.style.height = '';
+      slide.style.transform = '';
+      slide.style.opacity = '';
+      slide.style.visibility = '';
+      slide.style.zIndex = '';
+      slide.style.pointerEvents = '';
+      slide.style.boxShadow = '';
+      slide.style.transitionProperty = '';
+      slide.style.transitionDuration = '';
+      slide.style.transformOrigin = '';
+
+      if (overlayEls[i] && overlayEls[i].parentNode) {
+        overlayEls[i].parentNode.removeChild(overlayEls[i]);
+      }
+    }
+    overlayEls.length = 0;
+
+    slider.listEl.style.width = '';
+    slider.listEl.style.height = '';
+    slider.listEl.style.position = '';
+
+    if (_coreSetTranslate) slider.setTranslate = _coreSetTranslate;
+    if (_coreSetTransition) slider.setTransition = _coreSetTransition;
+    if (_originalSlidesPerView !== null) slider.params.slidesPerView = _originalSlidesPerView;
+  }
+
+  on('init', init);
+  on('slideChange', onSlideChange);
+  // onUpdate forces a layout read (offsetHeight) to re-measure height, so avoid
+  // running it twice per resize: the resize handler always calls update() before
+  // emitting 'resize', so listening on 'update' alone already covers resizes.
+  on('update', onUpdate);
   on('destroy', destroy);
 }
 
@@ -3293,11 +3905,13 @@ function EffectShowcase({ slider, extendParams, on }) {
   let _coreSetTransition = null;
   let _coreGetComputedTranslate = null;
   let _coreLoopFix = null;
+  let _originalSlidesPerView = null;
 
   function init() {
     if (slider.params.effect !== 'showcase') return;
 
     if (slider.params.slidesPerView < 1) {
+      _originalSlidesPerView = slider.params.slidesPerView;
       slider.params.slidesPerView = 1;
     }
 
@@ -3395,6 +4009,7 @@ function EffectShowcase({ slider, extendParams, on }) {
     if (_coreSetTransition) slider.setTransition = _coreSetTransition;
     if (_coreGetComputedTranslate) slider.getComputedTranslate = _coreGetComputedTranslate;
     if (_coreLoopFix) slider.loopFix = _coreLoopFix;
+    if (_originalSlidesPerView !== null) slider.params.slidesPerView = _originalSlidesPerView;
 
     slider.el.classList.remove('drift-slider--showcase');
 
@@ -3552,11 +4167,13 @@ function EffectCreative({ slider, extendParams, on }) {
   let _coreSetTransition = null;
   let _coreGetComputedTranslate = null;
   let _coreLoopFix = null;
+  let _originalSlidesPerView = null;
 
   function init() {
     if (slider.params.effect !== 'creative') return;
 
     if (slider.params.slidesPerView < 1) {
+      _originalSlidesPerView = slider.params.slidesPerView;
       slider.params.slidesPerView = 1;
     }
 
@@ -3649,6 +4266,7 @@ function EffectCreative({ slider, extendParams, on }) {
     if (_coreSetTransition) slider.setTransition = _coreSetTransition;
     if (_coreGetComputedTranslate) slider.getComputedTranslate = _coreGetComputedTranslate;
     if (_coreLoopFix) slider.loopFix = _coreLoopFix;
+    if (_originalSlidesPerView !== null) slider.params.slidesPerView = _originalSlidesPerView;
 
     slider.el.classList.remove('drift-slider--creative');
 
@@ -3724,6 +4342,13 @@ function Thumbs({ slider, extendParams, on }) {
   function init() {
     const params = slider.params.thumbs;
     if (!params || !params.slider) return;
+
+    // Detach handlers from a previous init to avoid duplicate bindings
+    for (const { el, handler } of clickHandlers) {
+      el.removeEventListener('click', handler);
+    }
+    clickHandlers.length = 0;
+
     thumbsSlider = params.slider;
 
     for (let i = 0; i < thumbsSlider.slides.length; i++) {
@@ -3755,4 +4380,4 @@ function Thumbs({ slider, extendParams, on }) {
   on('destroy', destroy);
 }
 
-export { A11y, Autoplay, DriftSlider, EffectCards, EffectCoverflow, EffectCreative, EffectFade, EffectShowcase, Keyboard, Navigation, Pagination, ScrollAos, Thumbs, DriftSlider as default };
+export { A11y, Autoplay, DriftSlider, EffectCards, EffectCoverflow, EffectCreative, EffectDeck, EffectFade, EffectShowcase, Keyboard, Navigation, Pagination, ScrollAos, Thumbs, DriftSlider as default };

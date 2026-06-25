@@ -162,4 +162,17 @@ describe('module/navigation', () => {
     // aria-disabled should be false
     expect(prev.getAttribute('aria-disabled')).toBe('false')
   })
+
+  it('refreshes the disabled state on resize', () => {
+    const s = createSlider({ slideCount: 5, sliderOptions: { modules: [Navigation], navigation: true } })
+    cleanup = s.cleanup
+    s.slider.slideTo(4, 0) // at the end → next disabled
+    const nextEl = s.container.querySelector('.drift-arrow--next')
+    expect(nextEl.classList.contains('drift-arrow--disabled')).toBe(true)
+
+    // A resize can change the boundary state without emitting slideChange
+    s.slider.isEnd = false
+    s.slider.emit('resize', s.slider)
+    expect(nextEl.classList.contains('drift-arrow--disabled')).toBe(false)
+  })
 })

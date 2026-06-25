@@ -168,6 +168,31 @@ export default function Autoplay({ slider, extendParams, on }) {
     }
   }
 
+  let _pausedByVisibility = false;
+  function isPointerOver() {
+    // :hover reflects the live pointer position even when no mouseenter fired
+    // (e.g. the pointer moved over the slider while the tab was hidden).
+    try {
+      return slider.el.matches(':hover');
+    } catch {
+      return false;
+    }
+  }
+  function onVisibilityChange() {
+    if (document.hidden) {
+      if (running && !paused) {
+        _pausedByVisibility = true;
+        pause();
+      }
+    } else if (_pausedByVisibility) {
+      _pausedByVisibility = false;
+      // Don't resume under a hovering pointer when pauseOnMouseEnter is set.
+      if (!(slider.params.autoplay.pauseOnMouseEnter && isPointerOver())) {
+        resume();
+      }
+    }
+  }
+
   function onTouchStart() {
     if (running) pause();
   }
@@ -187,6 +212,7 @@ export default function Autoplay({ slider, extendParams, on }) {
 
     slider.el.addEventListener('mouseenter', onMouseEnter);
     slider.el.addEventListener('mouseleave', onMouseLeave);
+    document.addEventListener('visibilitychange', onVisibilityChange);
 
     if (params.ticker) {
       slider.listEl.style.transitionProperty = 'none';
@@ -204,6 +230,7 @@ export default function Autoplay({ slider, extendParams, on }) {
     tickerStop();
     slider.el.removeEventListener('mouseenter', onMouseEnter);
     slider.el.removeEventListener('mouseleave', onMouseLeave);
+    document.removeEventListener('visibilitychange', onVisibilityChange);
   }
 
   on('init', init);

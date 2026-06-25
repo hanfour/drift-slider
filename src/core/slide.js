@@ -46,20 +46,21 @@ export default function slideModule({ slider }) {
 
   function slideNext(speed, runCallbacks = true) {
     const params = slider.params;
-
+    // snapGrid already has one entry per group (see calcSlides), so advancing
+    // one group means stepping one snap index — not slidesPerGroup.
     if (params.loop && slider._loopedSlides) {
       // In loop mode: let it go past current, loopFix will correct
-      const nextIndex = slider.activeIndex + params.slidesPerGroup;
+      const nextIndex = slider.activeIndex + 1;
       if (nextIndex >= slider.snapGrid.length) {
         // Jump back via loopFix first, then move forward
         slider.loopFix();
-        return slideTo(slider.activeIndex + params.slidesPerGroup, speed, runCallbacks);
+        return slideTo(slider.activeIndex + 1, speed, runCallbacks);
       }
       return slideTo(nextIndex, speed, runCallbacks);
     }
 
     const nextIndex = Math.min(
-      slider.activeIndex + params.slidesPerGroup,
+      slider.activeIndex + 1,
       slider.snapGrid.length - 1
     );
     return slideTo(nextIndex, speed, runCallbacks);
@@ -69,15 +70,15 @@ export default function slideModule({ slider }) {
     const params = slider.params;
 
     if (params.loop && slider._loopedSlides) {
-      const prevIndex = slider.activeIndex - params.slidesPerGroup;
+      const prevIndex = slider.activeIndex - 1;
       if (prevIndex < 0) {
         slider.loopFix();
-        return slideTo(slider.activeIndex - params.slidesPerGroup, speed, runCallbacks);
+        return slideTo(slider.activeIndex - 1, speed, runCallbacks);
       }
       return slideTo(prevIndex, speed, runCallbacks);
     }
 
-    const prevIndex = Math.max(slider.activeIndex - params.slidesPerGroup, 0);
+    const prevIndex = Math.max(slider.activeIndex - 1, 0);
     return slideTo(prevIndex, speed, runCallbacks);
   }
 

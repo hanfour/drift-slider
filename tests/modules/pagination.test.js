@@ -331,4 +331,27 @@ describe('module/pagination', () => {
     // After cleanup paginationEl is null — emit slideChange should not throw
     expect(() => s.slider.emit('slideChange')).not.toThrow()
   })
+
+  it('re-renders bullets when the slide count changes on resize', () => {
+    const s = createSlider({
+      slideCount: 5,
+      sliderOptions: { modules: [Pagination] },
+    })
+    cleanup = s.cleanup
+    const el = s.container.querySelector('.drift-pagination')
+    expect(el.querySelectorAll('.drift-pagination__bullet').length).toBe(5)
+
+    // Simulate a breakpoint/resize that reduces the number of snap points
+    s.slider.snapGrid = s.slider.snapGrid.slice(0, 3)
+    s.slider.emit('resize', s.slider)
+    expect(el.querySelectorAll('.drift-pagination__bullet').length).toBe(3)
+  })
+
+  it('removes the auto-created pagination element on destroy', () => {
+    const s = createSlider({ slideCount: 3, sliderOptions: { modules: [Pagination] } })
+    cleanup = s.cleanup
+    expect(s.container.querySelector('.drift-pagination')).toBeTruthy()
+    s.slider.destroy()
+    expect(s.container.querySelector('.drift-pagination')).toBeNull()
+  })
 })

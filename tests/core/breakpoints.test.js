@@ -71,4 +71,33 @@ describe('core/breakpoints', () => {
     cleanup = s.cleanup
     expect(s.slider.getBreakpoint()).toBeNull()
   })
+
+  it('builds loop clones when a breakpoint enables loop', () => {
+    vi.spyOn(window, 'innerWidth', 'get').mockReturnValue(1024)
+    const s = createSlider({
+      slideCount: 3,
+      sliderOptions: {
+        loop: false,
+        breakpoints: { 1024: { loop: true } },
+      },
+    })
+    cleanup = s.cleanup
+    expect(s.slider.params.loop).toBe(true)
+    expect(s.slider._loopedSlides).toBeGreaterThan(0)
+    expect(s.slider.listEl.querySelectorAll('.drift-slide--clone').length).toBeGreaterThan(0)
+  })
+
+  it('removes loop clones when a breakpoint disables loop', () => {
+    vi.spyOn(window, 'innerWidth', 'get').mockReturnValue(1024)
+    const s = createSlider({
+      slideCount: 3,
+      sliderOptions: {
+        loop: true,
+        breakpoints: { 1024: { loop: false } },
+      },
+    })
+    cleanup = s.cleanup
+    expect(s.slider.params.loop).toBe(false)
+    expect(s.slider.listEl.querySelectorAll('.drift-slide--clone').length).toBe(0)
+  })
 })

@@ -32,10 +32,11 @@ export default function updateModule({ slider }) {
       offset = containerSize / 2 - slideSize / 2;
     }
 
-    // Stacked effects (fade) position all slides at the same spot via opacity
-    // rather than translating a track. Skip per-slide width/margin writes so
-    // the effect's own sizing (100% of container) is preserved across updates.
-    const isStackedEffect = params.effect === 'fade';
+    // Effects that stack slides (absolute, 100% of container) declare
+    // slider._managesOwnLayout so core skips the per-slide width/margin and
+    // list width/height writes — otherwise they'd be overwritten with a
+    // slideCount * slideSize total on every update/resize.
+    const isStackedEffect = slider._managesOwnLayout === true;
 
     for (let i = 0; i < slides.length; i++) {
       slidesSizesGrid.push(slideSize);
@@ -43,9 +44,11 @@ export default function updateModule({ slider }) {
       const slidePosition = i * (slideSize + spaceBetween);
       slidesGrid.push(slidePosition);
 
-      // Snap grid (per group)
+      // Snap grid (per group). In centered mode each snap is shifted by the
+      // centering offset so the slide lands in the middle of the viewport
+      // (offset is 0 when centeredSlides is off, leaving this a no-op).
       if (i % params.slidesPerGroup === 0) {
-        snapGrid.push(slidePosition);
+        snapGrid.push(slidePosition - offset);
       }
 
       // Set slide dimensions
@@ -60,19 +63,47 @@ export default function updateModule({ slider }) {
       }
     }
 
-    slider.snapGrid = snapGrid;
-    slider.slidesGrid = slidesGrid;
-    slider.slidesSizesGrid = slidesSizesGrid;
-
     // Total list size
     const totalSize =
       slides.length * slideSize + (slides.length - 1) * spaceBetween;
 
-    // Max translate
-    slider.maxTranslate = 0;
-    slider.minTranslate = -(totalSize - containerSize);
+    // Translate bounds. Centered mode lets the first and last slides reach the
+    // viewport centre, so the bounds are shifted by the centering offset.
+    if (params.centeredSlides) {
+      const lastPosition = (slides.length - 1) * (slideSize + spaceBetween);
+      slider.maxTranslate = offset;
+      slider.minTranslate = offset - lastPosition;
+      if (slider.minTranslate > slider.maxTranslate) {
+        slider.minTranslate = slider.maxTranslate;
+      }
+    } else {
+      slider.maxTranslate = 0;
+      slider.minTranslate = -(totalSize - containerSize);
+      if (slider.minTranslate > 0) slider.minTranslate = 0;
+    }
 
-    if (slider.minTranslate > 0) slider.minTranslate = 0;
+    // Clamp trailing snap points so the final view sits flush against the end
+    // instead of overscrolling into empty space. Only relevant when slides do
+    // not divide evenly into the viewport (e.g. slidesPerView > 1) and when not
+    // centering (centered mode intentionally lets the last slide reach center).
+    if (!params.centeredSlides) {
+      const maxSnap = totalSize - containerSize;
+      if (maxSnap > 0) {
+        for (let k = 0; k < snapGrid.length; k++) {
+          if (snapGrid[k] > maxSnap) snapGrid[k] = maxSnap;
+        }
+        // Drop duplicate trailing snaps created by the clamp
+        let w = 1;
+        for (let k = 1; k < snapGrid.length; k++) {
+          if (snapGrid[k] !== snapGrid[w - 1]) snapGrid[w++] = snapGrid[k];
+        }
+        snapGrid.length = w;
+      }
+    }
+
+    slider.snapGrid = snapGrid;
+    slider.slidesGrid = slidesGrid;
+    slider.slidesSizesGrid = slidesSizesGrid;
 
     // Check overflow (not enough slides)
     slider.isLocked =
@@ -95,6 +126,14 @@ export default function updateModule({ slider }) {
     slider.emit('update', slider);
   }
 
+  // Re-read the slide elements from the DOM (e.g. after clones are added/removed).
+  function refreshSlides() {
+    slider.slides = Array.from(
+      slider.listEl.querySelectorAll(`:scope > .${slider.params.slideClass}`)
+    );
+  }
+
   slider.calcSlides = calcSlides;
   slider.update = update;
+  slider.refreshSlides = refreshSlides;
 }

@@ -223,4 +223,12 @@ describe('module/effect-showcase', () => {
     s.slider.slideTo(2, 0)
     expect(s.slider.listEl.style.transform).toContain('translateX')
   })
+
+  it('restores the original slidesPerView on destroy', () => {
+    const s = createSlider({ slideCount: 5, sliderOptions: { effect: 'showcase', modules: [EffectShowcase], slidesPerView: 0.5 } })
+    cleanup = s.cleanup
+    expect(s.slider.params.slidesPerView).toBe(1)
+    s.slider.destroy()
+    expect(s.slider.params.slidesPerView).toBe(0.5)
+  })
 })

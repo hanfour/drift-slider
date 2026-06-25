@@ -129,11 +129,13 @@ export default function EffectCreative({ slider, extendParams, on }) {
   let _coreSetTransition = null;
   let _coreGetComputedTranslate = null;
   let _coreLoopFix = null;
+  let _originalSlidesPerView = null;
 
   function init() {
     if (slider.params.effect !== 'creative') return;
 
     if (slider.params.slidesPerView < 1) {
+      _originalSlidesPerView = slider.params.slidesPerView;
       slider.params.slidesPerView = 1;
     }
 
@@ -226,6 +228,7 @@ export default function EffectCreative({ slider, extendParams, on }) {
     if (_coreSetTransition) slider.setTransition = _coreSetTransition;
     if (_coreGetComputedTranslate) slider.getComputedTranslate = _coreGetComputedTranslate;
     if (_coreLoopFix) slider.loopFix = _coreLoopFix;
+    if (_originalSlidesPerView !== null) slider.params.slidesPerView = _originalSlidesPerView;
 
     slider.el.classList.remove('drift-slider--creative');
 

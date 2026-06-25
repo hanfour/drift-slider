@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import {
   supportsPassive,
   supportsTouchEvents,
@@ -18,6 +18,23 @@ describe('supportsPassive', () => {
     const a = supportsPassive()
     const b = supportsPassive()
     expect(a).toBe(b)
+  })
+
+  it('returns a cached boolean even when the passive getter is never read', async () => {
+    vi.resetModules()
+    const add = vi.spyOn(window, 'addEventListener').mockImplementation(() => {})
+    vi.spyOn(window, 'removeEventListener').mockImplementation(() => {})
+
+    const fresh = await import('../../src/shared/support.js')
+    const first = fresh.supportsPassive()
+    expect(typeof first).toBe('boolean')
+
+    const callsAfterFirst = add.mock.calls.length
+    fresh.supportsPassive()
+    // Second call must use the cache, not re-run the feature detection
+    expect(add.mock.calls.length).toBe(callsAfterFirst)
+
+    vi.restoreAllMocks()
   })
 })
 

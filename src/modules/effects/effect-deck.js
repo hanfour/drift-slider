@@ -1,5 +1,11 @@
 export default function EffectDeck({ slider, extendParams, on }) {
+  // Stacked effect: core calcSlides must not write per-slide/list sizing.
+  if (slider.params.effect === 'deck') slider._managesOwnLayout = true;
+
   const overlayEls = [];
+  let _coreSetTranslate = null;
+  let _coreSetTransition = null;
+  let _originalSlidesPerView = null;
 
   extendParams({
     deckEffect: {
@@ -185,6 +191,10 @@ export default function EffectDeck({ slider, extendParams, on }) {
   }
 
   function overrideMethods() {
+    // Save originals so they can be restored on destroy (effect switch / reuse)
+    _coreSetTranslate = slider.setTranslate;
+    _coreSetTransition = slider.setTransition;
+
     slider.setTranslate = function (translate) {
       slider.translate = translate;
 
@@ -216,6 +226,7 @@ export default function EffectDeck({ slider, extendParams, on }) {
   function init() {
     if (slider.params.effect !== 'deck') return;
 
+    _originalSlidesPerView = slider.params.slidesPerView;
     slider.params.slidesPerView = 1;
 
     setupSlides();
@@ -233,7 +244,19 @@ export default function EffectDeck({ slider, extendParams, on }) {
     if (slider.params.effect !== 'deck') return;
     const firstSlide = slider.slides[0];
     if (firstSlide) {
-      slider.listEl.style.height = `${firstSlide.offsetHeight}px`;
+      // Measure the natural height with the absolute/100% positioning removed.
+      // Reading offsetHeight while the slide is position:absolute;height:100%
+      // resolves against the list's own (stale) height — a circular read that
+      // never picks up content-driven height changes on resize. Mirror the
+      // pre-absolute measurement that setupSlides does.
+      const prevPosition = firstSlide.style.position;
+      const prevHeight = firstSlide.style.height;
+      firstSlide.style.position = '';
+      firstSlide.style.height = '';
+      const naturalHeight = firstSlide.offsetHeight;
+      firstSlide.style.position = prevPosition;
+      firstSlide.style.height = prevHeight;
+      slider.listEl.style.height = `${naturalHeight}px`;
     }
     slider.setTranslate(slider.translate);
   }
@@ -274,11 +297,17 @@ export default function EffectDeck({ slider, extendParams, on }) {
     slider.listEl.style.width = '';
     slider.listEl.style.height = '';
     slider.listEl.style.position = '';
+
+    if (_coreSetTranslate) slider.setTranslate = _coreSetTranslate;
+    if (_coreSetTransition) slider.setTransition = _coreSetTransition;
+    if (_originalSlidesPerView !== null) slider.params.slidesPerView = _originalSlidesPerView;
   }
 
   on('init', init);
   on('slideChange', onSlideChange);
+  // onUpdate forces a layout read (offsetHeight) to re-measure height, so avoid
+  // running it twice per resize: the resize handler always calls update() before
+  // emitting 'resize', so listening on 'update' alone already covers resizes.
   on('update', onUpdate);
-  on('resize', onUpdate);
   on('destroy', destroy);
 }

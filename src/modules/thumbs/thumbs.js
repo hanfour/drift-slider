@@ -48,6 +48,13 @@ export default function Thumbs({ slider, extendParams, on }) {
   function init() {
     const params = slider.params.thumbs;
     if (!params || !params.slider) return;
+
+    // Detach handlers from a previous init to avoid duplicate bindings
+    for (const { el, handler } of clickHandlers) {
+      el.removeEventListener('click', handler);
+    }
+    clickHandlers.length = 0;
+
     thumbsSlider = params.slider;
 
     for (let i = 0; i < thumbsSlider.slides.length; i++) {

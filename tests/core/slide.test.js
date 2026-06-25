@@ -131,6 +131,38 @@ describe('core/slide', () => {
     })
   })
 
+  describe('slidesPerGroup navigation', () => {
+    it('builds one snap point per group', () => {
+      const s = createSlider({ slideCount: 9, sliderOptions: { slidesPerView: 3, slidesPerGroup: 3 } })
+      cleanup = s.cleanup
+      // 9 slides / group 3 → snap points at slides 0, 3, 6
+      expect(s.slider.snapGrid.length).toBe(3)
+    })
+
+    it('slideNext advances exactly one group, not slidesPerGroup snap points', () => {
+      const s = createSlider({ slideCount: 9, sliderOptions: { slidesPerView: 3, slidesPerGroup: 3 } })
+      cleanup = s.cleanup
+      s.slider.slideNext(0)
+      expect(s.slider.activeIndex).toBe(1)
+    })
+
+    it('can reach the middle group via successive slideNext', () => {
+      const s = createSlider({ slideCount: 9, sliderOptions: { slidesPerView: 3, slidesPerGroup: 3 } })
+      cleanup = s.cleanup
+      s.slider.slideNext(0)
+      s.slider.slideNext(0)
+      expect(s.slider.activeIndex).toBe(2)
+    })
+
+    it('slidePrev steps back one group', () => {
+      const s = createSlider({ slideCount: 9, sliderOptions: { slidesPerView: 3, slidesPerGroup: 3 } })
+      cleanup = s.cleanup
+      s.slider.slideTo(2, 0)
+      s.slider.slidePrev(0)
+      expect(s.slider.activeIndex).toBe(1)
+    })
+  })
+
   describe('slidePrev', () => {
     it('goes to previous slide', () => {
       const s = createSlider()

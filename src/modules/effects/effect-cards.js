@@ -1,4 +1,7 @@
 export default function EffectCards({ slider, extendParams, on }) {
+  // Stacked effect: core calcSlides must not write per-slide/list sizing.
+  if (slider.params.effect === 'cards') slider._managesOwnLayout = true;
+
   const ALL_DIRS = ['tl-br', 'bl-tr', 'tr-bl', 'br-tl'];
   const DIR_MAP = {
     'tl-br': { x: 1, y: 1 },
@@ -10,6 +13,10 @@ export default function EffectCards({ slider, extendParams, on }) {
   let _autoCycleIndex = 0;
   let _flipTimeout = null;
   const overlayEls = [];
+  let _coreSetTranslate = null;
+  let _coreSetTransition = null;
+  let _coreLoopFix = null;
+  let _originalSlidesPerView = null;
 
   extendParams({
     cardsEffect: {
@@ -224,11 +231,17 @@ export default function EffectCards({ slider, extendParams, on }) {
     if (slider.params.effect !== 'cards') return;
 
     // Force slidesPerView = 1
+    _originalSlidesPerView = slider.params.slidesPerView;
     slider.params.slidesPerView = 1;
 
     _prevActiveIndex = slider.activeIndex;
 
     setupSlides();
+
+    // Save originals so they can be restored on destroy (effect switch / reuse)
+    _coreSetTranslate = slider.setTranslate;
+    _coreSetTransition = slider.setTransition;
+    _coreLoopFix = slider.loopFix;
 
     // Override setTranslate
     slider.setTranslate = function (translate) {
@@ -273,27 +286,16 @@ export default function EffectCards({ slider, extendParams, on }) {
       slider.loopFix = function () {
         if (!slider.params.loop || !slider._loopedSlides) return;
 
-        const loopedSlides = slider._loopedSlides;
-        const totalOriginal = slider.slides.length - loopedSlides * 2;
+        // Reuse the core clone-wrap math; only the apply step differs (cards
+        // routes through its overridden setTranslate and tracks _prevActiveIndex).
+        const { newIdx, needsJump } = slider._resolveLoopIndex();
+        if (!needsJump || newIdx >= slider.snapGrid.length) return;
 
-        let needsJump = false;
-        let newIdx;
-
-        if (slider.activeIndex >= totalOriginal + loopedSlides) {
-          newIdx = loopedSlides + (slider.activeIndex - totalOriginal - loopedSlides);
-          needsJump = true;
-        } else if (slider.activeIndex < loopedSlides) {
-          newIdx = totalOriginal + slider.activeIndex;
-          needsJump = true;
-        }
-
-        if (needsJump) {
-          slider.setTransition(0);
-          slider.activeIndex = newIdx;
-          _prevActiveIndex = newIdx;
-          const translate = -slider.snapGrid[newIdx];
-          slider.setTranslate(translate);
-        }
+        slider.setTransition(0);
+        slider.activeIndex = newIdx;
+        _prevActiveIndex = newIdx;
+        const translate = -slider.snapGrid[newIdx];
+        slider.setTranslate(translate);
       };
     }
 
@@ -373,6 +375,12 @@ export default function EffectCards({ slider, extendParams, on }) {
     // Clean list styles
     slider.listEl.style.height = '';
     slider.listEl.style.position = '';
+
+    // Restore overridden core methods
+    if (_coreSetTranslate) slider.setTranslate = _coreSetTranslate;
+    if (_coreSetTransition) slider.setTransition = _coreSetTransition;
+    if (_coreLoopFix) slider.loopFix = _coreLoopFix;
+    if (_originalSlidesPerView !== null) slider.params.slidesPerView = _originalSlidesPerView;
 
     // Reset auto-cycle
     _autoCycleIndex = 0;
