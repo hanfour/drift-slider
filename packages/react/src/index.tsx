@@ -1,4 +1,4 @@
-import { useEffect, useRef, forwardRef } from 'react';
+import { useEffect, useImperativeHandle, useRef, forwardRef } from 'react';
 import type { CSSProperties, LiHTMLAttributes, ReactNode } from 'react';
 import CoreDriftSlider, { type DriftSliderOptions } from 'drift-slider';
 import type { DriftSliderModule, DriftSliderEvents } from 'drift-slider';
@@ -43,7 +43,33 @@ export function useDriftSlider(
   return [containerRef, sliderRef] as const;
 }
 
-export interface DriftSliderProps {
+export interface DriftSliderHandle {
+  slideTo: CoreDriftSlider['slideTo'];
+  slideNext: CoreDriftSlider['slideNext'];
+  slidePrev: CoreDriftSlider['slidePrev'];
+  update: () => void;
+  instance: CoreDriftSlider | null;
+}
+
+type EventShortcuts = {
+  onInit?: DriftSliderEvents['init'];
+  onSlideChange?: DriftSliderEvents['slideChange'];
+  onReachBeginning?: DriftSliderEvents['reachBeginning'];
+  onReachEnd?: DriftSliderEvents['reachEnd'];
+  onTouchStart?: DriftSliderEvents['touchStart'];
+  onTouchEnd?: DriftSliderEvents['touchEnd'];
+};
+
+const SHORTCUTS: Record<keyof EventShortcuts, keyof DriftSliderEvents> = {
+  onInit: 'init',
+  onSlideChange: 'slideChange',
+  onReachBeginning: 'reachBeginning',
+  onReachEnd: 'reachEnd',
+  onTouchStart: 'touchStart',
+  onTouchEnd: 'touchEnd',
+};
+
+export interface DriftSliderProps extends EventShortcuts {
   options?: DriftSliderOptions;
   modules?: DriftSliderModule[];
   on?: Partial<DriftSliderEvents>;
@@ -52,9 +78,51 @@ export interface DriftSliderProps {
   children?: ReactNode;
 }
 
-export const DriftSlider = forwardRef<unknown, DriftSliderProps>(
-  function DriftSlider({ options, className, style, children }, _ref) {
-    const [containerRef] = useDriftSlider(options, [options]);
+export const DriftSlider = forwardRef<DriftSliderHandle, DriftSliderProps>(
+  function DriftSlider(props, ref) {
+    const { options, modules, on, className, style, children, ...shortcuts } = props;
+
+    const mergedOn: Partial<DriftSliderEvents> = { ...options?.on, ...on };
+    (Object.keys(SHORTCUTS) as (keyof EventShortcuts)[]).forEach((key) => {
+      const handler = (shortcuts as EventShortcuts)[key];
+      if (handler) {
+        // each shortcut maps 1:1 to its event; signatures already match
+        (mergedOn as Record<string, unknown>)[SHORTCUTS[key]] = handler;
+      }
+    });
+
+    const mergedOptions: DriftSliderOptions = {
+      ...options,
+      modules: [...(options?.modules ?? []), ...(modules ?? [])],
+      on: mergedOn,
+    };
+
+    const containerRef = useRef<HTMLDivElement>(null);
+    const sliderRef = useRef<CoreDriftSlider | null>(null);
+
+    useEffect(() => {
+      const el = containerRef.current;
+      if (!el) return;
+      const slider = new CoreDriftSlider(el, mergedOptions);
+      sliderRef.current = slider;
+      return () => {
+        slider.destroy();
+        sliderRef.current = null;
+      };
+      // re-init only when options/modules identity changes
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [options, modules]);
+
+    useImperativeHandle(ref, () => ({
+      slideTo: (...args) => sliderRef.current!.slideTo(...args),
+      slideNext: (...args) => sliderRef.current!.slideNext(...args),
+      slidePrev: (...args) => sliderRef.current!.slidePrev(...args),
+      update: () => sliderRef.current?.update(),
+      get instance() {
+        return sliderRef.current;
+      },
+    }), []);
+
     return (
       <div className={cx('drift-slider', className)} style={style} ref={containerRef}>
         <div className="drift-track">
