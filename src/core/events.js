@@ -26,6 +26,8 @@ export default function eventsModule({ slider }) {
   function detachEvents() {
     if (resizeHandler) {
       window.removeEventListener('resize', resizeHandler);
+      // Cancel any debounced resize still pending so it can't fire post-destroy
+      if (resizeHandler.cancel) resizeHandler.cancel();
     }
     slider.listEl.removeEventListener('transitionend', onListTransitionEnd);
   }

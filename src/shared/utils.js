@@ -13,10 +13,20 @@ export function deepMerge(target, ...sources) {
   for (const source of sources) {
     if (!isObject(source)) continue;
     for (const key of Object.keys(source)) {
-      if (isObject(source[key]) && isObject(target[key])) {
-        target[key] = deepMerge({}, target[key], source[key]);
+      // Guard against prototype pollution from untrusted config (e.g. JSON)
+      if (key === '__proto__' || key === 'constructor' || key === 'prototype') {
+        continue;
+      }
+      const val = source[key];
+      if (Array.isArray(val)) {
+        // Clone arrays so the merged result does not alias the source
+        target[key] = val.slice();
+      } else if (isObject(val) && isObject(target[key])) {
+        target[key] = deepMerge({}, target[key], val);
       } else {
-        target[key] = source[key];
+        // Assign by reference for everything else, including class instances
+        // (e.g. a thumbs slider instance) which must not be cloned
+        target[key] = val;
       }
     }
   }
@@ -51,10 +61,15 @@ export function deepMergeDefaults(target, ...sources) {
 
 export function debounce(fn, delay) {
   let timer;
-  return function (...args) {
+  function debounced(...args) {
     clearTimeout(timer);
     timer = setTimeout(() => fn.apply(this, args), delay);
+  }
+  debounced.cancel = () => {
+    clearTimeout(timer);
+    timer = undefined;
   };
+  return debounced;
 }
 
 export function clamp(val, min, max) {
