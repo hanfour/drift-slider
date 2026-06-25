@@ -298,14 +298,11 @@ function updateModule({ slider }) {
       offset = containerSize / 2 - slideSize / 2;
     }
 
-    // Stacked effects (fade, deck, cards) position all slides at the same spot
-    // (absolute, 100% of container) and manage their own list sizing. Skip the
-    // per-slide width/margin and list width/height writes so they are not
-    // overwritten with a slideCount * slideSize total on every update/resize.
-    const isStackedEffect =
-      params.effect === 'fade' ||
-      params.effect === 'deck' ||
-      params.effect === 'cards';
+    // Effects that stack slides (absolute, 100% of container) declare
+    // slider._managesOwnLayout so core skips the per-slide width/margin and
+    // list width/height writes — otherwise they'd be overwritten with a
+    // slideCount * slideSize total on every update/resize.
+    const isStackedEffect = slider._managesOwnLayout === true;
 
     for (let i = 0; i < slides.length; i++) {
       slidesSizesGrid.push(slideSize);
@@ -395,8 +392,16 @@ function updateModule({ slider }) {
     slider.emit('update', slider);
   }
 
+  // Re-read the slide elements from the DOM (e.g. after clones are added/removed).
+  function refreshSlides() {
+    slider.slides = Array.from(
+      slider.listEl.querySelectorAll(`:scope > .${slider.params.slideClass}`)
+    );
+  }
+
   slider.calcSlides = calcSlides;
   slider.update = update;
+  slider.refreshSlides = refreshSlides;
 }
 
 function translateModule({ slider }) {
@@ -1082,6 +1087,11 @@ function loopModule({ slider }) {
   function createLoop() {
     if (!slider.params.loop) return;
 
+    // Loop clones are sized by slidesPerView, not slidesPerGroup, so they are
+    // not group-aligned. slidesPerGroup > 1 + loop would desync the snapGrid
+    // from the real slides (wrong active/aria mapping), so fall back to 1.
+    if (slider.params.slidesPerGroup > 1) slider.params.slidesPerGroup = 1;
+
     const slides = slider.slides;
     const perView = Math.ceil(slider.params.slidesPerView);
     const additional = slider.params.loopAdditionalSlides;
@@ -1121,10 +1131,8 @@ function loopModule({ slider }) {
       slider.listEl.appendChild(clone);
     }
 
-    // Re-query slides (now includes clones) — use :scope > for consistency
-    slider.slides = Array.from(
-      slider.listEl.querySelectorAll(`:scope > .${slider.params.slideClass}`)
-    );
+    // Re-query slides (now includes clones)
+    slider.refreshSlides();
   }
 
   function destroyLoop() {
@@ -1254,9 +1262,7 @@ function breakpointsModule({ slider }) {
     if (nextLoop === false && prevLoop === true) {
       slider.destroyLoop();
       slider._loopedSlides = 0;
-      slider.slides = Array.from(
-        slider.listEl.querySelectorAll(`:scope > .${slider.params.slideClass}`)
-      );
+      slider.refreshSlides();
     }
 
     for (const key of applyKeys) {
@@ -2025,6 +2031,15 @@ function Autoplay({ slider, extendParams, on }) {
   }
 
   let _pausedByVisibility = false;
+  function isPointerOver() {
+    // :hover reflects the live pointer position even when no mouseenter fired
+    // (e.g. the pointer moved over the slider while the tab was hidden).
+    try {
+      return slider.el.matches(':hover');
+    } catch {
+      return false;
+    }
+  }
   function onVisibilityChange() {
     if (document.hidden) {
       if (running && !paused) {
@@ -2033,7 +2048,10 @@ function Autoplay({ slider, extendParams, on }) {
       }
     } else if (_pausedByVisibility) {
       _pausedByVisibility = false;
-      resume();
+      // Don't resume under a hovering pointer when pauseOnMouseEnter is set.
+      if (!(slider.params.autoplay.pauseOnMouseEnter && isPointerOver())) {
+        resume();
+      }
     }
   }
 
@@ -2086,6 +2104,10 @@ function Autoplay({ slider, extendParams, on }) {
 }
 
 function EffectFade({ slider, extendParams, on }) {
+  // Declare that this effect manages its own slide/list sizing so core
+  // calcSlides skips width/margin writes (set before the first calcSlides).
+  if (slider.params.effect === 'fade') slider._managesOwnLayout = true;
+
   extendParams({
     fadeEffect: {
       crossFade: true,
@@ -2958,6 +2980,9 @@ function EffectCoverflow({ slider, extendParams, on }) {
 }
 
 function EffectCards({ slider, extendParams, on }) {
+  // Stacked effect: core calcSlides must not write per-slide/list sizing.
+  if (slider.params.effect === 'cards') slider._managesOwnLayout = true;
+
   const ALL_DIRS = ['tl-br', 'bl-tr', 'tr-bl', 'br-tl'];
   const DIR_MAP = {
     'tl-br': { x: 1, y: 1 },
@@ -3350,6 +3375,9 @@ function EffectCards({ slider, extendParams, on }) {
 }
 
 function EffectDeck({ slider, extendParams, on }) {
+  // Stacked effect: core calcSlides must not write per-slide/list sizing.
+  if (slider.params.effect === 'deck') slider._managesOwnLayout = true;
+
   const overlayEls = [];
   let _coreSetTranslate = null;
   let _coreSetTransition = null;
