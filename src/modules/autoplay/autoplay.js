@@ -169,6 +169,15 @@ export default function Autoplay({ slider, extendParams, on }) {
   }
 
   let _pausedByVisibility = false;
+  function isPointerOver() {
+    // :hover reflects the live pointer position even when no mouseenter fired
+    // (e.g. the pointer moved over the slider while the tab was hidden).
+    try {
+      return slider.el.matches(':hover');
+    } catch {
+      return false;
+    }
+  }
   function onVisibilityChange() {
     if (document.hidden) {
       if (running && !paused) {
@@ -177,7 +186,10 @@ export default function Autoplay({ slider, extendParams, on }) {
       }
     } else if (_pausedByVisibility) {
       _pausedByVisibility = false;
-      resume();
+      // Don't resume under a hovering pointer when pauseOnMouseEnter is set.
+      if (!(slider.params.autoplay.pauseOnMouseEnter && isPointerOver())) {
+        resume();
+      }
     }
   }
 
