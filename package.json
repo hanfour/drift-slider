@@ -6,7 +6,7 @@
   "workspaces": ["packages/*"],
   "scripts": {
     "test": "npm run test --workspaces --if-present",
-    "build": "npm run build --workspaces --if-present",
+    "build": "npm run build -w packages/core",
     "build:css": "npm run build:css -w packages/core",
     "build:docs": "npm run build -w packages/core && npm run build:css -w packages/core && node scripts/copy-docs-lib.mjs"
   },
