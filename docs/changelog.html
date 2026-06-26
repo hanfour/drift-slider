@@ -40,6 +40,38 @@
       <p class="lead" data-i18n-en>All notable changes to DriftSlider will be documented here.</p>
       <p class="lead" data-i18n-zh>DriftSlider 所有重要變更都記錄在此。</p>
 
+      <!-- drift-slider-react v0.1.0 -->
+      <div class="changelog-entry">
+        <h2 class="changelog-version">drift-slider-react v0.1.0</h2>
+        <p class="changelog-date">2026-06-26 &mdash; Official React wrapper</p>
+
+        <h3 data-i18n-en>New Package</h3>
+        <h3 data-i18n-zh>新套件</h3>
+        <ul>
+          <li data-i18n-en><strong>drift-slider-react</strong> &mdash; an official thin React wrapper, installed alongside the core: <code>npm i drift-slider drift-slider-react</code>.</li>
+          <li data-i18n-zh><strong>drift-slider-react</strong> &mdash; 官方輕量 React 包裝，與核心一起安裝：<code>npm i drift-slider drift-slider-react</code>。</li>
+          <li data-i18n-en><strong>&lt;DriftSlider&gt; component</strong> &mdash; renders the slider scaffold and accepts <code>options</code>, <code>modules</code>, an <code>on</code> event map, and shortcut event props (<code>onSlideChange</code>, <code>onReachEnd</code>, …).</li>
+          <li data-i18n-zh><strong>&lt;DriftSlider&gt; 元件</strong> &mdash; 自動產生 slider 結構，接受 <code>options</code>、<code>modules</code>、<code>on</code> 事件物件與快捷事件 props（<code>onSlideChange</code>、<code>onReachEnd</code>…）。</li>
+          <li data-i18n-en><strong>useDriftSlider hook &amp; &lt;Slide&gt; helper</strong> &mdash; a headless hook for full control, plus a <code>&lt;Slide&gt;</code> wrapper for list items.</li>
+          <li data-i18n-zh><strong>useDriftSlider hook 與 &lt;Slide&gt; helper</strong> &mdash; 提供完全掌控的 headless hook，以及包裝 list item 的 <code>&lt;Slide&gt;</code>。</li>
+          <li data-i18n-en><strong>Imperative ref handle</strong> &mdash; the <code>ref</code> exposes <code>slideTo</code>, <code>slideNext</code>, <code>slidePrev</code>, <code>update</code>, and the live <code>instance</code>.</li>
+          <li data-i18n-zh><strong>命令式 ref handle</strong> &mdash; <code>ref</code> 提供 <code>slideTo</code>、<code>slideNext</code>、<code>slidePrev</code>、<code>update</code> 與即時 <code>instance</code>。</li>
+          <li data-i18n-en><strong>SSR-safe</strong> &mdash; ships with the <code>'use client'</code> banner and initialises only in an effect; supports React 18 &amp; 19. Types are derived from the core package.</li>
+          <li data-i18n-zh><strong>SSR 安全</strong> &mdash; 內建 <code>'use client'</code>、僅在 effect 內初始化；支援 React 18 與 19；型別由核心套件衍生。</li>
+          <li data-i18n-en><strong>Auto-update on children change</strong> &mdash; adding, removing, or reordering slides refreshes the slider automatically.</li>
+          <li data-i18n-zh><strong>子節點變更自動更新</strong> &mdash; 新增、移除或重排 slide 會自動刷新 slider。</li>
+        </ul>
+
+        <h3 data-i18n-en>Notes</h3>
+        <h3 data-i18n-zh>注意事項</h3>
+        <ul>
+          <li data-i18n-en>Memoize <code>options</code>/<code>modules</code> (or define them outside render) &mdash; passing new object/array literals every render re-initialises the slider. Event-handler props may change freely.</li>
+          <li data-i18n-zh>請 memoize <code>options</code>/<code>modules</code>（或定義在 render 之外）&mdash; 每次 render 都傳入新的物件/陣列字面值會導致 slider 重新初始化；事件處理 props 則可自由變更。</li>
+          <li data-i18n-en>Requires <code>drift-slider &gt;= 0.7.0</code> as a peer dependency.</li>
+          <li data-i18n-zh>peer dependency 需要 <code>drift-slider &gt;= 0.7.0</code>。</li>
+        </ul>
+      </div>
+
       <!-- v0.7.0 -->
       <div class="changelog-entry">
         <h2 class="changelog-version">v0.7.0</h2>

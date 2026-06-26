@@ -1,5 +1,10 @@
 # Changelog
 
+> This file tracks the core **`drift-slider`** package. The React wrapper
+> **`drift-slider-react`** has its own changelog at
+> [`packages/react/CHANGELOG.md`](packages/react/CHANGELOG.md); detailed EN/ZH
+> release notes for every package live in [`docs/changelog.html`](docs/changelog.html).
+
 # 0.7.0 (2026-06-25)
 
 Project-wide health audit & hardening (PR #9). Detailed EN/ZH notes in `docs/changelog.html`.
