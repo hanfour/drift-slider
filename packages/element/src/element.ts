@@ -33,6 +33,27 @@ export class DriftSliderElement extends HTMLElement {
     return this._slider;
   }
 
+  get activeIndex(): number {
+    return this._slider ? this._slider.realIndex : -1;
+  }
+
+  slideTo(index: number, speed?: number, runCallbacks?: boolean): void {
+    this._slider?.slideTo(index, speed, runCallbacks);
+  }
+  slideNext(speed?: number): void {
+    this._slider?.slideNext(speed);
+  }
+  slidePrev(speed?: number): void {
+    this._slider?.slidePrev(speed);
+  }
+  update(): void {
+    this._slider?.update();
+  }
+  destroy(): void {
+    this._slider?.destroy();
+    this._slider = null;
+  }
+
   get config(): DriftSliderOptions {
     return this._config;
   }
