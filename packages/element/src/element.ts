@@ -1,6 +1,6 @@
 import CoreDriftSlider from 'drift-slider';
 import type { DriftSliderOptions, DriftSliderModule } from 'drift-slider';
-import { OBSERVED_ATTRIBUTES } from './attributes';
+import { OBSERVED_ATTRIBUTES, OPTION_ATTRS, coerceAttr, attrToOption } from './attributes';
 
 const UPGRADE_PROPS = ['config', 'modules'] as const;
 
@@ -13,6 +13,7 @@ export class DriftSliderElement extends HTMLElement {
   private _config: DriftSliderOptions = {};
   private _modules: DriftSliderModule[] = [];
   private _initPending = false;
+  private _reinitQueued = false;
 
   constructor() {
     super();
@@ -35,6 +36,7 @@ export class DriftSliderElement extends HTMLElement {
   }
   set config(value: DriftSliderOptions) {
     this._config = value ?? {};
+    this._scheduleReinit();
   }
 
   get modules(): DriftSliderModule[] {
@@ -42,6 +44,20 @@ export class DriftSliderElement extends HTMLElement {
   }
   set modules(value: DriftSliderModule[]) {
     this._modules = value ?? [];
+    this._scheduleReinit();
+  }
+
+  private _scheduleReinit(): void {
+    if (this._reinitQueued) return;
+    this._reinitQueued = true;
+    queueMicrotask(() => {
+      this._reinitQueued = false;
+      if (this._slider) {
+        this._slider.destroy();
+        this._slider = null;
+        this._init();
+      }
+    });
   }
 
   connectedCallback(): void {
@@ -58,11 +74,33 @@ export class DriftSliderElement extends HTMLElement {
   }
 
   attributeChangedCallback(): void {
-    // re-init wiring lands in Task 6
+    if (this._slider) this._scheduleReinit();
+  }
+
+  private _attrOptions(): DriftSliderOptions {
+    const out: Record<string, unknown> = {};
+    const json = this.getAttribute('config');
+    if (json) {
+      try { Object.assign(out, JSON.parse(json)); }
+      catch { console.warn('DriftSlider: invalid JSON in config attribute'); }
+    }
+    for (const attr of OPTION_ATTRS) {
+      if (!this.hasAttribute(attr)) continue;
+      const value = coerceAttr(attr, this.getAttribute(attr));
+      if (value !== undefined) out[attrToOption(attr)] = value;
+    }
+    return out as DriftSliderOptions;
   }
 
   private _buildOptions(): DriftSliderOptions {
-    return { ...this._config, modules: this._modules };
+    const fromAttrs = this._attrOptions();
+    // property wins; warn on conflict
+    for (const key of Object.keys(this._config)) {
+      if (key in fromAttrs) {
+        console.warn(`DriftSlider: property config.${key} overrides the conflicting attribute`);
+      }
+    }
+    return { ...fromAttrs, ...this._config, modules: this._modules };
   }
 
   private _ensureScaffold(): void {
@@ -79,6 +117,8 @@ export class DriftSliderElement extends HTMLElement {
     const children = Array.from(this.childNodes);
     for (const node of children) {
       if (node.nodeType === Node.ELEMENT_NODE && !SKIP.has((node as Element).tagName)) {
+        const el = node as Element;
+        if (!el.classList.contains('drift-slide')) el.classList.add('drift-slide');
         list.appendChild(node); // move (preserves ids, aria, listeners)
       } else if (node.nodeType === Node.ELEMENT_NODE) {
         leaveOutside.push(node);
