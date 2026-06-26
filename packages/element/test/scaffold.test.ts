@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll, afterEach } from 'vitest';
+import { describe, it, expect, beforeAll, afterEach, vi } from 'vitest';
 import { DriftSliderElement } from '../src/element';
 
 beforeAll(() => {
@@ -41,5 +41,36 @@ describe('scaffold generation', () => {
     el.querySelector<HTMLButtonElement>('#b')!.focus();
     await Promise.resolve();
     expect(document.activeElement).toBe(el.querySelector('#b'));
+  });
+
+  it('leaves <style> outside the list (SKIP set)', async () => {
+    const el = mount('<div>a</div><style>.x{}</style>');
+    await Promise.resolve();
+    expect(el.querySelector('.drift-list > style')).toBeNull();
+    expect(el.querySelector('style')).toBeTruthy();
+  });
+
+  it('dispatches drift:error and keeps _slider null when scaffold fails', async () => {
+    const spy = vi.spyOn(Element.prototype, 'replaceChildren').mockImplementationOnce(() => {
+      throw new Error('boom');
+    });
+    const el = mount('<div>a</div>');
+    let errorFired = false;
+    el.addEventListener('drift:error', () => { errorFired = true; });
+    await Promise.resolve();
+    spy.mockRestore();
+    expect(errorFired).toBe(true);
+    expect(el.instance).toBeNull();
+  });
+
+  it('preserves relative order of skipped nodes after the track', async () => {
+    const el = mount('<div>a</div><template id="t1"></template><script id="s1"></script>');
+    await Promise.resolve();
+    const children = Array.from(el.children);
+    const trackIdx = children.findIndex(c => c.classList.contains('drift-track'));
+    const t1Idx = children.findIndex(c => c.id === 't1');
+    const s1Idx = children.findIndex(c => c.id === 's1');
+    expect(trackIdx).toBeLessThan(t1Idx);
+    expect(t1Idx).toBeLessThan(s1Idx);
   });
 });
