@@ -1,7 +1,10 @@
 import { useEffect, useImperativeHandle, useRef, forwardRef, Children, isValidElement } from 'react';
 import type { CSSProperties, LiHTMLAttributes, ReactNode } from 'react';
-import CoreDriftSlider, { type DriftSliderOptions } from 'drift-slider';
-import type { DriftSliderModule, DriftSliderEvents } from 'drift-slider';
+import CoreDriftSlider, {
+  type DriftSliderOptions,
+  type DriftSliderModule,
+  type DriftSliderEvents,
+} from 'drift-slider';
 
 export function cx(...parts: Array<string | false | undefined>): string {
   return parts.filter(Boolean).join(' ');
@@ -73,6 +76,37 @@ const SHORTCUTS: Record<keyof EventShortcuts, keyof DriftSliderEvents> = {
   onTouchEnd: 'touchEnd',
 };
 
+// Merge `options.on`, the `on` prop, and the shortcut props into one event map.
+function collectHandlers(
+  optionsOn: Partial<DriftSliderEvents> | undefined,
+  onProp: Partial<DriftSliderEvents> | undefined,
+  shortcuts: EventShortcuts,
+): Partial<DriftSliderEvents> {
+  const handlers: Partial<DriftSliderEvents> = { ...optionsOn, ...onProp };
+  (Object.keys(SHORTCUTS) as (keyof EventShortcuts)[]).forEach((key) => {
+    const handler = shortcuts[key];
+    if (handler) (handlers as Record<string, unknown>)[SHORTCUTS[key]] = handler;
+  });
+  return handlers;
+}
+
+// Build a stable `on` map whose forwarders read the latest handler from the ref
+// on each emit — so changing a handler prop takes effect without re-init. Covers
+// the shortcut events plus any keys present on the handler map.
+function forwardEvents(
+  handlers: Partial<DriftSliderEvents>,
+  handlersRef: { current: Partial<DriftSliderEvents> },
+): Partial<DriftSliderEvents> {
+  const on: Record<string, (...args: unknown[]) => void> = {};
+  new Set<string>([...Object.values(SHORTCUTS), ...Object.keys(handlers)]).forEach((name) => {
+    on[name] = (...args) => {
+      const map = handlersRef.current as Record<string, ((...a: unknown[]) => void) | undefined>;
+      map[name]?.(...args);
+    };
+  });
+  return on as Partial<DriftSliderEvents>;
+}
+
 export interface DriftSliderProps extends EventShortcuts {
   options?: DriftSliderOptions;
   modules?: DriftSliderModule[];
@@ -86,36 +120,18 @@ export const DriftSlider = forwardRef<DriftSliderHandle, DriftSliderProps>(
   function DriftSlider(props, ref) {
     const { options, modules, on, className, style, children, ...shortcuts } = props;
 
-    // Collect the latest event handlers each render and keep them in a ref, so
-    // that changing a handler prop (e.g. onSlideChange) takes effect WITHOUT
-    // tearing the slider down and recreating it.
-    const handlers: Partial<DriftSliderEvents> = { ...options?.on, ...on };
-    (Object.keys(SHORTCUTS) as (keyof EventShortcuts)[]).forEach((key) => {
-      const handler = (shortcuts as EventShortcuts)[key];
-      if (handler) {
-        // each shortcut maps 1:1 to its event; signatures already match
-        (handlers as Record<string, unknown>)[SHORTCUTS[key]] = handler;
-      }
-    });
+    // Keep the latest handlers in a ref so changing a handler prop takes effect
+    // without tearing the slider down and recreating it.
+    const handlers = collectHandlers(options?.on, on, shortcuts as EventShortcuts);
     const handlersRef = useRef(handlers);
     useEffect(() => {
       handlersRef.current = handlers;
     });
 
-    // Stable forwarders read the latest handler from the ref on each emit —
-    // cover the shortcut events plus any keys present on the handler map.
-    const forwarders: Record<string, (...args: unknown[]) => void> = {};
-    new Set<string>([...Object.values(SHORTCUTS), ...Object.keys(handlers)]).forEach((name) => {
-      forwarders[name] = (...args) => {
-        const map = handlersRef.current as Record<string, ((...a: unknown[]) => void) | undefined>;
-        map[name]?.(...args);
-      };
-    });
-
     const sliderOptions: DriftSliderOptions = {
       ...options,
       modules: [...(options?.modules ?? []), ...(modules ?? [])],
-      on: forwarders as Partial<DriftSliderEvents>,
+      on: forwardEvents(handlers, handlersRef),
     };
 
     // Compose the lifecycle from the shared hook; re-init only when
