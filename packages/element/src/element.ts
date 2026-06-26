@@ -1,6 +1,7 @@
 import CoreDriftSlider from 'drift-slider';
 import type { DriftSliderOptions, DriftSliderModule } from 'drift-slider';
-import { OBSERVED_ATTRIBUTES, OPTION_ATTRS, coerceAttr, attrToOption } from './attributes';
+import { OBSERVED_ATTRIBUTES, OPTION_ATTRS, MODULE_ATTRS, coerceAttr, attrToOption } from './attributes';
+import { resolveModuleNames, moduleForEffect } from './registry';
 
 const UPGRADE_PROPS = ['config', 'modules'] as const;
 
@@ -92,6 +93,24 @@ export class DriftSliderElement extends HTMLElement {
     return out as DriftSliderOptions;
   }
 
+  private _buildModules(): DriftSliderModule[] {
+    const mods = new Set<DriftSliderModule>(this._modules);
+
+    const attr = this.getAttribute('modules');
+    if (attr) for (const m of resolveModuleNames(attr.split(/[\s,]+/))) mods.add(m);
+
+    for (const [attrName, regName] of Object.entries(MODULE_ATTRS)) {
+      if (this.hasAttribute(attrName) && coerceAttr(attrName, this.getAttribute(attrName))) {
+        for (const m of resolveModuleNames([regName])) mods.add(m);
+      }
+    }
+
+    const effect = this.getAttribute('effect') ?? (this._config as { effect?: string }).effect;
+    if (effect) { const m = moduleForEffect(effect); if (m) mods.add(m); }
+
+    return [...mods];
+  }
+
   private _buildOptions(): DriftSliderOptions {
     const fromAttrs = this._attrOptions();
     // property wins; warn on conflict
@@ -100,7 +119,7 @@ export class DriftSliderElement extends HTMLElement {
         console.warn(`DriftSlider: property config.${key} overrides the conflicting attribute`);
       }
     }
-    return { ...fromAttrs, ...this._config, modules: this._modules };
+    return { ...fromAttrs, ...this._config, modules: this._buildModules() };
   }
 
   private _ensureScaffold(): void {
