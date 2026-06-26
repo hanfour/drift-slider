@@ -9,7 +9,7 @@
     "build": "npm run build -w packages/core && npm run build -w packages/react && npm run build -w packages/element",
     "build:element": "npm run build -w packages/core && npm run build -w packages/element",
     "build:css": "npm run build:css -w packages/core",
-    "build:docs": "npm run build -w packages/core && npm run build:css -w packages/core && node scripts/copy-docs-lib.mjs"
+    "build:docs": "npm run build -w packages/core && npm run build:css -w packages/core && npm run build -w packages/element && node scripts/copy-docs-lib.mjs"
   },
   "devDependencies": {}
 }

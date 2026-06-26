@@ -63,7 +63,8 @@
       <div class="demo-info-bar">
         <span data-i18n-en>Current Slide: <strong id="current-index">1</strong> / 5</span>
         <span data-i18n-zh>目前投影片：<strong id="current-index-zh">1</strong> / 5</span>
-        <span>Progress: <strong id="current-progress">0%</strong></span>
+        <span data-i18n-en>Progress: <strong id="current-progress">0%</strong></span>
+        <span data-i18n-zh>進度：<strong id="current-progress-zh">0%</strong></span>
       </div>
 
       <!-- Source Code section -->
@@ -108,7 +109,7 @@ registerModules({ Navigation, Pagination });</code></pre>
 
   <!-- Load the core UMD for DriftSlider globals, then the element IIFE via CDN -->
   <script src="../assets/lib/drift-slider.umd.js"></script>
-  <script src="https://unpkg.com/drift-slider-element" defer></script>
+  <script src="../assets/lib/drift-slider-element.iife.global.js" defer></script>
   <script src="../assets/js/prism.js"></script>
   <script src="../assets/js/docs.js"></script>
   <script>
@@ -123,7 +124,9 @@ registerModules({ Navigation, Pagination });</code></pre>
         if (idxElZh) idxElZh.textContent = idx;
         var pct = Math.round(e.detail.progress * 100);
         var progEl = document.getElementById('current-progress');
+        var progElZh = document.getElementById('current-progress-zh');
         if (progEl) progEl.textContent = pct + '%';
+        if (progElZh) progElZh.textContent = pct + '%';
       });
     });
   </script>
