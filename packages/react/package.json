@@ -19,7 +19,7 @@
   "peerDependencies": {
     "react": ">=18",
     "react-dom": ">=18",
-    "drift-slider": "*"
+    "drift-slider": ">=0.7.0"
   },
   "devDependencies": {
     "@testing-library/react": "^16.0.0",
