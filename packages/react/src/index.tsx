@@ -86,20 +86,21 @@ export const DriftSlider = forwardRef<DriftSliderHandle, DriftSliderProps>(
   function DriftSlider(props, ref) {
     const { options, modules, on, className, style, children, ...shortcuts } = props;
 
-    const mergedOn: Partial<DriftSliderEvents> = { ...options?.on, ...on };
+    // Collect the latest event handlers each render and keep them in a ref, so
+    // that changing a handler prop (e.g. onSlideChange) takes effect WITHOUT
+    // tearing the slider down and recreating it.
+    const handlers: Partial<DriftSliderEvents> = { ...options?.on, ...on };
     (Object.keys(SHORTCUTS) as (keyof EventShortcuts)[]).forEach((key) => {
       const handler = (shortcuts as EventShortcuts)[key];
       if (handler) {
         // each shortcut maps 1:1 to its event; signatures already match
-        (mergedOn as Record<string, unknown>)[SHORTCUTS[key]] = handler;
+        (handlers as Record<string, unknown>)[SHORTCUTS[key]] = handler;
       }
     });
-
-    const mergedOptions: DriftSliderOptions = {
-      ...options,
-      modules: [...(options?.modules ?? []), ...(modules ?? [])],
-      on: mergedOn,
-    };
+    const handlersRef = useRef(handlers);
+    useEffect(() => {
+      handlersRef.current = handlers;
+    });
 
     const containerRef = useRef<HTMLDivElement>(null);
     const sliderRef = useRef<CoreDriftSlider | null>(null);
@@ -107,7 +108,24 @@ export const DriftSlider = forwardRef<DriftSliderHandle, DriftSliderProps>(
     useEffect(() => {
       const el = containerRef.current;
       if (!el) return;
-      const slider = new CoreDriftSlider(el, mergedOptions);
+      // Register stable forwarders that read the latest handler from the ref on
+      // each emit — covers the shortcut events plus any keys present at init.
+      const eventNames = new Set<string>([
+        ...Object.values(SHORTCUTS),
+        ...Object.keys(handlersRef.current),
+      ]);
+      const forwarders: Record<string, (...args: unknown[]) => void> = {};
+      eventNames.forEach((name) => {
+        forwarders[name] = (...args) => {
+          const map = handlersRef.current as Record<string, ((...a: unknown[]) => void) | undefined>;
+          map[name]?.(...args);
+        };
+      });
+      const slider = new CoreDriftSlider(el, {
+        ...options,
+        modules: [...(options?.modules ?? []), ...(modules ?? [])],
+        on: forwarders as Partial<DriftSliderEvents>,
+      });
       sliderRef.current = slider;
       return () => {
         slider.destroy();
