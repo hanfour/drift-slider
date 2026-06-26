@@ -14,7 +14,7 @@
   "files": ["dist", "src"],
   "sideEffects": ["./dist/define.js", "./dist/with-css.js", "./dist/drift-slider-element.iife.global.js", "./src/define.ts", "./src/with-css.ts", "./src/cdn.ts", "*.css"],
   "scripts": {
-    "prebuild": "cd ../core && npm run build",
+    "prebuild": "cd ../core && npm run build && npm run build:css",
     "build": "tsup",
     "test": "vitest run",
     "test:watch": "vitest",
