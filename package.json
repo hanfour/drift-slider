@@ -1,94 +1,14 @@
 {
-  "name": "drift-slider",
-  "version": "0.7.0",
-  "description": "A lightweight, modular slider/carousel library with physics-based touch interaction",
+  "name": "drift-slider-monorepo",
+  "version": "0.0.0",
+  "private": true,
   "type": "module",
-  "main": "./dist/esm/index.mjs",
-  "module": "./dist/esm/index.mjs",
-  "types": "./dist/types/index.d.ts",
-  "sideEffects": [
-    "*.css"
-  ],
-  "exports": {
-    ".": {
-      "types": "./dist/types/index.d.ts",
-      "default": "./dist/esm/index.mjs"
-    },
-    "./core": {
-      "types": "./dist/types/core.d.ts",
-      "default": "./dist/esm/core.mjs"
-    },
-    "./modules": {
-      "types": "./dist/types/modules/index.d.ts",
-      "default": "./dist/esm/modules/index.mjs"
-    },
-    "./modules/*": {
-      "types": "./dist/types/modules/*.d.ts",
-      "default": "./dist/esm/modules/*.mjs"
-    },
-    "./css": "./dist/css/core.css",
-    "./css/*": "./dist/css/*.css",
-    "./css/bundle": "./dist/drift-slider-bundle.css",
-    "./bundle": "./dist/drift-slider.umd.js",
-    "./jquery": "./dist/drift-slider.jquery.js",
-    "./package.json": "./package.json"
-  },
-  "files": [
-    "dist/",
-    "src/",
-    "package.json"
-  ],
+  "workspaces": ["packages/*"],
   "scripts": {
-    "build": "rollup -c rollup.config.mjs && npm run build:types",
-    "build:types": "node scripts/build-types.mjs",
-    "build:css": "node scripts/build-css.mjs",
-    "build:docs": "npm run build && npm run build:css && cp dist/esm/index.mjs dist/css/core.css dist/drift-slider-bundle.css dist/drift-slider.umd.js dist/drift-slider.jquery.js docs/assets/lib/ 2>/dev/null || true",
-    "dev": "rollup -c rollup.config.mjs -w",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage",
-    "release": "release-it",
-    "release:dry": "release-it --dry-run",
-    "publint": "publint",
-    "prepublishOnly": "npm run build && npm run build:css && npm run publint",
-    "optimize": "node scripts/agent-optimize.mjs"
+    "test": "npm run test --workspaces --if-present",
+    "build": "npm run build -w packages/core && npm run build -w packages/react",
+    "build:css": "npm run build:css -w packages/core",
+    "build:docs": "npm run build -w packages/core && npm run build:css -w packages/core && node scripts/copy-docs-lib.mjs"
   },
-  "keywords": [
-    "slider",
-    "carousel",
-    "swiper",
-    "touch",
-    "responsive",
-    "a11y",
-    "physics",
-    "coverflow",
-    "fade",
-    "cards",
-    "jquery-plugin",
-    "typescript",
-    "lightweight",
-    "modular"
-  ],
-  "author": "hanfour",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/hanfour/drift-slider.git"
-  },
-  "bugs": {
-    "url": "https://github.com/hanfour/drift-slider/issues"
-  },
-  "homepage": "https://hanfour.github.io/drift-slider/",
-  "devDependencies": {
-    "@lhci/cli": "^0.15.1",
-    "@release-it/conventional-changelog": "^10.0.6",
-    "@rollup/plugin-terser": "^1.0.0",
-    "@vitest/coverage-v8": "^4.1.0",
-    "jsdom": "^29.0.0",
-    "publint": "^0.3.18",
-    "release-it": "^19.2.4",
-    "rollup": "^4.9.0",
-    "sass": "^1.69.0",
-    "vitest": "^4.1.0"
-  }
+  "devDependencies": {}
 }

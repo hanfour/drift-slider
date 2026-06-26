@@ -21,7 +21,7 @@ jobs:
           cache: npm
 
       - run: npm ci
-      - run: npm test
-      - run: npm publish --provenance --access public
+      - run: npm test -w packages/core
+      - run: npm publish -w packages/core --provenance --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
