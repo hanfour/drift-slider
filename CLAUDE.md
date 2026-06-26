@@ -1,17 +1,23 @@
 # DriftSlider — Claude Code Instructions
 
 ## Project Structure
-- `src/` — library source code (modules, core)
-- `tests/` — test files
-- `docs/` — static documentation site (GitHub Pages)
+This repo is an **npm-workspaces monorepo** (root `package.json` is `private`,
+`workspaces: ["packages/*"]`); commands run from the repo root delegate to the workspaces.
+- `packages/core/` — the published `drift-slider` library
+  - `packages/core/src/` — library source code (modules, core)
+  - `packages/core/tests/` — test files
+  - `packages/core/scripts/` — core build scripts (build-css, build-types, …)
+- `packages/react/` — the `drift-slider-react` React wrapper (`src/` + `test/`)
+- `docs/` — static documentation site (GitHub Pages), at the repo root
 - `docs/demos/` — individual demo pages
-- `docs/assets/lib/` — built library bundle for docs site
-- `scripts/` — automation scripts
+- `docs/assets/lib/` — built library bundle for docs site (refreshed by `npm run build:docs`)
+- `scripts/` — repo-level scripts (e.g. `copy-docs-lib.mjs`)
 
-## Build
-- `npm run build` — build src/ → dist/
-- `npm run build:css` — build CSS bundle
-- `npm test` — run tests
+## Build (run from the repo root)
+- `npm run build` — build core (`packages/core`, rollup) then react (`packages/react`, tsup)
+- `npm run build:css` — build the core CSS bundle
+- `npm run build:docs` — build core + copy the bundle into `docs/assets/lib/`
+- `npm test` — run all workspace tests
 
 ## i18n
 - EN/ZH toggle via `data-i18n-en` / `data-i18n-zh` attributes
@@ -47,7 +53,7 @@ daily task prompt, Claude should:
 
 ### Task Type C — New Core Feature
 - Pick from C-Type Ideas in competitor-analysis.md
-- Implement module in `src/`, add tests in `tests/`
-- `npm run build` and copy to `docs/assets/lib/`
+- Implement the module in `packages/core/src/`, add tests in `packages/core/tests/`
+- `npm run build:docs` to rebuild and refresh `docs/assets/lib/`
 - Create demo page + update API/Modules docs
 - `npm test` must pass
