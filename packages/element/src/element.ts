@@ -37,15 +37,9 @@ export class DriftSliderElement extends HTMLElement {
     return this._slider ? this._slider.realIndex : -1;
   }
 
-  slideTo(index: number, speed?: number, runCallbacks?: boolean): void {
-    this._slider?.slideTo(index, speed, runCallbacks);
-  }
-  slideNext(speed?: number): void {
-    this._slider?.slideNext(speed);
-  }
-  slidePrev(speed?: number): void {
-    this._slider?.slidePrev(speed);
-  }
+  slideTo(index: number, speed?: number, runCallbacks?: boolean): CoreDriftSlider | undefined { return this._slider?.slideTo(index, speed, runCallbacks); }
+  slideNext(speed?: number): CoreDriftSlider | undefined { return this._slider?.slideNext(speed); }
+  slidePrev(speed?: number): CoreDriftSlider | undefined { return this._slider?.slidePrev(speed); }
   update(): void {
     this._slider?.update();
   }
@@ -117,7 +111,7 @@ export class DriftSliderElement extends HTMLElement {
   }
 
   private _buildModules(): DriftSliderModule[] {
-    const mods = new Set<DriftSliderModule>(this._modules);
+    const mods = new Set<DriftSliderModule>([...(this._modules ?? []), ...((this._config.modules as DriftSliderModule[] | undefined) ?? [])]);
 
     const attr = this.getAttribute('modules');
     if (attr) for (const m of resolveModuleNames(attr.split(/[\s,]+/))) mods.add(m);

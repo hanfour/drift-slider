@@ -32,6 +32,13 @@ describe('imperative API', () => {
     expect(el.activeIndex).toBe(-1);
   });
 
+  it('slideNext returns the core instance (the core returns `this`)', async () => {
+    const el = mount();
+    await Promise.resolve();
+    const result = el.slideNext(0);
+    expect(result).toBe(el.instance);
+  });
+
   it('destroy() tears down without removing from the DOM', async () => {
     const el = mount();
     await Promise.resolve();

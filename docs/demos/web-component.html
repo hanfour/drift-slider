@@ -28,6 +28,7 @@
   <link rel="stylesheet" href="../assets/css/prism-onedark.css">
   <link rel="stylesheet" href="../assets/lib/drift-slider-bundle.css">
   <style>
+    drift-slider:not(:defined) { display: block; max-height: 360px; overflow: hidden; }
     drift-slider {
       display: block;
       border-radius: 12px;
@@ -52,7 +53,7 @@
       <p class="demo-desc" data-i18n-zh>以原生 HTML 自訂元素使用 DriftSlider — 只需加入帶有屬性的 &lt;drift-slider&gt;，無需撰寫任何 JavaScript 樣板程式碼。</p>
 
       <!-- Live slider demo -->
-      <drift-slider loop navigation pagination slides-per-view="1" speed="500">
+      <drift-slider loop navigation pagination modules="navigation pagination a11y" slides-per-view="1" speed="500">
         <img src="https://picsum.photos/seed/wc1/900/340" alt="Slide 1">
         <img src="https://picsum.photos/seed/wc2/900/340" alt="Slide 2">
         <img src="https://picsum.photos/seed/wc3/900/340" alt="Slide 3">

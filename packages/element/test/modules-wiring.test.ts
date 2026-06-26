@@ -38,6 +38,16 @@ describe('modules wiring', () => {
     expect(el.instance!.params.modules).toContain(EffectFade);
   });
 
+  it('honors modules passed inside el.config = { modules: [...] }', async () => {
+    registerModules({ Navigation });
+    const el = document.createElement('drift-slider') as DriftSliderElement;
+    el.innerHTML = '<div>a</div><div>b</div>';
+    el.config = { modules: [Navigation] };
+    document.body.appendChild(el);
+    await Promise.resolve();
+    expect(el.instance!.params.modules).toContain(Navigation);
+  });
+
   it('merges and dedupes the .modules property with attribute sources', async () => {
     registerModules({ Navigation });
     const el = mount({ navigation: '' });

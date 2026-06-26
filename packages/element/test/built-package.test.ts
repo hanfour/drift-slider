@@ -13,6 +13,9 @@ const def = await loadBuilt('../dist/define.js');
 const distIndexPath = resolve(dirname(fileURLToPath(import.meta.url)), '../dist/index.js');
 const distIndexExists = existsSync(distIndexPath);
 
+const distDtsPath = resolve(dirname(fileURLToPath(import.meta.url)), '../dist/index.d.ts');
+const distDtsExists = existsSync(distDtsPath);
+
 describe('built drift-slider-element', () => {
   it.skipIf(!main)('main entry exports the class + registerModules, no define', () => {
     expect(typeof main.DriftSliderElement).toBe('function');
@@ -26,5 +29,10 @@ describe('built drift-slider-element', () => {
   it.skipIf(!distIndexExists)('ESM index.js does not contain customElements (opt-in registration contract)', () => {
     const src = readFileSync(distIndexPath, 'utf8');
     expect(src).not.toContain('customElements');
+  });
+  it.skipIf(!distDtsExists)('dist/index.d.ts ships the HTMLElementTagNameMap augmentation', () => {
+    const dts = readFileSync(distDtsPath, 'utf8');
+    expect(dts).toContain('HTMLElementTagNameMap');
+    expect(dts).toContain("'drift-slider'");
   });
 });

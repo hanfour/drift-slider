@@ -260,9 +260,11 @@ advanced use. Framework bindings use `@drift:slidechange` (Vue),
 - Scaffold is a pure **move**; author `id`s and `aria-*` are never modified, so
   IDRef chains (`aria-controls`, `aria-labelledby`) keep resolving.
 - The inner `.drift-slider` div is the semantic root owned by the core **A11y
-  module** (role/`aria-roledescription`); the A11y module runs **after**
-  scaffold completion. The host `<drift-slider>` tag adds no competing role in
-  v1.
+  module** (role/`aria-roledescription`); A11y is a module that only runs when
+  included — it is **not automatic**. CDN users include it by passing
+  `modules="... a11y"` (the CDN IIFE pre-registers it); bundler users call
+  `registerModules({ A11y })` and include it in the `modules` array. The host
+  `<drift-slider>` tag adds no competing role in v1.
 - Generated `.drift-track` / `.drift-list` carry no `tabindex` and introduce no
   focusable noise. Per-slide role is `group` (not `tabpanel`, which would
   require a full `tablist`).
