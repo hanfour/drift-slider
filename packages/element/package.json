@@ -1,0 +1,23 @@
+{
+  "name": "drift-slider-element",
+  "version": "0.1.0",
+  "description": "Official <drift-slider> Web Component for DriftSlider",
+  "type": "module",
+  "scripts": {
+    "build": "tsup",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "peerDependencies": {
+    "drift-slider": ">=0.7.0"
+  },
+  "devDependencies": {
+    "drift-slider": "*",
+    "tsup": "^8.0.0",
+    "typescript": "^5.4.0",
+    "vitest": "^4.1.0",
+    "jsdom": "^29.0.0"
+  },
+  "keywords": ["web-component", "custom-element", "slider", "carousel", "drift-slider"],
+  "license": "MIT"
+}
