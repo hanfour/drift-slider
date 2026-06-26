@@ -8,3 +8,6 @@ registerModules(modules as unknown as Record<string, import('drift-slider').Drif
 if (typeof customElements !== 'undefined' && !customElements.get('drift-slider')) {
   customElements.define('drift-slider', DriftSliderElement);
 }
+
+export { DriftSliderElement } from './element';
+export { registerModules } from './registry';
