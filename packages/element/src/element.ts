@@ -65,8 +65,43 @@ export class DriftSliderElement extends HTMLElement {
     return { ...this._config, modules: this._modules };
   }
 
+  private _ensureScaffold(): void {
+    if (this.querySelector(':scope > .drift-track > .drift-list')) return;
+
+    const active = document.activeElement;
+    const restoreFocus = active instanceof HTMLElement && this.contains(active) ? active : null;
+
+    const list = document.createElement('ul');
+    list.className = 'drift-list';
+
+    const SKIP = new Set(['TEMPLATE', 'SCRIPT', 'STYLE']);
+    const leaveOutside: Node[] = [];
+    const children = Array.from(this.childNodes);
+    for (const node of children) {
+      if (node.nodeType === Node.ELEMENT_NODE && !SKIP.has((node as Element).tagName)) {
+        list.appendChild(node); // move (preserves ids, aria, listeners)
+      } else if (node.nodeType === Node.ELEMENT_NODE) {
+        leaveOutside.push(node);
+      }
+      // text/comment nodes are dropped from the slide area
+    }
+
+    const track = document.createElement('div');
+    track.className = 'drift-track';
+    track.appendChild(list);
+    this.replaceChildren(track, ...leaveOutside);
+
+    if (restoreFocus) restoreFocus.focus();
+  }
+
   private _init(): void {
     this._initPending = false;
+    try {
+      this._ensureScaffold();
+    } catch (error) {
+      this.dispatchEvent(new CustomEvent('drift:error', { detail: { error }, bubbles: true }));
+      return;
+    }
     this._slider = new CoreDriftSlider(this, this._buildOptions());
   }
 }
