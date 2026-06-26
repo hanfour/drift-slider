@@ -90,6 +90,37 @@ npm i drift-slider drift-slider-react
 
 See [`packages/react/README.md`](packages/react/README.md) for usage.
 
+## Web Component
+
+An official Web Component wrapper is available as `drift-slider-element`:
+
+```bash
+npm i drift-slider drift-slider-element
+```
+
+**CDN** — drop one script tag; `<drift-slider>` auto-registers and CSS is injected:
+
+```html
+<script src="https://unpkg.com/drift-slider-element"></script>
+
+<drift-slider loop navigation pagination slides-per-view="1">
+  <img src="https://picsum.photos/seed/a/800/400" alt="">
+  <img src="https://picsum.photos/seed/b/800/400" alt="">
+</drift-slider>
+```
+
+**Bundler** — import and register only the modules you use:
+
+```js
+import 'drift-slider-element/define';
+import { registerModules } from 'drift-slider-element';
+import { Navigation, Pagination } from 'drift-slider/modules';
+
+registerModules({ Navigation, Pagination });
+```
+
+See [`packages/element/README.md`](packages/element/README.md) for the full attribute table, events, and imperative API.
+
 ## HTML Structure
 
 ```html

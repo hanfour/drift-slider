@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DriftSlider — Web Component</title>
+  <meta name="description" content="Use DriftSlider as a native HTML custom element with zero JavaScript boilerplate — just drop in &lt;drift-slider&gt; tags.">
+  <meta name="keywords" content="DriftSlider, web component, custom element, drift-slider-element, HTML slider, carousel">
+  <link rel="canonical" href="https://hanfour.github.io/drift-slider/demos/web-component.html">
+  <link rel="alternate" hreflang="en" href="https://hanfour.github.io/drift-slider/demos/web-component.html">
+  <link rel="alternate" hreflang="zh-Hant" href="https://hanfour.github.io/drift-slider/demos/web-component.html">
+  <link rel="alternate" hreflang="x-default" href="https://hanfour.github.io/drift-slider/demos/web-component.html">
+  <meta property="og:title" content="DriftSlider — Web Component">
+  <meta property="og:description" content="Use DriftSlider as a native HTML custom element — zero JS boilerplate.">
+  <meta property="og:image" content="https://hanfour.github.io/drift-slider/assets/img/og-image.png">
+  <meta property="og:url" content="https://hanfour.github.io/drift-slider/demos/web-component.html">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="DriftSlider — Web Component">
+  <meta name="twitter:description" content="Use DriftSlider as a native HTML custom element — zero JS boilerplate.">
+  <meta name="theme-color" content="#48D9C1">
+  <meta name="robots" content="index, follow">
+  <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/docs.css">
+  <link rel="stylesheet" href="../assets/css/prism-onedark.css">
+  <link rel="stylesheet" href="../assets/lib/drift-slider-bundle.css">
+  <style>
+    drift-slider {
+      display: block;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    drift-slider img {
+      width: 100%;
+      height: 340px;
+      object-fit: cover;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div data-include="../_includes/header.html"></div>
+  <div class="page-body">
+    <div class="demo-page">
+      <a href="../demos.html" class="demo-back">&larr; Back to Demos</a>
+      <h1 data-i18n-en>Web Component</h1>
+      <h1 data-i18n-zh>Web Component 元件</h1>
+      <p class="demo-desc" data-i18n-en>Use DriftSlider as a native HTML custom element — drop in &lt;drift-slider&gt; with attributes, no JavaScript boilerplate required.</p>
+      <p class="demo-desc" data-i18n-zh>以原生 HTML 自訂元素使用 DriftSlider — 只需加入帶有屬性的 &lt;drift-slider&gt;，無需撰寫任何 JavaScript 樣板程式碼。</p>
+
+      <!-- Live slider demo -->
+      <drift-slider loop navigation pagination slides-per-view="1" speed="500">
+        <img src="https://picsum.photos/seed/wc1/900/340" alt="Slide 1">
+        <img src="https://picsum.photos/seed/wc2/900/340" alt="Slide 2">
+        <img src="https://picsum.photos/seed/wc3/900/340" alt="Slide 3">
+        <img src="https://picsum.photos/seed/wc4/900/340" alt="Slide 4">
+        <img src="https://picsum.photos/seed/wc5/900/340" alt="Slide 5">
+      </drift-slider>
+
+      <div class="demo-info-bar">
+        <span data-i18n-en>Current Slide: <strong id="current-index">1</strong> / 5</span>
+        <span data-i18n-zh>目前投影片：<strong id="current-index-zh">1</strong> / 5</span>
+        <span>Progress: <strong id="current-progress">0%</strong></span>
+      </div>
+
+      <!-- Source Code section -->
+      <h2 class="demo-section-title">Source Code</h2>
+      <div class="code-block">
+        <span class="code-lang">html</span>
+        <pre><code class="language-html">&lt;!-- CDN: auto-registers &lt;drift-slider&gt; and injects CSS --&gt;
+&lt;script src="https://unpkg.com/drift-slider-element"&gt;&lt;/script&gt;
+
+&lt;drift-slider loop navigation pagination slides-per-view="1" speed="500"&gt;
+  &lt;img src="https://picsum.photos/seed/wc1/900/340" alt="Slide 1"&gt;
+  &lt;img src="https://picsum.photos/seed/wc2/900/340" alt="Slide 2"&gt;
+  &lt;img src="https://picsum.photos/seed/wc3/900/340" alt="Slide 3"&gt;
+  &lt;img src="https://picsum.photos/seed/wc4/900/340" alt="Slide 4"&gt;
+  &lt;img src="https://picsum.photos/seed/wc5/900/340" alt="Slide 5"&gt;
+&lt;/drift-slider&gt;
+
+&lt;script&gt;
+  var el = document.querySelector('drift-slider');
+  el.addEventListener('drift:slidechange', function(e) {
+    document.getElementById('current-index').textContent = e.detail.activeIndex + 1;
+    var pct = Math.round(e.detail.progress * 100);
+    document.getElementById('current-progress').textContent = pct + '%';
+  });
+&lt;/script&gt;</code></pre>
+      </div>
+
+      <h2 class="demo-section-title" data-i18n-en>Bundler Usage</h2>
+      <h2 class="demo-section-title" data-i18n-zh>打包工具用法</h2>
+      <div class="code-block">
+        <span class="code-lang">js</span>
+        <pre><code class="language-javascript">import 'drift-slider-element/define';
+import { registerModules } from 'drift-slider-element';
+import { Navigation, Pagination } from 'drift-slider/modules';
+import 'drift-slider/css/bundle';
+
+registerModules({ Navigation, Pagination });</code></pre>
+      </div>
+    </div>
+  </div>
+  <div data-include="../_includes/footer.html"></div>
+
+  <!-- Load the core UMD for DriftSlider globals, then the element IIFE via CDN -->
+  <script src="../assets/lib/drift-slider.umd.js"></script>
+  <script src="https://unpkg.com/drift-slider-element" defer></script>
+  <script src="../assets/js/prism.js"></script>
+  <script src="../assets/js/docs.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      var el = document.querySelector('drift-slider');
+      if (!el) return;
+      el.addEventListener('drift:slidechange', function(e) {
+        var idx = e.detail.activeIndex + 1;
+        var idxEl = document.getElementById('current-index');
+        var idxElZh = document.getElementById('current-index-zh');
+        if (idxEl) idxEl.textContent = idx;
+        if (idxElZh) idxElZh.textContent = idx;
+        var pct = Math.round(e.detail.progress * 100);
+        var progEl = document.getElementById('current-progress');
+        if (progEl) progEl.textContent = pct + '%';
+      });
+    });
+  </script>
+</body>
+</html>
