@@ -319,6 +319,7 @@ declare module 'drift-slider' {
   export const A11y: DriftSliderModule;
   export const EffectCreative: DriftSliderModule;
   export const EffectShowcase: DriftSliderModule;
+  export const EffectDeck: DriftSliderModule;
   export const Thumbs: DriftSliderModule;
   export const ScrollAos: DriftSliderModule;
 

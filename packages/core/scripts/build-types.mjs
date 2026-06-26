@@ -30,7 +30,7 @@ export default DriftSlider;
 const moduleNames = [
   'Navigation', 'Pagination', 'Autoplay', 'EffectFade',
   'EffectCoverflow', 'EffectCards', 'EffectCreative', 'EffectShowcase',
-  'Keyboard', 'A11y', 'ScrollAos', 'Thumbs',
+  'EffectDeck', 'Keyboard', 'A11y', 'ScrollAos', 'Thumbs',
 ];
 const moduleExports = moduleNames.map(n => `export { ${n} } from '../index';`).join('\n');
 writeFileSync('dist/types/modules/index.d.ts', moduleExports + '\n');
@@ -45,6 +45,7 @@ const moduleMap = {
   'effect-cards': 'EffectCards',
   'effect-creative': 'EffectCreative',
   'effect-showcase': 'EffectShowcase',
+  'effect-deck': 'EffectDeck',
   keyboard: 'Keyboard',
   a11y: 'A11y',
   'scroll-aos': 'ScrollAos',
