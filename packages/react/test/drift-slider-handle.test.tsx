@@ -28,4 +28,28 @@ describe('DriftSlider ref + events', () => {
     expect(handle!.instance!.activeIndex).toBe(1);
     expect(onSlideChange).toHaveBeenCalled();
   });
+
+  it('handle methods do not throw when the slider is not mounted', async () => {
+    let handle: DriftSliderHandle | null = null;
+    function App() {
+      const ref = useRef<DriftSliderHandle>(null);
+      queueMicrotask(() => { handle = ref.current; });
+      return (
+        <DriftSlider ref={ref}>
+          <Slide>a</Slide>
+        </DriftSlider>
+      );
+    }
+    const { unmount } = render(<App />);
+    await vi.waitFor(() => expect(handle).toBeTruthy());
+    unmount(); // destroys the slider; sliderRef.current is now null
+
+    expect(handle!.instance).toBeNull();
+    // slideTo/slideNext/slidePrev/update must all guard the null instance
+    expect(() => handle!.slideNext(0)).not.toThrow();
+    expect(() => handle!.slidePrev(0)).not.toThrow();
+    expect(() => handle!.slideTo(0)).not.toThrow();
+    expect(() => handle!.update()).not.toThrow();
+    expect(handle!.slideNext(0)).toBeUndefined();
+  });
 });

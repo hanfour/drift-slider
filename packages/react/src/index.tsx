@@ -48,9 +48,9 @@ export function useDriftSlider(
 }
 
 export interface DriftSliderHandle {
-  slideTo: CoreDriftSlider['slideTo'];
-  slideNext: CoreDriftSlider['slideNext'];
-  slidePrev: CoreDriftSlider['slidePrev'];
+  slideTo: (...args: Parameters<CoreDriftSlider['slideTo']>) => CoreDriftSlider | undefined;
+  slideNext: (...args: Parameters<CoreDriftSlider['slideNext']>) => CoreDriftSlider | undefined;
+  slidePrev: (...args: Parameters<CoreDriftSlider['slidePrev']>) => CoreDriftSlider | undefined;
   update: () => void;
   instance: CoreDriftSlider | null;
 }
@@ -102,39 +102,27 @@ export const DriftSlider = forwardRef<DriftSliderHandle, DriftSliderProps>(
       handlersRef.current = handlers;
     });
 
-    const containerRef = useRef<HTMLDivElement>(null);
-    const sliderRef = useRef<CoreDriftSlider | null>(null);
-
-    useEffect(() => {
-      const el = containerRef.current;
-      if (!el) return;
-      // Register stable forwarders that read the latest handler from the ref on
-      // each emit — covers the shortcut events plus any keys present at init.
-      const eventNames = new Set<string>([
-        ...Object.values(SHORTCUTS),
-        ...Object.keys(handlersRef.current),
-      ]);
-      const forwarders: Record<string, (...args: unknown[]) => void> = {};
-      eventNames.forEach((name) => {
-        forwarders[name] = (...args) => {
-          const map = handlersRef.current as Record<string, ((...a: unknown[]) => void) | undefined>;
-          map[name]?.(...args);
-        };
-      });
-      const slider = new CoreDriftSlider(el, {
-        ...options,
-        modules: [...(options?.modules ?? []), ...(modules ?? [])],
-        on: forwarders as Partial<DriftSliderEvents>,
-      });
-      sliderRef.current = slider;
-      return () => {
-        slider.destroy();
-        sliderRef.current = null;
+    // Stable forwarders read the latest handler from the ref on each emit —
+    // cover the shortcut events plus any keys present on the handler map.
+    const forwarders: Record<string, (...args: unknown[]) => void> = {};
+    new Set<string>([...Object.values(SHORTCUTS), ...Object.keys(handlers)]).forEach((name) => {
+      forwarders[name] = (...args) => {
+        const map = handlersRef.current as Record<string, ((...a: unknown[]) => void) | undefined>;
+        map[name]?.(...args);
       };
-      // re-init only when options/modules identity changes
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [options, modules]);
+    });
 
+    const sliderOptions: DriftSliderOptions = {
+      ...options,
+      modules: [...(options?.modules ?? []), ...(modules ?? [])],
+      on: forwarders as Partial<DriftSliderEvents>,
+    };
+
+    // Compose the lifecycle from the shared hook; re-init only when
+    // options/modules identity changes.
+    const [containerRef, sliderRef] = useDriftSlider(sliderOptions, [options, modules]);
+
+    // Recompute on children key-set changes (skip the initial mount).
     const keySig = childrenKeys(children);
     const didMount = useRef(false);
     useEffect(() => {
@@ -146,14 +134,14 @@ export const DriftSlider = forwardRef<DriftSliderHandle, DriftSliderProps>(
     }, [keySig]);
 
     useImperativeHandle(ref, () => ({
-      slideTo: (...args) => sliderRef.current!.slideTo(...args),
-      slideNext: (...args) => sliderRef.current!.slideNext(...args),
-      slidePrev: (...args) => sliderRef.current!.slidePrev(...args),
+      slideTo: (...args) => sliderRef.current?.slideTo(...args),
+      slideNext: (...args) => sliderRef.current?.slideNext(...args),
+      slidePrev: (...args) => sliderRef.current?.slidePrev(...args),
       update: () => sliderRef.current?.update(),
       get instance() {
         return sliderRef.current;
       },
-    }), []);
+    }), [sliderRef]);
 
     return (
       <div className={cx('drift-slider', className)} style={style} ref={containerRef}>
