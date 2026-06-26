@@ -50,6 +50,7 @@ export class DriftSliderElement extends HTMLElement {
     this._slider?.update();
   }
   destroy(): void {
+    this._initPending = false;
     this._slider?.destroy();
     this._slider = null;
   }

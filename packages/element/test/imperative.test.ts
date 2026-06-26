@@ -39,4 +39,13 @@ describe('imperative API', () => {
     expect(el.instance).toBeNull();
     expect(el.isConnected).toBe(true);
   });
+
+  it('destroy() before first init cancels the pending microtask (no zombie slider)', async () => {
+    const el = mount();
+    // _initPending is true here; microtask has NOT run yet
+    el.destroy();
+    // flush the microtask queue — without the fix, _init() would run here
+    await Promise.resolve();
+    expect(el.instance).toBeNull();
+  });
 });
