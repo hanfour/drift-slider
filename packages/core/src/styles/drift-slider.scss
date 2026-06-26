@@ -1,6 +1,11 @@
 @use 'variables' as *;
 @use 'mixins' as *;
 
+// Web Component: avoid a flash of un-transformed slides before upgrade.
+drift-slider:not(:defined) .drift-track {
+  visibility: hidden;
+}
+
 // Core layout
 .drift-slider {
   position: relative;

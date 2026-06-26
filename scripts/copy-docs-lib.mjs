@@ -9,6 +9,7 @@ const files = [
   'packages/core/dist/drift-slider-bundle.css',
   'packages/core/dist/drift-slider.umd.js',
   'packages/core/dist/drift-slider.jquery.js',
+  'packages/element/dist/drift-slider-element.iife.global.js',
 ];
 
 for (const src of files) {

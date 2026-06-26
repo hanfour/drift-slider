@@ -1,0 +1,35 @@
+{
+  "name": "drift-slider-element",
+  "version": "0.1.0",
+  "description": "Official <drift-slider> Web Component for DriftSlider",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" },
+    "./define": { "types": "./dist/define.d.ts", "import": "./dist/define.js" },
+    "./with-css": { "types": "./dist/with-css.d.ts", "import": "./dist/with-css.js" }
+  },
+  "files": ["dist", "src"],
+  "sideEffects": ["./dist/define.js", "./dist/with-css.js", "./dist/drift-slider-element.iife.global.js", "./src/define.ts", "./src/with-css.ts", "./src/cdn.ts", "*.css"],
+  "scripts": {
+    "prebuild": "cd ../core && npm run build && npm run build:css",
+    "build": "tsup",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "drift-slider": ">=0.7.0"
+  },
+  "devDependencies": {
+    "drift-slider": "*",
+    "tsup": "^8.0.0",
+    "typescript": "^5.4.0",
+    "vitest": "^4.1.0",
+    "jsdom": "^29.0.0"
+  },
+  "keywords": ["web-component", "custom-element", "slider", "carousel", "drift-slider"],
+  "license": "MIT"
+}
