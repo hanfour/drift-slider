@@ -2,6 +2,7 @@ import CoreDriftSlider from 'drift-slider';
 import type { DriftSliderOptions, DriftSliderModule } from 'drift-slider';
 import { OBSERVED_ATTRIBUTES, OPTION_ATTRS, MODULE_ATTRS, coerceAttr, attrToOption } from './attributes';
 import { resolveModuleNames, moduleForEffect } from './registry';
+import { CORE_EVENTS, eventName, buildDetail } from './events';
 
 const UPGRADE_PROPS = ['config', 'modules'] as const;
 
@@ -111,15 +112,36 @@ export class DriftSliderElement extends HTMLElement {
     return [...mods];
   }
 
+  private _buildOn(): Record<string, (...args: unknown[]) => void> {
+    const userOn = (this._config.on ?? {}) as Record<string, ((...a: unknown[]) => void) | undefined>;
+    const on: Record<string, (...args: unknown[]) => void> = {};
+    for (const core of CORE_EVENTS) {
+      on[core] = (slider: unknown, ...rest: unknown[]) => {
+        const detail = core === 'destroy'
+          ? {}
+          : buildDetail(slider as Parameters<typeof buildDetail>[0]);
+        this.dispatchEvent(new CustomEvent(eventName(core), { detail, bubbles: true, composed: false }));
+        userOn[core]?.(slider, ...rest);
+      };
+    }
+    return on;
+  }
+
   private _buildOptions(): DriftSliderOptions {
     const fromAttrs = this._attrOptions();
-    // property wins; warn on conflict
+    // property wins; warn on conflict (skip 'on' — it's handled via _buildOn)
     for (const key of Object.keys(this._config)) {
-      if (key in fromAttrs) {
+      if (key !== 'on' && key in fromAttrs) {
         console.warn(`DriftSlider: property config.${key} overrides the conflicting attribute`);
       }
     }
-    return { ...fromAttrs, ...this._config, modules: this._buildModules() };
+    const { on: _omit, ...configRest } = this._config as DriftSliderOptions & { on?: unknown };
+    return {
+      ...fromAttrs,
+      ...configRest,
+      modules: this._buildModules(),
+      on: this._buildOn(),
+    } as DriftSliderOptions;
   }
 
   private _ensureScaffold(): void {
